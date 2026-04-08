@@ -1,2 +1,2 @@
 # internship-program-system
-Sistema de gestión de practicas profesionales de la Universidad Veracruzana.
+Professional Internship Management System of the Universidad Veracruzana.
