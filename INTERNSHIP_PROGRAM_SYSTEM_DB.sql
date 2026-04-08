@@ -1,0 +1,216 @@
+CREATE DATABASE IF NOT EXISTS SPP;
+
+USE SPP;
+
+CREATE TABLE ROL (
+id INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE USUARIO (
+id INT AUTO_INCREMENT PRIMARY KEY,
+correo_institucional VARCHAR(255) NOT NULL UNIQUE,
+contrasena VARCHAR(255) NOT NULL,
+nombre VARCHAR(60) NOT NULL,
+apellido_paterno VARCHAR(60) NOT NULL,
+apellido_materno VARCHAR(60),
+activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE USUARIOS_ROLES (
+usuario_id INT NOT NULL,
+rol_id INT NOT NULL,
+PRIMARY KEY (usuario_id, rol_id),
+CONSTRAINT fk_usuariosroles_usuario
+FOREIGN KEY (usuario_id) REFERENCES USUARIO(id) ON DELETE CASCADE,
+CONSTRAINT fk_usuariosroles_rol
+FOREIGN KEY (rol_id) REFERENCES ROL(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ESTUDIANTE (
+usuario_id INT PRIMARY KEY,
+matricula VARCHAR(10) NOT NULL UNIQUE,
+CONSTRAINT fk_estudiante_usuario 
+FOREIGN KEY (usuario_id) REFERENCES USUARIO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE PROFESOR (
+usuario_id INT PRIMARY KEY,
+numero_personal VARCHAR(6) NOT NULL UNIQUE,
+es_coordinador BOOLEAN NOT NULL DEFAULT FALSE,
+CONSTRAINT fk_profesor_usuario
+FOREIGN KEY (usuario_id) REFERENCES USUARIO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ORGANIZACION_VINCULADA (
+id INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(255) NOT NULL,
+correo VARCHAR(255) NOT NULL UNIQUE,
+telefono VARCHAR(10) NOT NULL,
+direccion TEXT NOT NULL, 
+ciudad VARCHAR(100) NOT NULL,
+sector VARCHAR(255) NOT NULL,
+numero_usuarios_directos INT,
+numero_usuarios_indirectos INT,
+activo BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE RESPONSABLE_PROYECTO (
+id INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(60) NOT NULL,
+apellido_paterno VARCHAR(60) NOT NULL,
+apellido_materno VARCHAR(60),
+correo VARCHAR(255) NOT NULL UNIQUE,
+cargo VARCHAR(255) NOT NULL,
+organizacion_id INT NOT NULL,
+CONSTRAINT fk_responsableproyecto_organizacion
+FOREIGN KEY (organizacion_id) REFERENCES ORGANIZACION_VINCULADA(id) ON DELETE CASCADE
+);
+
+CREATE TABLE PROYECTO (
+id INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(255) NOT NULL,
+descripcion_general TEXT NOT NULL,
+objetivo_general TEXT NOT NULL,
+objetivos_inmediatos TEXT NOT NULL,
+objetivos_mediatos TEXT NOT NULL,
+metodologia VARCHAR(100) NOT NULL,
+recursos TEXT NOT NULL,
+responsabilidades VARCHAR(255) NOT NULL,
+duracion TIME NOT NULL,
+organizacion_id INT NOT NULL,
+responsable_id INT NOT NULL,
+CONSTRAINT fk_proyecto_organizacion
+FOREIGN KEY (organizacion_id) REFERENCES ORGANIZACION_VINCULADA(id) ON DELETE CASCADE,
+CONSTRAINT fk_proyecto_responsable
+FOREIGN KEY (responsable_id) REFERENCES RESPONSABLE_PROYECTO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ACTIVIDADES_PLAN (
+id INT AUTO_INCREMENT PRIMARY KEY,
+nombre VARCHAR(100) NOT NULL,
+mes VARCHAR(60) NOT NULL,
+semana_inicio INT NOT NULL,
+semana_fin INT NOT NULL,
+proyecto_id INT NOT NULL,
+CONSTRAINT fk_actividadesplan_proyecto
+FOREIGN KEY (proyecto_id) REFERENCES PROYECTO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE HORARIO (
+id INT AUTO_INCREMENT PRIMARY KEY,
+dia_semana ENUM('LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES') NOT NULL,
+hora_entrada TIME NOT NULL,
+hora_salida TIME NOT NULL,
+proyecto_id INT NOT NULL,
+CONSTRAINT fk_horario_proyecto
+FOREIGN KEY (proyecto_id) REFERENCES PROYECTO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE EXPERIENCIA_EDUCATIVA (
+NRC VARCHAR(5) PRIMARY KEY,
+periodo_escolar VARCHAR(25) NOT NULL,
+profesor_id INT NOT NULL,
+CONSTRAINT fk_experienciaeducativa_profesor
+FOREIGN KEY (profesor_id) REFERENCES PROFESOR(usuario_id) ON DELETE CASCADE
+);
+
+CREATE TABLE EXPERIENCIA_ESTUDIANTES (
+NRC VARCHAR(5) NOT NULL,
+estudiante_id INT NOT NULL,
+PRIMARY KEY (NRC, estudiante_id),
+CONSTRAINT fk_experienciaestudiantes_experiencia
+FOREIGN KEY (NRC) REFERENCES EXPERIENCIA_EDUCATIVA(NRC) ON DELETE CASCADE,
+CONSTRAINT fk_experienciaestudiantes_estudiante
+FOREIGN KEY (estudiante_id) REFERENCES ESTUDIANTE(id) ON DELETE CASCADE
+);
+
+CREATE TABLE SOLICITUD_PROYECTO (
+estudiante_id INT NOT NULL,
+proyecto_id INT NOT NULL,
+prioridad TINYINT NOT NULL CHECK (prioridad BETWEEN 1 AND 3),
+PRIMARY KEY (estudiante_id, proyecto_id),
+CONSTRAINT fk_solicitudproyecto_estudiante
+FOREIGN KEY (estudiante_id) REFERENCES ESTUDIANTE(id) ON DELETE CASCADE,
+CONSTRAINT fk_solicitudproyecto_proyecto
+FOREIGN KEY (proyecto_id) REFERENCES PROYECTO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ASIGNACION_PROYECTO (
+estudiante_id INT PRIMARY KEY,
+proyecto_id INT NOT NULL,
+profesor_id INT NOT NULL,
+CONSTRAINT fk_asignacionproyecto_estudiante
+FOREIGN KEY (estudiante_id) REFERENCES ESTUDIANTE(id) ON DELETE CASCADE,
+CONSTRAINT fk_asignacionproyecto_proyecto
+FOREIGN KEY (proyecto_id) REFERENCES PROYECTO(id) ON DELETE CASCADE,
+CONSTRAINT fk_asignacionproyecto_profesor
+FOREIGN KEY (profesor_id) REFERENCES PROFESOR(id) ON DELETE CASCADE
+);
+
+CREATE TABLE DOCUMENTO (
+id INT AUTO_INCREMENT PRIMARY KEY,
+tipo VARCHAR(60) NOT NULL,
+ruta_archivo VARCHAR(255) NOT NULL,
+fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+estado ENUM('pendiente', 'revisado', 'rechazado') NOT NULL DEFAULT 'pendiente',
+fecha_revision TIMESTAMP,
+estudiante_id INT NOT NULL,
+profesor_id INT NOT NULL,
+CONSTRAINT fk_documento_estudiante
+FOREIGN KEY (estudiante_id) REFERENCES ESTUDIANTE(id) ON DELETE CASCADE,
+CONSTRAINT fk_documento_profesor
+FOREIGN KEY (profesor_id) REFERENCES PROFESOR(id) ON DELETE CASCADE
+);
+
+CREATE TABLE REPORTE (
+id INT AUTO_INCREMENT PRIMARY KEY,
+numero INT NOT NULL,
+fecha DATE NOT NULL,
+observaciones_generales TEXT,
+tipo ENUM('parcial','mensual','final') NOT NULL,
+estado ENUM('pendiente', 'revisado', 'rechazado') NOT NULL DEFAULT 'pendiente',
+ruta_archivo VARCHAR(255),
+fecha_revision TIMESTAMP,
+estudiante_id INT NOT NULL,
+profesor_id INT NOT NULL,
+proyecto_id INT NOT NULL,
+CONSTRAINT fk_reporte_estudiante
+FOREIGN KEY (estudiante_id) REFERENCES ESTUDIANTE(id) ON DELETE CASCADE,
+CONSTRAINT fk_reporte_profesor
+FOREIGN KEY (profesor_id) REFERENCES PROFESOR(id) ON DELETE CASCADE,
+CONSTRAINT fk_reporte_proyecto
+FOREIGN KEY (proyecto_id) REFERENCES PROYECTO(id) ON DELETE CASCADE
+);
+
+CREATE TABLE REPORTE_ENTREGABLES (
+id INT AUTO_INCREMENT PRIMARY KEY,
+resultado_entregable TEXT NOT NULL,
+porcentaje_avance VARCHAR(5) NOT NULL,
+observaciones_particulares TEXT NOT NULL,
+reporte_id INT NOT NULL,
+CONSTRAINT fk_entregable_reporte
+FOREIGN KEY (reporte_id) REFERENCES REPORTE (id) ON DELETE CASCADE
+);
+
+CREATE TABLE REPORTE_AVANCES (
+id INT AUTO_INCREMENT PRIMARY KEY,
+periodo VARCHAR(60) NOT NULL,
+mes TINYINT NOT NULL,
+horas_reportadas INT NOT NULL,
+porcentaje_avance VARCHAR(5) NOT NULL,
+observaciones_particulares TEXT NOT NULL,
+resultados_obtenidos_momento TEXT,
+reporte_id INT NOT NULL,
+CONSTRAINT fk_reporte_avances
+FOREIGN KEY (reporte_id) REFERENCES REPORTE(id) ON DELETE CASCADE
+);
+
+CREATE TABLE AVANCE_SEMANAL (
+id INT AUTO_INCREMENT PRIMARY KEY,
+numero_semana INT NOT NULL,
+es_real BOOLEAN NOT NULL,
+proyecto_id INT NOT NULL,
+CONSTRAINT fk_avancesemanal_proyecto
+FOREIGN KEY (proyecto_id) REFERENCES PROYECTO(id) ON DELETE CASCADE
+);
