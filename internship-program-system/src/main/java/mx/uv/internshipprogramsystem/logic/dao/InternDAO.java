@@ -10,20 +10,6 @@ import java.sql.SQLTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
-
-import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
-import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import mx.uv.internshipprogramsystem.logic.interfaces.IInternDAO;
-import mx.uv.internshipprogramsystem.logic.validations.InternValidator;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.SQLTransientConnectionException;
-import java.util.ArrayList;
-import java.util.List;
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IInternDAO;

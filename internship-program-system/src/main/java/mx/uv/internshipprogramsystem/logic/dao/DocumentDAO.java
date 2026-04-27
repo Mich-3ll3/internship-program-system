@@ -1,26 +1,26 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
 import mx.uv.internshipprogramsystem.logic.dto.DocumentDTO;
-import mx.uv.internshipprogramsystem.logic.exceptions.DocumentException;
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.logic.interfaces.IDocumentDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.logging.Logger;
-import mx.uv.internshipprogramsystem.logic.interfaces.IDocumentDAO;
 
 public class DocumentDAO implements IDocumentDAO {
-    private static final Logger LOGGER = Logger.getLogger(DocumentDAO.class.getName());
+
+    private static final Logger logger = LoggerFactory.getLogger(DocumentDAO.class);
 
     @Override
-    public boolean insert(DocumentDTO document) throws DocumentException {
-        boolean operationSuccessful = false;
+    public boolean insert(DocumentDTO document) throws BusinessException {
         String insertDocumentQuery = "INSERT INTO DOCUMENTO (nombre, tipo, ruta) VALUES (?, ?, ?)";
-
-        try (Connection Connection = DataBaseManager.getConnection();
-             PreparedStatement insertDocumentStatement = Connection.prepareStatement(insertDocumentQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement insertDocumentStatement = connection.prepareStatement(insertDocumentQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
 
             insertDocumentStatement.setString(1, document.getName());
             insertDocumentStatement.setString(2, document.getType());
@@ -33,55 +33,64 @@ public class DocumentDAO implements IDocumentDAO {
                         document.setId(generatedKeys.getInt(1));
                     }
                 }
-                operationSuccessful = true;
+                logger.info("Documento '{}' insertado correctamente con id {}", document.getName(), document.getId());
+                return true;
+            } else {
+                logger.warn("No se insertó el documento '{}'", document.getName());
+                return false;
             }
-        } catch (SQLException exception) {
-            throw new DocumentException("Error inserting document", exception);
+        } catch (SQLException sqlException) {
+            logger.error("Error insertando documento '{}'", document.getName(), sqlException);
+            throw new BusinessException("Error insertando documento " + document.getName(), sqlException);
         }
-        return operationSuccessful;
     }
 
     @Override
-    public DocumentDTO findById(int id) throws DocumentException {
-        DocumentDTO documentResult = null;
+    public DocumentDTO findById(int id) throws BusinessException {
         String selectDocumentById = "SELECT * FROM DOCUMENTO WHERE id = ?";
-
-        try (Connection Connection = DataBaseManager.getConnection();
-             PreparedStatement statementSelectDocument = Connection.prepareStatement(selectDocumentById)) {
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement statementSelectDocument = connection.prepareStatement(selectDocumentById)) {
 
             statementSelectDocument.setInt(1, id);
             try (ResultSet resultSetDocument = statementSelectDocument.executeQuery()) {
                 if (resultSetDocument.next()) {
-                    documentResult = new DocumentDTO(
+                    DocumentDTO documentResult = new DocumentDTO(
                         resultSetDocument.getInt("id"),
                         resultSetDocument.getString("nombre"),
                         resultSetDocument.getString("tipo"),
                         resultSetDocument.getString("ruta")
                     );
+                    logger.info("Documento encontrado con id {}", id);
+                    return documentResult;
+                } else {
+                    logger.warn("No se encontró documento con id {}", id);
+                    return null;
                 }
             }
-        } catch (SQLException exception) {
-            throw new DocumentException("Error finding document with id " + id, exception);
+        } catch (SQLException sqlException) {
+            logger.error("Error buscando documento con id {}", id, sqlException);
+            throw new BusinessException("Error buscando documento con id " + id, sqlException);
         }
-        return documentResult;
     }
 
     @Override
-    public boolean delete(int id) throws DocumentException {
-        boolean operationSuccessful = false;
+    public boolean delete(int id) throws BusinessException {
         String deleteDocumentById = "DELETE FROM DOCUMENTO WHERE id = ?";
-
-        try (Connection Connection = DataBaseManager.getConnection();
-             PreparedStatement deleteDocumentStatement = Connection.prepareStatement(deleteDocumentById)) {
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement deleteDocumentStatement = connection.prepareStatement(deleteDocumentById)) {
 
             deleteDocumentStatement.setInt(1, id);
             int affectedRows = deleteDocumentStatement.executeUpdate();
             if (affectedRows > 0) {
-                operationSuccessful = true;
+                logger.info("Documento con id {} eliminado correctamente", id);
+                return true;
+            } else {
+                logger.warn("No se eliminó documento con id {}", id);
+                return false;
             }
-        } catch (SQLException exception) {
-            throw new DocumentException("Error deleting document with id " + id, exception);
+        } catch (SQLException sqlException) {
+            logger.error("Error eliminando documento con id {}", id, sqlException);
+            throw new BusinessException("Error eliminando documento con id " + id, sqlException);
         }
-        return operationSuccessful;
     }
 }

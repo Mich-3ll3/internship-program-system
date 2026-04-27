@@ -1,80 +1,86 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
 import mx.uv.internshipprogramsystem.logic.dto.ProjectAssignmentDTO;
-import mx.uv.internshipprogramsystem.logic.exceptions.ProjectAssignmentException;
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.logic.interfaces.IProjectAssignmentDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import mx.uv.internshipprogramsystem.logic.interfaces.IProjectAssignmentDAO;
 
 public class ProjectAssignmentDAO implements IProjectAssignmentDAO {
 
-    @Override
-    public boolean insert(ProjectAssignmentDTO assignment) throws ProjectAssignmentException {
-        boolean operationSuccessful = false;
-        String insertAssignmentQuery = "INSERT INTO ASIGNACION_PROYECTO (estudiante_id, proyecto_id, fecha_asignacion) VALUES (?, ?, ?)";
+    private static final Logger logger = LoggerFactory.getLogger(ProjectAssignmentDAO.class);
 
-        try (Connection Connection = DataBaseManager.getConnection();
-             PreparedStatement insertAssignmentStatement = Connection.prepareStatement(insertAssignmentQuery)) {
+    @Override
+    public boolean insert(ProjectAssignmentDTO assignment) throws BusinessException {
+        String insertAssignmentQuery = "INSERT INTO ASIGNACION_PROYECTO (estudiante_id, proyecto_id, fecha_asignacion) VALUES (?, ?, ?)";
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement insertAssignmentStatement = connection.prepareStatement(insertAssignmentQuery)) {
 
             insertAssignmentStatement.setInt(1, assignment.getStudentId());
             insertAssignmentStatement.setInt(2, assignment.getProjectId());
             insertAssignmentStatement.setString(3, assignment.getAssignmentDate());
 
             int affectedRows = insertAssignmentStatement.executeUpdate();
-            if (affectedRows > 0) {
-                operationSuccessful = true;
-            }
-        } catch (SQLException exception) {
-            throw new ProjectAssignmentException("Error inserting project assignment", exception);
+            logger.info("Asignación insertada: estudiante {} → proyecto {}", assignment.getStudentId(), assignment.getProjectId());
+            return affectedRows > 0;
+        } catch (SQLException sqlException) {
+            logger.error("Error insertando asignación estudiante {} → proyecto {}", assignment.getStudentId(), assignment.getProjectId(), sqlException);
+            throw new BusinessException("Error insertando asignación de proyecto", sqlException);
         }
-        return operationSuccessful;
     }
 
     @Override
-    public ProjectAssignmentDTO findById(int id) throws ProjectAssignmentException {
-        ProjectAssignmentDTO assignmentResult = null;
+    public ProjectAssignmentDTO findById(int id) throws BusinessException {
         String selectAssignmentQuery = "SELECT id, estudiante_id, proyecto_id, fecha_asignacion FROM ASIGNACION_PROYECTO WHERE id = ?";
-
-        try (Connection Connection = DataBaseManager.getConnection();
-             PreparedStatement statementSelectAssignment = Connection.prepareStatement(selectAssignmentQuery)) {
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement statementSelectAssignment = connection.prepareStatement(selectAssignmentQuery)) {
 
             statementSelectAssignment.setInt(1, id);
             try (ResultSet resultSetAssignment = statementSelectAssignment.executeQuery()) {
                 if (resultSetAssignment.next()) {
-                    assignmentResult = new ProjectAssignmentDTO(
+                    ProjectAssignmentDTO assignmentResult = new ProjectAssignmentDTO(
                         resultSetAssignment.getInt("id"),
                         resultSetAssignment.getInt("estudiante_id"),
                         resultSetAssignment.getInt("proyecto_id"),
                         resultSetAssignment.getString("fecha_asignacion")
                     );
+                    logger.info("Asignación encontrada con id {}", id);
+                    return assignmentResult;
+                } else {
+                    logger.warn("No se encontró asignación con id {}", id);
+                    return null;
                 }
             }
-        } catch (SQLException exception) {
-            throw new ProjectAssignmentException("Error finding project assignment with id " + id, exception);
+        } catch (SQLException sqlException) {
+            logger.error("Error buscando asignación con id {}", id, sqlException);
+            throw new BusinessException("Error buscando asignación con id " + id, sqlException);
         }
-        return assignmentResult;
     }
 
     @Override
-    public boolean delete(int id) throws ProjectAssignmentException {
-        boolean operationSuccessful = false;
+    public boolean delete(int id) throws BusinessException {
         String deleteAssignmentById = "DELETE FROM ASIGNACION_PROYECTO WHERE id = ?";
-
-        try (Connection Connection = DataBaseManager.getConnection();
-             PreparedStatement deleteAssignmentStatement = Connection.prepareStatement(deleteAssignmentById)) {
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement deleteAssignmentStatement = connection.prepareStatement(deleteAssignmentById)) {
 
             deleteAssignmentStatement.setInt(1, id);
             int affectedRows = deleteAssignmentStatement.executeUpdate();
             if (affectedRows > 0) {
-                operationSuccessful = true;
+                logger.info("Asignación con id {} eliminada correctamente", id);
+                return true;
+            } else {
+                logger.warn("No se eliminó asignación con id {}", id);
+                return false;
             }
-        } catch (SQLException exception) {
-            throw new ProjectAssignmentException("Error deleting project assignment with id " + id, exception);
+        } catch (SQLException sqlException) {
+            logger.error("Error eliminando asignación con id {}", id, sqlException);
+            throw new BusinessException("Error eliminando asignación con id " + id, sqlException);
         }
-        return operationSuccessful;
     }
 }
