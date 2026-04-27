@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.sql.SQLTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
