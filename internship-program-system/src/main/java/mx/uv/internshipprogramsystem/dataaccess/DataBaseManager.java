@@ -1,14 +1,7 @@
 package mx.uv.internshipprogramsystem.dataaccess;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Properties;
-
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,12 +13,15 @@ public class DataBaseManager {
     private static String password;
 
     static {
-        Properties props = new Properties();
-        try (FileInputStream fis = new FileInputStream("db.properties")) {
-            props.load(fis);
-            url = props.getProperty("db.url");
-            user = props.getProperty("db.user");
-            password = props.getProperty("db.password");
+        Properties properties = new Properties();
+        try (InputStream input = DataBaseManager.class.getClassLoader().getResourceAsStream("db.properties")) {
+            if (input == null) {
+                throw new RuntimeException("No se encontró db.properties en el classpath");
+            }
+            properties.load(input);
+            url = properties.getProperty("db.url");
+            user = properties.getProperty("db.user");
+            password = properties.getProperty("db.password");
         } catch (IOException e) {
             e.printStackTrace();
         }

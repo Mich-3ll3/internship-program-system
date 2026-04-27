@@ -6,27 +6,33 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.SQLTransientConnectionException;
+import java.sql.Statement;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IUserDAO;
+import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
+import mx.uv.internshipprogramsystem.logic.validations.PasswordValidator;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
 
 public class UserDAO implements IUserDAO{
-    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserDAO.class);
     
     public UserDAO() {
     }
     
-    public boolean create(UserDTO user, String plainPassword) throws BusinessException {
+    public int create(UserDTO user, String plainPassword) throws BusinessException {
         String insertUserQuery = "INSERT INTO USUARIO (correo_institucional, contrasena, nombre, "
                                + "apellido_paterno, apellido_materno, activo, rol) "
-                               + "VALUES (?,SHA(?,256),?,?,?,?,?)";
+                               + "VALUES (?,SHA2(?,256),?,?,?,?,?)";
         
         UserValidator validator = new UserValidator();
         validator.validateUserForCreation(user, plainPassword);
         try (Connection connection = DataBaseManager.getConnection();
-                PreparedStatement insertUserStatement = connection.prepareStatement(insertUserQuery)) {
+                PreparedStatement insertUserStatement = connection.prepareStatement(
+                        insertUserQuery, Statement.RETURN_GENERATED_KEYS)) {
 
             insertUserStatement.setString(1, user.getInstitucionalEmail());
             insertUserStatement.setString(2, plainPassword);
@@ -36,13 +42,34 @@ public class UserDAO implements IUserDAO{
             insertUserStatement.setBoolean(6, user.getIsActive());
             insertUserStatement.setString(7, user.getRol().name());
 
-            return insertUserStatement.executeUpdate() > 0;
-        } catch (SQLException sqlException) {
-            throw new BusinessException("Error creando el usuario " + user.getInstitucionalEmail(), sqlException);
+            int affectedRows = insertUserStatement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new BusinessException("No se pudo crear el usuario " + user.getInstitucionalEmail());
+            }
+
+            try (ResultSet generatedKeys = insertUserStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    throw new BusinessException("No se pudo obtener el ID del usuario creado.");
+                }
+            }    
+        } catch (SQLIntegrityConstraintViolationException integrityException) {
+            LOGGER.error("Violación de integridad al crear usuario", integrityException);
+            throw new BusinessException("El correo institucional ya existe.", integrityException);
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new BusinessException("No se pudo establecer conexión con la base de datos.", connectionException);
+        } catch (SQLException insertException) {
+            LOGGER.error("Error SQL al crear usuario {}", user.getInstitucionalEmail(), insertException);
+            throw new BusinessException("Error creando el usuario " + user.getInstitucionalEmail(), insertException);
         }
     }
 
     public boolean update(UserDTO user) throws BusinessException {
+        UserValidator validator = new UserValidator();
+        validator.validateUserForUpdate(user);
         String updateUserQuery = "UPDATE USUARIO SET nombre=?, apellido_paterno=?, apellido_materno=?, "
                                + "activo=?, rol=? WHERE correo_institucional=?";
         try (Connection connection = DataBaseManager.getConnection();
@@ -55,24 +82,39 @@ public class UserDAO implements IUserDAO{
             updateUserStatement.setString(6, user.getInstitucionalEmail());
 
             return updateUserStatement.executeUpdate() > 0;
-        } catch (SQLException sqlException) {
-            throw new BusinessException("Error actualizando usuario " + user.getInstitucionalEmail(), sqlException);
+        } catch (SQLIntegrityConstraintViolationException integrityException) {
+            LOGGER.error("Violación de integridad al actualizar usuario", integrityException);
+            throw new BusinessException("Datos inválidos al actualizar usuario.", integrityException);
+        } catch (SQLException updateException) {
+            LOGGER.error("Error SQL al actualizar usuario {}", user.getInstitucionalEmail(), updateException);
+            throw new BusinessException("Error actualizando usuario " + user.getInstitucionalEmail(), updateException);
         }
     }
     
     public boolean changeStatus(String email, boolean isActive) throws BusinessException {
+        InputValidator.validateNotEmpty(email, "El correo institucional no puede ser nulo o vacío.");
         String changeUserStatusQuery = "UPDATE USUARIO SET activo=? WHERE correo_institucional=?";
         try (Connection connection = DataBaseManager.getConnection();
                 PreparedStatement changeUserStatusStatement = connection.prepareStatement(changeUserStatusQuery)) {
             changeUserStatusStatement.setBoolean(1, isActive);
             changeUserStatusStatement.setString(2, email);
+            
             return changeUserStatusStatement.executeUpdate() > 0;
-        } catch (SQLException sqlException) {
-            throw new BusinessException("Error cambiando estado del usuario " + email, sqlException);
-        }
+        
+        } catch (SQLException statusException) {
+            LOGGER.error("Error SQL al cambiar estado del usuario {}", email, statusException);
+            throw new BusinessException("Error cambiando estado del usuario " + email, statusException);
+    }
+
     }
 
     public boolean login(String email, String plainPassword) throws BusinessException {
+        UserValidator validator = new UserValidator();
+        validator.validateEmailFormat(email);
+
+        PasswordValidator passwordValidator = new PasswordValidator();
+        passwordValidator.validatePassword(plainPassword);
+        
         String loginUserQuery = "SELECT COUNT(*) FROM USUARIO WHERE correo_institucional=? AND contrasena=SHA2(?,256)";
         try (Connection connection = DataBaseManager.getConnection();
                 PreparedStatement loginUserStatement = connection.prepareStatement(loginUserQuery)) {
@@ -86,6 +128,7 @@ public class UserDAO implements IUserDAO{
                 return false;
             }
         } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al verificar login para {}", email, sqlException);
             throw new BusinessException("Error verificando login para " + email, sqlException);
         }
     }
