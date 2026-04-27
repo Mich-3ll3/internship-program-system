@@ -1,6 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
-import mx.uv.internshipprogramsystem.logic.interfaces.IProjectAssignment;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectAssignmentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.ProjectAssignmentException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
@@ -9,8 +8,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import mx.uv.internshipprogramsystem.logic.interfaces.IProjectAssignmentDAO;
 
-public class ProjectAssignmentDAO implements IProjectAssignment {
+public class ProjectAssignmentDAO implements IProjectAssignmentDAO {
 
     @Override
     public boolean insert(ProjectAssignmentDTO assignment) throws ProjectAssignmentException {

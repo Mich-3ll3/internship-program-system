@@ -1,16 +1,15 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
-import mx.uv.internshipprogramsystem.logic.interfaces.IProjectResponsible;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.ProjectResponsibleException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import mx.uv.internshipprogramsystem.logic.interfaces.IProjectResponsibleDAO;
 
-public class ProjectResponsibleDAO implements IProjectResponsible {
+public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
 
     @Override
     public boolean insert(ProjectResponsibleDTO responsible) throws ProjectResponsibleException {

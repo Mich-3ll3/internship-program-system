@@ -1,6 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
-import mx.uv.internshipprogramsystem.logic.interfaces.IProjectRequest;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectRequestDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.ProjectRequestException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
@@ -11,8 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import mx.uv.internshipprogramsystem.logic.interfaces.IProjectRequestDAO;
 
-public class ProjectRequestDAO implements IProjectRequest {
+public class ProjectRequestDAO implements IProjectRequestDAO {
 
     @Override
     public boolean insert(ProjectRequestDTO request) throws ProjectRequestException {

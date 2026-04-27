@@ -1,6 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
-import mx.uv.internshipprogramsystem.logic.interfaces.IDocument;
 import mx.uv.internshipprogramsystem.logic.dto.DocumentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.DocumentException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
@@ -10,8 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
+import mx.uv.internshipprogramsystem.logic.interfaces.IDocumentDAO;
 
-public class DocumentDAO implements IDocument {
+public class DocumentDAO implements IDocumentDAO {
     private static final Logger LOGGER = Logger.getLogger(DocumentDAO.class.getName());
 
     @Override

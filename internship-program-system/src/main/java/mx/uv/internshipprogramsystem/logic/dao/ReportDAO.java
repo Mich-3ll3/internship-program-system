@@ -1,6 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
-import mx.uv.internshipprogramsystem.logic.interfaces.IReport;
 import mx.uv.internshipprogramsystem.logic.dto.ReportDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.ReportException;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
@@ -10,8 +9,9 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import mx.uv.internshipprogramsystem.logic.interfaces.IReportDAO;
 
-public class ReportDAO implements IReport {
+public class ReportDAO implements IReportDAO {
 
     @Override
     public boolean registerReport(ReportDTO report) throws ReportException {
