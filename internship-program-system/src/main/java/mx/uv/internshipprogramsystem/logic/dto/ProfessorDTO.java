@@ -19,6 +19,13 @@ public class ProfessorDTO extends UserDTO{
         this.staffNumber = staffNumber;
         this.isCoordinator = isCoordinator;
     }
+    
+    public ProfessorDTO(int staffNumber, boolean isCoordinator, Integer id, String institucionalEmail, String name, String firstSurname, String secondSurname, Boolean isActive) {
+        super(id, institucionalEmail, name, firstSurname, secondSurname, isActive, null);
+        this.staffNumber = staffNumber;
+        this.isCoordinator = isCoordinator;
+    }
+
 
     public int getStaffNumber() {
         return staffNumber;
