@@ -1,5 +1,6 @@
 package mx.uv.internshipprogramsystem.dataaccess;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,16 +13,16 @@ public class DataBaseManager {
     private static String password;
 
     static {
-        Properties props = new Properties();
+        Properties properties = new Properties();
         try (InputStream input = DataBaseManager.class.getClassLoader().getResourceAsStream("db.properties")) {
             if (input == null) {
-                throw new RuntimeException("No se encontró el archivo db.properties en el classpath");
+                throw new RuntimeException("No se encontró db.properties en el classpath");
             }
-            props.load(input);
-            url = props.getProperty("db.url");
-            user = props.getProperty("db.user");
-            password = props.getProperty("db.password");
-        } catch (Exception e) {
+            properties.load(input);
+            url = properties.getProperty("db.url");
+            user = properties.getProperty("db.user");
+            password = properties.getProperty("db.password");
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

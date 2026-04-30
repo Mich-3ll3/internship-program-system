@@ -15,6 +15,11 @@ public class InternDTO extends UserDTO{
         super(id, institucionalEmail, name, firstSurname, secondSurname, isActive, rol);
         this.enrollmentNumber = enrollmentNumber;
     }
+    
+    public InternDTO(String enrollmentNumber, Integer id, String institucionalEmail, String name, String firstSurname, String secondSurname, Boolean isActive) {
+        super(id, institucionalEmail, name, firstSurname, secondSurname, isActive, null);
+        this.enrollmentNumber = enrollmentNumber;
+    }
 
     public String getEnrollmentNumber() {
         return enrollmentNumber;

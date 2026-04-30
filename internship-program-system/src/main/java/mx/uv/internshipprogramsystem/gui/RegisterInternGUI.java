@@ -4,12 +4,11 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -22,6 +21,8 @@ import mx.uv.internshipprogramsystem.logic.dto.RolUsuario;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
 import mx.uv.internshipprogramsystem.logic.validations.InternValidator;
+import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
+import mx.uv.internshipprogramsystem.logic.dao.InternDAO;
 
 public class RegisterInternGUI extends Application {
 
@@ -38,7 +39,7 @@ public class RegisterInternGUI extends Application {
         primaryStage.setTitle("Registrar Estudiante");
 
         VBox root = new VBox(20);
-        root.setPadding(new Insets(20, 20, 20, 20));
+        root.setPadding(new Insets(20));
         root.setAlignment(Pos.CENTER);
 
         Label labelTitle = new Label("Registro de Estudiante");
@@ -49,77 +50,88 @@ public class RegisterInternGUI extends Application {
         grid.setVgap(12);
         grid.setAlignment(Pos.CENTER);
 
-        textFieldEmail = new TextField();
+        textFieldEmail = createTextField(grid, "Correo institucional:", 0);
         passwordField = new PasswordField();
-        textFieldName = new TextField();
-        textFieldFirstSurname = new TextField();
-        textFieldSecondSurname = new TextField();
-        textFieldEnrollment = new TextField();
+        grid.add(new Label("Contraseña:"), 0, 1);
+        grid.add(passwordField, 1, 1);
 
-        addFormField(grid, "Correo (@uv.mx):", textFieldEmail, 0);
-        addFormField(grid, "Contraseña:", passwordField, 1);
-        addFormField(grid, "Nombre(s):", textFieldName, 2);
-        addFormField(grid, "Apellido Paterno:", textFieldFirstSurname, 3);
-        addFormField(grid, "Apellido Materno:", textFieldSecondSurname, 4);
-        addFormField(grid, "Matrícula:", textFieldEnrollment, 5);
+        textFieldName = createTextField(grid, "Nombre:", 2);
+        textFieldFirstSurname = createTextField(grid, "Apellido paterno:", 3);
+        textFieldSecondSurname = createTextField(grid, "Apellido materno:", 4);
+        textFieldEnrollment = createTextField(grid, "Matrícula:", 5);
 
-        buttonRegister = new Button("Registrar Estudiante");
-        buttonRegister.setMinWidth(150);
-        buttonRegister.setOnAction(e -> handleRegistration());
+        buttonRegister = new Button("Registrar");
+        buttonRegister.setOnAction(e -> handleRegister());
 
         root.getChildren().addAll(labelTitle, grid, buttonRegister);
 
-        Scene scene = new Scene(root, 450, 550);
+        Scene scene = new Scene(root, 400, 400);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
 
-    private void addFormField(GridPane grid, String labelText, TextField field, int row) {
-        grid.add(new Label(labelText), 0, row);
-        grid.add(field, 1, row);
+    private TextField createTextField(GridPane grid, String label, int row) {
+        Label fieldLabel = new Label(label);
+        TextField textField = new TextField();
+        grid.add(fieldLabel, 0, row);
+        grid.add(textField, 1, row);
+        return textField;
     }
 
-    private void handleRegistration() {
+    private void handleRegister() {
         try {
-            String institutionalEmail = textFieldEmail.getText();
-            String plainPassword = passwordField.getText();
-            String enrollmentNumber = textFieldEnrollment.getText();
-
-            UserDTO user = new UserDTO();
-            user.setInstitucionalEmail(institutionalEmail);
-            user.setName(textFieldName.getText());
-            user.setFirstSurname(textFieldFirstSurname.getText());
-            user.setSecondSurname(textFieldSecondSurname.getText());
-            user.setIsActive(true);
-            user.setRol(RolUsuario.ESTUDIANTE);
-
-            InternDTO intern = new InternDTO();
-            intern.setEnrollmentNumber(enrollmentNumber);
-
+            UserDTO user = new UserDTO(
+                textFieldEmail.getText(),
+                passwordField.getText(),
+                textFieldName.getText(),
+                textFieldFirstSurname.getText(),
+                textFieldSecondSurname.getText(),
+                true,
+                RolUsuario.ESTUDIANTE
+            );
+            
             UserValidator userValidator = new UserValidator();
-            userValidator.validateUserForCreation(user, plainPassword);
+            userValidator.validateUniqueName(textFieldName.getText());
 
             InternValidator internValidator = new InternValidator();
-            internValidator.validateEnrollmentNumber(enrollmentNumber);
+            internValidator.validateEnrollmentNumber(textFieldEnrollment.getText());
 
-            showAlert(AlertType.INFORMATION, "Éxito", "Registro exitoso");
+            UserDAO userDAO = new UserDAO();
+            int userId = userDAO.create(user, passwordField.getText());
 
-        } catch (BusinessException businessException) {
-            showAlert(AlertType.ERROR, "Error", businessException.getMessage());
-        } catch (Exception exception) {
-            showAlert(AlertType.ERROR, "Error Grave", "Ocurrió un error inesperado.");
+            InternDTO intern = new InternDTO(
+                textFieldEnrollment.getText(),
+                userId,
+                user.getInstitucionalEmail(),
+                user.getName(),
+                user.getFirstSurname(),
+                user.getSecondSurname(),
+                user.getIsActive(),
+                user.getRol()
+            );
+
+            InternDAO internDAO = new InternDAO();
+            internDAO.create(intern);
+
+            showAlert(Alert.AlertType.INFORMATION, "Registro exitoso", "El estudiante fue registrado correctamente.");
+
+        } catch (BusinessException ex) {
+            showAlert(Alert.AlertType.ERROR, "Error de negocio", ex.getMessage());
+        } catch (Exception ex) {
+            showAlert(Alert.AlertType.ERROR, "Error inesperado", "Ocurrió un error al registrar el estudiante.");
         }
     }
 
-    private void showAlert(AlertType type, String title, String content) {
+    private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(content);
+        alert.setContentText(message);
         alert.showAndWait();
     }
-
+    
     public static void main(String[] args) {
         launch(args);
     }
+
 }
