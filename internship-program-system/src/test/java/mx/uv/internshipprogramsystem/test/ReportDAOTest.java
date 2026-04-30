@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-public class ReportDAOtest {
+public class ReportDAOTest {
 
     @Test
     public void testRegisterReport() throws BusinessException {
