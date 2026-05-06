@@ -9,5 +9,7 @@ public interface IProfessorDAO {
     boolean update(ProfessorDTO professor) throws BusinessException;
     ProfessorDTO findByStaffNumber(String staffNumber) throws BusinessException;
     List<ProfessorDTO> findAll() throws BusinessException;
+    List<ProfessorDTO> findAllName() throws BusinessException;
     ProfessorDTO findCoordinator() throws BusinessException;
+    int countAll() throws BusinessException;
 }

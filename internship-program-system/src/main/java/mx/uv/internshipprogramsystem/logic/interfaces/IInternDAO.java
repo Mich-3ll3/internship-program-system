@@ -9,4 +9,5 @@ public interface IInternDAO {
     InternDTO findByMatricula(String enrollmentNumber) throws BusinessException;
     List<InternDTO> findAll() throws BusinessException;
     boolean update(InternDTO intern) throws BusinessException;
+    int countAll() throws BusinessException;
 }

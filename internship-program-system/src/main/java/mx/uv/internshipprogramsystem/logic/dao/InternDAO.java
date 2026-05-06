@@ -114,8 +114,10 @@ public class InternDAO implements IInternDAO{
 
     public List<InternDTO> findAll() throws BusinessException {
         String selectAllInternsQuery =
-            "SELECT u.nombre " +
-            "FROM ESTUDIANTE e JOIN USUARIO u ON e.usuario_id = u.id";
+            "SELECT u.id, u.nombre, u.activo, e.NRC " +
+                   "FROM ESTUDIANTE s " +
+                   "JOIN USUARIO u ON s.usuario_id = u.id " +
+                   "LEFT JOIN EXPERIENCIA_ESTUDIANTES e ON s.usuario_id = e.estudiante_id";
         List<InternDTO> interns = new ArrayList<>();
 
         try (Connection connection = DataBaseManager.getConnection();
@@ -124,11 +126,12 @@ public class InternDAO implements IInternDAO{
 
             while (resultSet.next()) {
                 InternDTO intern = new InternDTO();
-                intern.setName(resultSet.getString("nombre")); // solo asigna el nombre
+                intern.setId(resultSet.getInt("id"));
+                intern.setName(resultSet.getString("nombre"));
+                intern.setIsActive(resultSet.getBoolean("activo"));
+                intern.setNRC(resultSet.getString("NRC"));
                 interns.add(intern);
             }
-            return interns;
-
         } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error("Fallo de conexión con la base de datos", connectionException);
             throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
@@ -136,5 +139,29 @@ public class InternDAO implements IInternDAO{
             LOGGER.error("Error SQL al obtener la lista de estudiantes", sqlException);
             throw new BusinessException("Error obteniendo la lista de estudiantes", sqlException);
         }
+        return interns;
+    }
+    
+    public int countAll() throws BusinessException {
+        String selectCountInternsQuery = "SELECT COUNT(*) AS total FROM ESTUDIANTE";
+
+        int total = 0;
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectCountInternsStatement = connection.prepareStatement(selectCountInternsQuery);
+             ResultSet resultSet = selectCountInternsStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                total = resultSet.getInt("total");
+            }
+
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al contar estudiantes", sqlException);
+            throw new BusinessException("Error al obtener el total de estudiantes.", sqlException);
+        }
+        return total;
     }
 }

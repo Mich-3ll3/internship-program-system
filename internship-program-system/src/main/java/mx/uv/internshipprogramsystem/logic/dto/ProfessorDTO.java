@@ -3,6 +3,7 @@ package mx.uv.internshipprogramsystem.logic.dto;
 public class ProfessorDTO extends UserDTO{
     private int staffNumber;
     private boolean isCoordinator;
+    private int groups;
     
     public ProfessorDTO() {
         
@@ -41,5 +42,13 @@ public class ProfessorDTO extends UserDTO{
 
     public void setIsCoordinator(boolean isCoordinator) {
         this.isCoordinator = isCoordinator;
+    }
+    
+    public int getGroups() {
+        return groups;
+    }
+
+    public void setGroups(int groups) {
+        this.groups = groups;
     }
 }
