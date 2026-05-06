@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity"
+            maxWidth="-Infinity"
+            minHeight="-Infinity"
+            minWidth="-Infinity" 
+            prefHeight="700.0"
+            prefWidth="1000.0"
+            style="-fx-background-color: #f5f6fa;"
+            stylesheets="@styles.css"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uv.internshipprogramsystem.gui.controller.AdminHomeDashboardController">
+    <left>
+        <VBox alignment="TOP_CENTER"
+              prefWidth="70.0"
+              spacing="20.0"
+              style="-fx-background-color:#4a90e2;"
+              BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0"
+                           prefWidth="40.0"
+                           style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin> 
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                </StackPane>
+                <Button fx:id="btnHome" 
+                        mnemonicParsing="false" 
+                        prefHeight="40.0" 
+                        prefWidth="40.0" 
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" 
+                        text="⌂" 
+                        textFill="WHITE"
+                        onAction="#goHome"/>
+                <Button fx:id="btnProfessor"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;" 
+                        text="🎓"
+                        textFill="WHITE"
+                        onAction = "#goProfessorModule"/>
+                <Button fx:id="btnIntern"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        text="👥"
+                        textFill="WHITE"
+                        onAction = "#goInternModule"/>
+                        <Region VBox.vgrow="ALWAYS" />
+                <Button  fx:id="btnExit"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="🚪"
+                        textFill="WHITE"
+                        onAction="#logOut">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+    
+    <center>
+        <ScrollPane fitToWidth="true"
+                    style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
+            <content>
+                <VBox spacing="25.0">
+                    <padding>
+                        <Insets bottom="30.0"
+                                left="30.0"
+                                right="30.0"
+                                top="25.0">
+                        </Insets>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT"
+                              spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Panel de Administración"
+                                               textFill="#1a2744">
+                                            <font>
+                                                <Font name="System Bold"
+                                                      size="22.0">
+                                                </Font>
+                                            </font>
+                                        </Label>
+                                        <Label text="Bienvenido de nuevo"
+                                               textFill="#6b7280"/>
+                                        <Label fx:id="lblDate"
+                                               textFill="#6b7280"
+                                               style="-fx-font-weight: bold; -fx-font-size: 24;" >
+                                        </Label>
+                                    </children>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <StackPane prefHeight="35.0"
+                                           prefWidth="35.0"
+                                           style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
+                                </StackPane>
+                            </children>
+                        </HBox>
+                        
+                        <HBox spacing="20.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT"
+                                      prefHeight="90.0"
+                                      spacing="15.0"
+                                      style="-fx-background-color: #EBF3FF; -fx-background-radius: 8;"
+                                      styleClass="stat-card">
+                                    <padding>
+                                        <Insets left="20.0"
+                                                right="20.0">
+                                        </Insets>
+                                    </padding>
+                                    <children>
+                                        <StackPane prefHeight="45.0"
+                                                   prefWidth="45.0"
+                                                   style="-fx-background-color: #EBF3FF; -fx-background-radius: 10;">
+                                            <children>
+                                                <Label style="-fx-font-size: 16;"
+                                                       text="🎓"
+                                                       textFill="#4a90e2">
+                                                </Label>
+                                            </children>
+                                        </StackPane>
+                                        <VBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label style="-fx-font-size: 11;"
+                                                       text="PROFESORES"
+                                                       textFill="#6b7280" />
+                                                <Label fx:id="lblTotalProfessors"
+                                                       style="-fx-font-weight: bold; -fx-font-size: 24;">
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                
+                                <HBox alignment="CENTER_LEFT"
+                                      prefHeight="90.0"
+                                      spacing="15.0"
+                                      style="-fx-background-color: #EBF3FF; -fx-background-radius: 8;"
+                                      styleClass="stat-card">
+                                    <padding>
+                                        <Insets left="20.0"
+                                                right="20.0">
+                                        </Insets>
+                                    </padding>
+                                    <children>
+                                        <StackPane prefHeight="45.0"
+                                                   prefWidth="45.0"
+                                                   style="-fx-background-color: #EBF3FF; -fx-background-radius: 10;">
+                                            <children>
+                                                <Label style="-fx-font-size: 16;"
+                                                       text="👥"
+                                                       textFill="#4a90e2">
+                                                </Label>
+                                            </children>
+                                        </StackPane>
+                                        <VBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label style="-fx-font-size: 11;"
+                                                       text="ESTUDIANTES"
+                                                       textFill="#6b7280" />
+                                                <Label fx:id="lblTotalInterns" 
+                                                       style="-fx-font-weight: bold; -fx-font-size: 24;">
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                
+                                <HBox alignment="CENTER_LEFT"
+                                      prefHeight="90.0"
+                                      spacing="15.0"
+                                      style="-fx-background-color: #EBF3FF; -fx-background-radius: 8;"
+                                      styleClass="stat-card">
+                                    <padding>
+                                        <Insets left="20.0"
+                                                right="20.0">
+                                        </Insets>
+                                    </padding>
+                                    <children>
+                                        <StackPane prefHeight="45.0"
+                                                   prefWidth="45.0"
+                                                   style="-fx-background-color: #EBF3FF; -fx-background-radius: 10;">
+                                            <children>
+                                                <Label style="-fx-font-size: 16;"
+                                                       text="👨"
+                                                       textFill="#4a90e2">
+                                                </Label>
+                                            </children>
+                                        </StackPane>
+                                        <VBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label style="-fx-font-size: 11;"
+                                                       text="ACTIVOS"
+                                                       textFill="#6b7280" />
+                                                <Label fx:id="lblTotalActiveUsers" 
+                                                       style="-fx-font-weight: bold; -fx-font-size: 24;">
+                                                </Label>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
+                        
+                        <HBox spacing="20.0"
+                              VBox.vgrow="ALWAYS">
+                            <children>
+                                <VBox spacing="15.0"
+                                      style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: rgba(0,0,0,0.05); -fx-border-radius: 15;"
+                                      HBox.hgrow="ALWAYS">
+                                    <padding> 
+                                        <Insets bottom="15.0"
+                                                left="15.0"
+                                                right="15.0"
+                                                top="15.0">
+                                        </Insets> 
+                                    </padding>
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT"
+                                              spacing="10.0">
+                                            <children>
+                                                <StackPane prefHeight="35.0"
+                                                           prefWidth="35.0"
+                                                           style="-fx-background-color: #EBF3FF; -fx-background-radius: 10;">
+                                                    <children>
+                                                        <Label style="-fx-font-size: 16;"
+                                                               text="🎓"
+                                                               textFill="#4a90e2">
+                                                        </Label>
+                                                    </children>
+                                                </StackPane>
+                                                <Label text="Profesores"> 
+                                                    <font> 
+                                                        <Font name="System Bold"
+                                                              size="14.0">
+                                                        </Font> 
+                                                    </font> 
+                                                </Label>
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Button fx:id = "btnAddProfessor"
+                                                        style="-fx-background-color: #4a90e2; -fx-background-radius: 5;-fx-border-color: #ddd;-fx-border-radius: 5;-fx-padding: 6 12 6 12;-fx-font-size: 12;-fx-font-weight: bold;"
+                                                        text="+ Agregar"
+                                                        onAction="#goFormAddProfessor">
+                                                </Button>
+                                            </children>
+                                        </HBox>
+                                        
+                                        <HBox alignment="CENTER_LEFT"
+                                              spacing="5.0">
+                                            <children>
+                                                <Label style="-fx-font-size: 14;"
+                                                       text="🔍"
+                                                       textFill="#6b7280">
+                                                </Label>
+                                                <TextField fx:id="txtSearchProfessor"
+                                                           promptText="Buscar profesor..."
+                                                           style="-fx-background-color: #f9f9f9; -fx-border-color: #eee; -fx-border-radius: 5; -fx-padding: 6 10 6 10;"
+                                                           HBox.hgrow="ALWAYS">
+                                                </TextField>
+                                                <Button fx:id="btnSearchProfessor"
+                                                        style="-fx-background-color: #4a90e2;-fx-background-radius: 5;-fx-text-fill: white;-fx-font-size: 12;-fx-font-weight: bold;-fx-padding: 6 12 6 12;"
+                                                        text="Buscar"
+                                                        onAction="#goConsultProfessor">
+                                                </Button>
+                                            </children>
+                                        </HBox>
+                                        
+                                        <TableView fx:id = "tblProfessors"
+                                                   prefHeight="300.0"
+                                                   VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id = "colNameProfessor"
+                                                             prefWidth="75.0"
+                                                             text="Nombre" />
+                                                <TableColumn fx:id = "colGroupsProfessor"
+                                                             prefWidth="75.0"
+                                                             text="Grupos" />
+                                                <TableColumn fx:id = "colStatusProfessor"
+                                                             prefWidth="75.0" 
+                                                             text="Estado">
+                                                </TableColumn>
+                                            </columns>
+                                        </TableView>
+                                        <Hyperlink fx:id="lnkShowProfessors"
+                                                   style="-fx-font-size: 12;"
+                                                   text="Ver todos los profesores ↗"
+                                                   textFill="#4a90e2"
+                                                   onAction = "#goConsultProfessor">
+                                        </Hyperlink>
+                                    </children>
+                                </VBox>
+                                
+                                <VBox spacing="15.0"
+                                      style="-fx-background-color: white; -fx-background-radius: 15; -fx-border-color: rgba(0,0,0,0.05); -fx-border-radius: 15;"
+                                      HBox.hgrow="ALWAYS">
+                                    <padding>
+                                        <Insets bottom="15.0"
+                                                left="15.0"
+                                                right="15.0"
+                                                top="15.0">
+                                        </Insets> 
+                                    </padding>
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT"
+                                              spacing="10.0">
+                                            <children>
+                                                <StackPane prefHeight="35.0"
+                                                           prefWidth="35.0"
+                                                           style="-fx-background-color: #EBF3FF; -fx-background-radius: 10;">
+                                                    <children>
+                                                        <Label style="-fx-font-size: 16;"
+                                                               text="👥"
+                                                               textFill="#4a90e2">
+                                                        </Label>
+                                                    </children>
+                                                </StackPane>
+                                                <Label text="Estudiantes"> 
+                                                    <font> 
+                                                        <Font name="System Bold"
+                                                              size="14.0">
+                                                        </Font> 
+                                                    </font> 
+                                                </Label>
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Button fx:id = "btnAddIntern"
+                                                        style="-fx-background-color: #4a90e2; -fx-background-radius: 5;-fx-border-color: #ddd;-fx-border-radius: 5;-fx-padding: 6 12 6 12;-fx-font-size: 12;-fx-font-weight: bold;"
+                                                        text="+ Agregar"
+                                                        onAction="#goFormAddIntern">
+                                                </Button>
+                                            </children>
+                                        </HBox>
+                                        
+                                        <HBox alignment="CENTER_LEFT"
+                                              spacing="5.0">
+                                            <children>
+                                                <Label style="-fx-font-size: 14;"
+                                                       text="🔍"
+                                                       textFill="#6b7280">
+                                                </Label>
+                                                <TextField fx:id="txtSearchIntern"
+                                                           promptText="Buscar estudiante..."
+                                                           style="-fx-background-color: #f9f9f9; -fx-border-color: #eee; -fx-border-radius: 5; -fx-padding: 6 10 6 10;"
+                                                           HBox.hgrow="ALWAYS">
+                                                </TextField>
+                                                <Button fx:id="btnSearchIntern"
+                                                        style="-fx-background-color: #4a90e2;-fx-background-radius: 5;-fx-text-fill: white;-fx-font-size: 12;-fx-font-weight: bold;-fx-padding: 6 12 6 12;"
+                                                        text="Buscar"
+                                                        onAction="#goConsultIntern">
+                                                </Button>
+                                            </children>
+                                        </HBox>
+                                        
+                                        <TableView fx:id = "tblIntern"
+                                                   prefHeight="300.0"
+                                                   VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id = "colNameIntern"
+                                                             prefWidth="75.0"
+                                                             text="Nombre" />
+                                                <TableColumn fx:id = "colNRCIntern"
+                                                             prefWidth="75.0"
+                                                             text="NRC" />
+                                                <TableColumn fx:id = "colStatusIntern"
+                                                             prefWidth="75.0"
+                                                             text="Estado">
+                                                </TableColumn>
+                                            </columns>
+                                        </TableView>
+                                        <Hyperlink fx:id="lnkShowIntern"
+                                                   style="-fx-font-size: 12;"
+                                                   text="Ver todos los estudiantes ↗"
+                                                   textFill="#4a90e2"
+                                                   onAction="#goConsultIntern">
+                                        </Hyperlink>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+   </center>
+</BorderPane>

@@ -7,5 +7,6 @@ public interface IUserDAO {
     int create(UserDTO user, String plainPassword) throws BusinessException;
     boolean update(UserDTO user) throws BusinessException;
     boolean changeStatus(String email, boolean isActive) throws BusinessException;
-    boolean login(String email, String plainPassword) throws BusinessException;
+    UserDTO login(String email, String plainPassword) throws BusinessException;
+    int countActiveUsers() throws BusinessException;
 }

@@ -2,6 +2,7 @@ package mx.uv.internshipprogramsystem.logic.dto;
 
 public class InternDTO extends UserDTO{
     private String enrollmentNumber;
+    private String NRC;
 
     public InternDTO() {
     }
@@ -29,4 +30,11 @@ public class InternDTO extends UserDTO{
         this.enrollmentNumber = enrollmentNumber;
     }
     
+    public String getNRC() {
+        return NRC;
+    }
+
+    public void setNRC(String NRC) {
+        this.NRC = NRC;
+    }
 }

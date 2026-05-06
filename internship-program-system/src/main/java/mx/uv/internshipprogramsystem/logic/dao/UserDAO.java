@@ -10,6 +10,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.logic.dto.RolUsuario;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IUserDAO;
@@ -108,29 +109,64 @@ public class UserDAO implements IUserDAO{
 
     }
 
-    public boolean login(String email, String plainPassword) throws BusinessException {
+    public UserDTO login(String email, String plainPassword) throws BusinessException {
         UserValidator validator = new UserValidator();
         validator.validateEmailFormat(email);
 
         PasswordValidator passwordValidator = new PasswordValidator();
         passwordValidator.validatePassword(plainPassword);
-        
-        String loginUserQuery = "SELECT COUNT(*) FROM USUARIO WHERE correo_institucional=? AND contrasena=SHA2(?,256)";
+
+        UserDTO user = new UserDTO();
+        String loginUserQuery = "SELECT u.*, e.matricula " +
+                                "FROM USUARIO u " +
+                                "LEFT JOIN ESTUDIANTE e ON u.id = e.usuario_id " +
+                                "WHERE u.correo_institucional = ? AND u.contrasena = SHA2(?, 256)";
+
         try (Connection connection = DataBaseManager.getConnection();
-                PreparedStatement loginUserStatement = connection.prepareStatement(loginUserQuery)) {
+             PreparedStatement loginUserStatement = connection.prepareStatement(loginUserQuery)) {
             loginUserStatement.setString(1, email);
             loginUserStatement.setString(2, plainPassword);
 
             try (ResultSet resultSet = loginUserStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getInt(1) > 0;
+                    if (!resultSet.getBoolean("activo")) {
+                        throw new BusinessException("La cuenta está desactivada.");
+                    }
+
+                    user.setId(resultSet.getInt("id"));
+                    user.setInstitucionalEmail(resultSet.getString("correo_institucional"));
+                    user.setName(resultSet.getString("nombre"));
+                    user.setFirstSurname(resultSet.getString("apellido_paterno"));
+                    user.setSecondSurname(resultSet.getString("apellido_materno"));
+                    user.setIsActive(resultSet.getBoolean("activo"));
+                    user.setRol(RolUsuario.valueOf(resultSet.getString("rol")));
                 }
-                return false;
             }
         } catch (SQLException sqlException) {
             LOGGER.error("Error SQL al verificar login para {}", email, sqlException);
             throw new BusinessException("Error verificando login para " + email, sqlException);
         }
+        return user;
     }
+    
+    public int countActiveUsers() throws BusinessException {
+        String selectCountActiveUsersQuery = "SELECT COUNT(*) AS totalActivos FROM USUARIO WHERE activo = true";
+        int totalActivos = 0;
 
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectCountActiveUsersStatement = connection.prepareStatement(selectCountActiveUsersQuery);
+             ResultSet resultSet = selectCountActiveUsersStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                totalActivos = resultSet.getInt("totalActivos");
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al contar usuarios activos", sqlException);
+            throw new BusinessException("Error al obtener el total de usuarios activos.", sqlException);
+        }
+        return totalActivos;
+    }
 }

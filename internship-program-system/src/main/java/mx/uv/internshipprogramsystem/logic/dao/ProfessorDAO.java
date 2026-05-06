@@ -83,9 +83,16 @@ public class ProfessorDAO implements IProfessorDAO {
         InputValidator.validateNotEmpty(staffNumber, "El número de personal no puede estar vacío.");
         
         String selectProfessorByStaffNumberQuery =
-            "SELECT p.numero_personal, p.es_coordinador, u.* " +
-            "FROM PROFESOR p JOIN USUARIO u ON p.usuario_id = u.id " +
-            "WHERE p.numero_personal = ?";
+            "SELECT p.numero_personal, p.es_coordinador, u.id, u.correo_institucional, u.nombre, " +
+            "u.apellido_paterno, u.apellido_materno, u.activo, COUNT(e.profesor_id) AS grupos " +
+            "FROM PROFESOR p " +
+            "JOIN USUARIO u ON p.usuario_id = u.id " +
+            "LEFT JOIN EXPERIENCIA_EDUCATIVA e ON p.usuario_id = e.profesor_id " +
+            "WHERE p.numero_personal = ? " +
+            "GROUP BY p.numero_personal, p.es_coordinador, u.id, u.correo_institucional, " +
+            "u.nombre, u.apellido_paterno, u.apellido_materno, u.activo";
+        
+        ProfessorDTO professor = new ProfessorDTO();
         
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectProfessorByStaffNumberStatement = connection.prepareStatement(selectProfessorByStaffNumberQuery)) {
@@ -94,31 +101,30 @@ public class ProfessorDAO implements IProfessorDAO {
             
             try (ResultSet resultSet = selectProfessorByStaffNumberStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return new ProfessorDTO(
-                        resultSet.getInt("numero_personal"),
-                        resultSet.getBoolean("es_coordinador"),
-                        resultSet.getInt("id"),
-                        resultSet.getString("correo_institucional"),
-                        resultSet.getString("nombre"),
-                        resultSet.getString("apellido_paterno"),
-                        resultSet.getString("apellido_materno"),
-                        resultSet.getBoolean("activo")
-                    );
+                    professor.setStaffNumber(resultSet.getInt("numero_personal"));
+                    professor.setIsCoordinator(resultSet.getBoolean("es_coordinador"));
+                    professor.setId(resultSet.getInt("id"));
+                    professor.setInstitucionalEmail(resultSet.getString("correo_institucional"));
+                    professor.setName(resultSet.getString("nombre"));
+                    professor.setFirstSurname(resultSet.getString("apellido_paterno"));
+                    professor.setSecondSurname(resultSet.getString("apellido_materno"));
+                    professor.setIsActive(resultSet.getBoolean("activo"));
+                    professor.setGroups(resultSet.getInt("grupos"));
                 }
             }
-            return null;
-
         } catch (SQLTransientConnectionException connectionException) {
             throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
         } catch (SQLException selectException) {
             throw new BusinessException("Error buscando profesor con número de personal " + staffNumber, selectException);
         }
+        return professor;
     }
 
-    public List<ProfessorDTO> findAll() throws BusinessException {
+    public List<ProfessorDTO> findAllName() throws BusinessException {
         String selectAllProfessorsQuery =
             "SELECT u.nombre " +
             "FROM PROFESOR p JOIN USUARIO u ON p.usuario_id = u.id";
+        
         List<ProfessorDTO> professors = new ArrayList<>();
 
         try (Connection connection = DataBaseManager.getConnection();
@@ -138,6 +144,39 @@ public class ProfessorDAO implements IProfessorDAO {
         } catch (SQLException sqlException) {
             LOGGER.error("Error SQL al obtener la lista de profesores", sqlException);
             throw new BusinessException("Error obteniendo la lista de profesores", sqlException);
+        }
+    }
+    
+    public List<ProfessorDTO> findAll() throws BusinessException {
+        String selectAllProfessorsQuery = 
+            "SELECT p.numero_personal, p.es_coordinador, u.id, u.correo_institucional, " +
+            "u.nombre, u.apellido_paterno, u.apellido_materno, u.activo " +
+            "FROM PROFESOR p JOIN USUARIO u ON p.usuario_id = u.id";
+
+        List<ProfessorDTO> professors = new ArrayList<>();
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectAllProfessorsStatement = connection.prepareStatement(selectAllProfessorsQuery);
+             ResultSet resultSet = selectAllProfessorsStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                ProfessorDTO professor = new ProfessorDTO();
+                professor.setStaffNumber(resultSet.getInt("numero_personal"));
+                professor.setIsCoordinator(resultSet.getBoolean("es_coordinador"));
+                professor.setId(resultSet.getInt("id"));
+                professor.setInstitucionalEmail(resultSet.getString("correo_institucional"));
+                professor.setName(resultSet.getString("nombre"));
+                professor.setFirstSurname(resultSet.getString("apellido_paterno"));
+                professor.setSecondSurname(resultSet.getString("apellido_materno"));
+                professor.setIsActive(resultSet.getBoolean("activo"));
+
+                professors.add(professor);
+            }
+            return professors;
+
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al obtener la lista de profesores", sqlException);
+            throw new BusinessException("No se pudo obtener la lista de profesores", sqlException);
         }
     }
 
@@ -171,5 +210,28 @@ public class ProfessorDAO implements IProfessorDAO {
         } catch (SQLException selectException) {
             throw new BusinessException("Error obteniendo coordinador", selectException);
         }
+    }
+    
+    public int countAll() throws BusinessException {
+        String selectCountProfessorQuery = "SELECT COUNT(*) AS total FROM PROFESOR";
+
+        int total = 0;
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectCountProfessorStatement = connection.prepareStatement(selectCountProfessorQuery);
+             ResultSet resultSet = selectCountProfessorStatement.executeQuery()) {
+
+            if (resultSet.next()) {
+                total = resultSet.getInt("total");
+            }
+
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al contar profesores", sqlException);
+            throw new BusinessException("Error al obtener el total de profesores.", sqlException);
+        }
+        return total;
     }
 }
