@@ -5,14 +5,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import mx.uv.internshipprogramsystem.gui.controller.WindowManagerController;
+import mx.uv.internshipprogramsystem.gui.controllers.WindowManagerController;
 
 public class InternshipProgramSystem extends Application {
 
     @Override
     public void start(Stage primaryStage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WindowManagerGUI.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/uv/internshipprogramsystem/gui/fxml/WindowManagerGUI.fxml"));
             BorderPane marcoPrincipal = loader.load();
 
             WindowManagerController.setMainLayout(marcoPrincipal);

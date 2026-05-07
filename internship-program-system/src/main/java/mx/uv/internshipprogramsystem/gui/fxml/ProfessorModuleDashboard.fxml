@@ -17,7 +17,7 @@
             style="-fx-background-color: #f5f6fa;"
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mx.uv.internshipprogramsystem.gui.controller.ProfessorManagementController">
+            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorManagementController">
     <center>
         <VBox spacing="16.0">
             <padding>

@@ -1,4 +1,4 @@
-package mx.uv.internshipprogramsystem.gui.controller;
+package mx.uv.internshipprogramsystem.gui.controllers;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -26,7 +26,7 @@ public class WindowManagerController {
     public static void changeView(String fxmlName) {
         Platform.runLater(() -> {
             try {
-                URL fxmlUrl = WindowManagerController.class.getResource("/fxml/" + fxmlName);
+                URL fxmlUrl = WindowManagerController.class.getResource("/mx/uv/internshipprogramsystem/gui/fxml/" + fxmlName);
                 if (fxmlUrl == null) {
                     throw new IOException("No se encontró el archivo FXML en: /fxml/" + fxmlName);
                 }

@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane 
-    fx:controller="mx.uv.internshipprogramsystem.gui.controller.ProfesorHomeDashboardController" 
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfesorHomeDashboardController" 
     maxHeight="-Infinity" 
     maxWidth="-Infinity" 
     minHeight="-Infinity" 

@@ -1,4 +1,4 @@
-package mx.uv.internshipprogramsystem.gui.controller;
+package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -87,7 +87,7 @@ public class AdminHomeDashboardController {
 
     @FXML
     private void goFormAddIntern(ActionEvent event) {
-        WindowManagerController.changeView("RegisterInternshipDashboard.fxml");
+        WindowManagerController.changeView("RegisterInternDashboard.fxml");
     }
 
     @FXML
