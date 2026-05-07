@@ -1,4 +1,4 @@
-package mx.uv.internshipprogramsystem.gui.controller;
+package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.net.URL;
 import java.util.ResourceBundle;

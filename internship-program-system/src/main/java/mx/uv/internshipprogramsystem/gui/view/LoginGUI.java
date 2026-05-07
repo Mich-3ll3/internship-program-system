@@ -10,7 +10,7 @@ public class LoginGUI extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/LoginGUI.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/mx/uv/internshipprogramsystem/gui/fxml/LoginGUI.fxml"));
         
         Scene scene = new Scene(root);
         stage.setTitle("Login - Sistema de Prácticas");

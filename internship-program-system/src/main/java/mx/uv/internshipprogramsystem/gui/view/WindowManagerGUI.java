@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import mx.uv.internshipprogramsystem.gui.controller.WindowManagerController;
+import mx.uv.internshipprogramsystem.gui.controllers.WindowManagerController;
 
 public class WindowManagerGUI extends Application {
     private static final Logger LOGGER = Logger.getLogger(WindowManagerGUI.class.getName());
@@ -16,7 +16,7 @@ public class WindowManagerGUI extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/WindowManagerGUI.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mx/uv/internshipprogramsystem/gui/fxml/WindowManagerGUI.fxml"));
             BorderPane root = loader.load();
             
             WindowManagerController.setMainLayout(root);
