@@ -28,9 +28,13 @@ public class UserDTO {
         this.institucionalEmail = institucionalEmail;
         this.name = name;
         this.firstSurname = firstSurname;
-        this.secondSurname = secondSurname;
+        this.secondSurname = (secondSurname != null ? secondSurname : "");
         this.isActive = isActive;
         this.rol = rol;
+    }
+
+    public UserDTO(Integer id) {
+        this.id = id;
     }
         
     public Integer getId() {
@@ -74,7 +78,7 @@ public class UserDTO {
     }
 
     public void setSecondSurname(String secondSurname) {
-        this.secondSurname = secondSurname;
+        this.secondSurname = (secondSurname != null) ? secondSurname : "";
     }
 
     public Boolean getIsActive() {
@@ -91,5 +95,17 @@ public class UserDTO {
 
     public void setRol(RolUsuario rol) {
         this.rol = rol;
+    }
+    
+    public String getNameComplet() {
+        String firstName = (name != null) ? name : "";
+        String firstLastName = (firstSurname != null) ? firstSurname : "";
+        String secondLastName = (secondSurname != null && !secondSurname.equalsIgnoreCase("null")) ? secondSurname : "";
+
+        return (firstName + " " + firstLastName + " " + secondLastName).trim().replaceAll("\\s+", " ");
+    }
+
+    public String getActive() {
+        return getIsActive() != null && getIsActive() ? "Activo" : "Inactivo";
     }
 }

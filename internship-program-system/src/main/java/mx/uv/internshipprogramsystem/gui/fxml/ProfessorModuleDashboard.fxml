@@ -8,6 +8,8 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -18,6 +20,61 @@
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorManagementController">
+    <left>
+        <VBox alignment="TOP_CENTER"
+              prefWidth="70.0"
+              spacing="20.0"
+              style="-fx-background-color:#4a90e2;"
+              BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0"
+                           prefWidth="40.0"
+                           style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin> 
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                </StackPane>
+                <Button fx:id="btnHome" 
+                        mnemonicParsing="false" 
+                        prefHeight="40.0" 
+                        prefWidth="40.0" 
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" 
+                        text="⌂" 
+                        textFill="WHITE"
+                        onAction="#goHome"/>
+                <Button fx:id="btnProfessor"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;" 
+                        text="🎓"
+                        textFill="WHITE"
+                        onAction = "#goProfessorModule"/>
+                <Button fx:id="btnIntern"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        text="👥"
+                        textFill="WHITE"
+                        onAction = "#goInternModule"/>
+                        <Region VBox.vgrow="ALWAYS" />
+                <Button  fx:id="btnExit"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="🚪"
+                        textFill="WHITE"
+                        onAction="#logOut">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+    
     <center>
         <VBox spacing="16.0">
             <padding>
@@ -33,7 +90,7 @@
                     <Label text="Consulta, registro, modificación y cambio de estado de profesores." textFill="#6b7280" />
                 </VBox>
                 <Button mnemonicParsing="false"
-                        onAction="#showPendingFunctionalityMessage"
+                        onAction="#goRegisterProfessor"
                         style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;"
                         text="+ Nuevo profesor" />
             </HBox>
@@ -45,11 +102,11 @@
                 </padding>
                 <HBox alignment="CENTER_LEFT" spacing="8.0">
                     <TextField fx:id="txtSearchStaffNumber"
-                               onAction="#validateSearchProfessor"
+                               onAction="#searchProfessor"
                                promptText="Buscar por número de personal: 123456"
                                HBox.hgrow="ALWAYS" />
                     <Button mnemonicParsing="false"
-                            onAction="#validateSearchProfessor"
+                            onAction="#searchProfessor"
                             style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;"
                             text="Buscar" />
                 </HBox>
@@ -71,7 +128,7 @@
                               wrapText="true"
                               HBox.hgrow="ALWAYS" />
                     <VBox spacing="8.0">
-                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#showPendingFunctionalityMessage" text="Modificar" />
+                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goUpdateProfessor" text="Modificar" />
                         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#showPendingFunctionalityMessage" text="Cambiar estado" />
                     </VBox>
                 </HBox>

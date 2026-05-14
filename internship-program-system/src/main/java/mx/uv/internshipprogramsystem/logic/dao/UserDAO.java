@@ -10,6 +10,8 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
+import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.RolUsuario;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -117,13 +119,15 @@ public class UserDAO implements IUserDAO{
         passwordValidator.validatePassword(plainPassword);
 
         UserDTO user = new UserDTO();
-        String loginUserQuery = "SELECT u.*, e.matricula " +
+        String loginUserQuery = "SELECT u.*, e.matricula, p.numero_personal, p.es_coordinador, u.activo, u.rol " +
                                 "FROM USUARIO u " +
                                 "LEFT JOIN ESTUDIANTE e ON u.id = e.usuario_id " +
+                                "LEFT JOIN PROFESOR p ON u.id = p.usuario_id " +
                                 "WHERE u.correo_institucional = ? AND u.contrasena = SHA2(?, 256)";
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement loginUserStatement = connection.prepareStatement(loginUserQuery)) {
+            
             loginUserStatement.setString(1, email);
             loginUserStatement.setString(2, plainPassword);
 
@@ -133,13 +137,19 @@ public class UserDAO implements IUserDAO{
                         throw new BusinessException("La cuenta está desactivada.");
                     }
 
-                    user.setId(resultSet.getInt("id"));
-                    user.setInstitucionalEmail(resultSet.getString("correo_institucional"));
-                    user.setName(resultSet.getString("nombre"));
-                    user.setFirstSurname(resultSet.getString("apellido_paterno"));
-                    user.setSecondSurname(resultSet.getString("apellido_materno"));
-                    user.setIsActive(resultSet.getBoolean("activo"));
-                    user.setRol(RolUsuario.valueOf(resultSet.getString("rol")));
+                    String rol = resultSet.getString("rol");
+                    switch (RolUsuario.valueOf(rol)) {
+                        case PROFESOR -> {
+                            return buildProfessor(resultSet);
+                        }
+                        case ESTUDIANTE -> {
+                            return buildIntern(resultSet);
+                        }
+                        case ADMINISTRADOR -> {
+                            return buildAdmin(resultSet);
+                        }
+                        default -> throw new BusinessException("Rol desconocido: " + rol);
+                    }
                 }
             }
         } catch (SQLException sqlException) {
@@ -168,5 +178,43 @@ public class UserDAO implements IUserDAO{
             throw new BusinessException("Error al obtener el total de usuarios activos.", sqlException);
         }
         return totalActivos;
+    }
+    
+    private ProfessorDTO buildProfessor(ResultSet rs) throws SQLException {
+        ProfessorDTO professor = new ProfessorDTO();
+        professor.setId(rs.getInt("id"));
+        professor.setInstitucionalEmail(rs.getString("correo_institucional"));
+        professor.setName(rs.getString("nombre"));
+        professor.setFirstSurname(rs.getString("apellido_paterno"));
+        professor.setSecondSurname(rs.getString("apellido_materno"));
+        professor.setIsActive(rs.getBoolean("activo"));
+        professor.setStaffNumber(rs.getString("numero_personal"));
+        professor.setIsCoordinator(rs.getBoolean("es_coordinador"));
+        professor.setRol(RolUsuario.PROFESOR);
+        return professor;
+    }
+
+    private InternDTO buildIntern(ResultSet rs) throws SQLException {
+        InternDTO intern = new InternDTO();
+        intern.setId(rs.getInt("id"));
+        intern.setInstitucionalEmail(rs.getString("correo_institucional"));
+        intern.setName(rs.getString("nombre"));
+        intern.setFirstSurname(rs.getString("apellido_paterno"));
+        intern.setSecondSurname(rs.getString("apellido_materno"));
+        intern.setIsActive(rs.getBoolean("activo"));
+        intern.setEnrollmentNumber(rs.getString("matricula"));
+        intern.setRol(RolUsuario.ESTUDIANTE);
+        return intern;
+    }
+
+    private UserDTO buildAdmin(ResultSet rs) throws SQLException {
+        UserDTO admin = new UserDTO();
+        admin.setId(rs.getInt("id"));
+        admin.setName(rs.getString("nombre"));
+        admin.setFirstSurname(rs.getString("apellido_paterno"));
+        admin.setSecondSurname(rs.getString("apellido_materno"));
+        admin.setIsActive(rs.getBoolean("activo"));
+        admin.setRol(RolUsuario.ADMINISTRADOR);
+        return admin;
     }
 }

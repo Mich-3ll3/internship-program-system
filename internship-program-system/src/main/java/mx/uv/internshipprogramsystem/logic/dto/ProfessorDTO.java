@@ -1,46 +1,51 @@
 package mx.uv.internshipprogramsystem.logic.dto;
 
 public class ProfessorDTO extends UserDTO{
-    private int staffNumber;
-    private boolean isCoordinator;
+    private String staffNumber;
+    private Boolean isCoordinator;
     private int groups;
     
     public ProfessorDTO() {
         
     }
 
-    public ProfessorDTO(int staffNumber, boolean isCoordinator, String institucionalEmail, String password, String name, String firstSurname, String secondSurname, Boolean isActive, RolUsuario rol) {
+    public ProfessorDTO(String staffNumber, boolean isCoordinator, String institucionalEmail, String password, String name, String firstSurname, String secondSurname, Boolean isActive, RolUsuario rol) {
         super(institucionalEmail, password, name, firstSurname, secondSurname, isActive, rol);
         this.staffNumber = staffNumber;
         this.isCoordinator = isCoordinator;
     }
 
-    public ProfessorDTO(int staffNumber, boolean isCoordinator, Integer id, String institucionalEmail, String name, String firstSurname, String secondSurname, Boolean isActive, RolUsuario rol) {
+    public ProfessorDTO(String staffNumber, boolean isCoordinator, Integer id, String institucionalEmail, String name, String firstSurname, String secondSurname, Boolean isActive, RolUsuario rol) {
         super(id, institucionalEmail, name, firstSurname, secondSurname, isActive, rol);
         this.staffNumber = staffNumber;
         this.isCoordinator = isCoordinator;
     }
     
-    public ProfessorDTO(int staffNumber, boolean isCoordinator, Integer id, String institucionalEmail, String name, String firstSurname, String secondSurname, Boolean isActive) {
+    public ProfessorDTO(String staffNumber, boolean isCoordinator, Integer id, String institucionalEmail, String name, String firstSurname, String secondSurname, Boolean isActive) {
         super(id, institucionalEmail, name, firstSurname, secondSurname, isActive, null);
         this.staffNumber = staffNumber;
         this.isCoordinator = isCoordinator;
     }
 
-
-    public int getStaffNumber() {
+    public ProfessorDTO(String staffNumber, boolean isCoordinator, Integer id) {
+        super(id);
+        this.staffNumber = staffNumber;
+        this.isCoordinator = isCoordinator;
+    }
+    
+    public String getStaffNumber() {
         return staffNumber;
     }
 
-    public void setStaffNumber(int staffNumber) {
+    public void setStaffNumber(String staffNumber) {
         this.staffNumber = staffNumber;
     }
 
-    public boolean getIsCoordinator() {
+    public Boolean getIsCoordinator() {
         return isCoordinator;
     }
 
-    public void setIsCoordinator(boolean isCoordinator) {
+    public void setIsCoordinator(Boolean isCoordinator) {
         this.isCoordinator = isCoordinator;
     }
     
@@ -50,5 +55,9 @@ public class ProfessorDTO extends UserDTO{
 
     public void setGroups(int groups) {
         this.groups = groups;
+    }
+    
+    public String getCoordinator() {
+        return (getIsCoordinator() != null && getIsCoordinator()) ? "Sí" : "No";
     }
 }

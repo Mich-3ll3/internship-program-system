@@ -2,79 +2,55 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressBar;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ResourceBundle;
+public class ProfesorHomeDashboardController {
 
-public class ProfesorHomeDashboardController implements Initializable {
-
-    private Button btnHome;
-    private Button btnIntern;
-    private Button btnReports;
-    private Button btnProjects;
-    private Button btnExit;
-    private Label lblDate;
-    private Label lblTotalInterns;
-    private Label lblPendingCount;
-    private Label lblReportStats;
-    private Label lblFormStats;
-    private Label lblSelfEvaluationStats;
-    private Label lblProjectStats;
-    private ProgressBar pbGlobalProgress;
-    private ChoiceBox<String> cbReportStatus;
-    private TableView<?> tblReportDocuments; 
-    private TableColumn<?, ?> colNameAlumno;
-    private TableColumn<?, ?> colTypeDocument;
-    private TableColumn<?, ?> colDeliveryDate;
-    private TableColumn<?, ?> colStateDocument;
-    private TextArea taDocComment;
-    private TextField txtSearchIntern;
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        setupStaticInfo();
-        loadComponentDefaults();
-    }
-
-    private void setupStaticInfo() {
-        LocalDate now = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM");
-        String dateText = now.format(formatter);
-        lblDate.setText(dateText.substring(0, 1).toUpperCase() + dateText.substring(1));
-    }
-
-    private void loadComponentDefaults() {
-        if (cbReportStatus != null) {
-            cbReportStatus.getItems().addAll("Pendiente", "Aprobado", "Rechazado", "En corrección");
-            cbReportStatus.setValue("Pendiente");
-        }
+    @FXML
+    private void abrirAlumnos(ActionEvent event) {
     }
 
     @FXML
-    void goHome(ActionEvent event) {
-         WindowManagerController.changeView("CoordinatorProfessorHomeDashboard.fxml");
+    private void abrirReportes(ActionEvent event) {
     }
 
     @FXML
-    void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView("InternModuleDashboard.fxml");
+    private void cerrarSesion(ActionEvent event) {
     }
 
     @FXML
-    void logOut(ActionEvent event) {
-        WindowManagerController.changeView("LoginDashboard.fxml");
+    private void evaluarAlumnoSeleccionado(ActionEvent event) {
     }
+
+    @FXML
+    private void registrarEvaluacion(ActionEvent event) {
+    }
+
+    @FXML
+    private void abrirReporteSeleccionado(ActionEvent event) {
+    }
+
+    @FXML
+    private void enviarRecordatorioReporte(ActionEvent event) {
+    }
+
+    @FXML
+    private void aprobarReporte(ActionEvent event) {
+    }
+
+    @FXML
+    private void pedirCambiosReporte(ActionEvent event) {
+    }
+
+    @FXML
+    private void abrirDocumentos(ActionEvent event) {
+    }
+    
+    @FXML
+    private void guardarEstadoDocumento(ActionEvent event) {
+    }
+    
+    @FXML
+    private void subirDocumento(ActionEvent event) {
+    }
+
 }

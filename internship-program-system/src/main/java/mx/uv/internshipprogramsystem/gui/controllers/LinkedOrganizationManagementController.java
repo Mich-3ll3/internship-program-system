@@ -1,66 +1,114 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
+import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
-import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.util.List;
+import java.util.stream.Collectors;
+import javafx.event.ActionEvent;
+import mx.uv.internshipprogramsystem.logic.validations.LinkedOrganizationValidator;
 
 public class LinkedOrganizationManagementController {
-    private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-    private static final String PHONE_PATTERN = "^\\d{10}$";
+    private static final Logger LOGGER = LoggerFactory.getLogger(LinkedOrganizationManagementController.class);
+
+    @FXML private TextField txtName;
+    @FXML private TextField txtEmail;
+    @FXML private TextField txtPhoneNumber;
+    @FXML private TextField txtAddress;
+    @FXML private TextField txtCity;
+    @FXML private TextField txtState;
+    @FXML private TextField txtSector;
+    @FXML private TextField txtDirectUserCount;
+    @FXML private TextField txtIndirectUserCount;
+    @FXML private TextField txtSearchName;
+    @FXML private TableView<LinkedOrganizationDTO> tblOrganizations;
+    @FXML private TableColumn<LinkedOrganizationDTO, String> colName;
+    @FXML private TableColumn<LinkedOrganizationDTO, String> colEmail;
+    @FXML private TableColumn<LinkedOrganizationDTO, String> colPhoneNumber;
+    @FXML private TableColumn<LinkedOrganizationDTO, String> colCity;
+    @FXML private TableColumn<LinkedOrganizationDTO, String> colSector;
+
+    private final LinkedOrganizationDAO organizationDAO = new LinkedOrganizationDAO();
+    private ObservableList<LinkedOrganizationDTO> masterData = FXCollections.observableArrayList();
 
     @FXML
-    private TextField txtName;
+    public void initialize() {
+        configureTable();
+        loadOrganizations();
+    }
 
-    @FXML
-    private TextField txtEmail;
+    private void configureTable() {
+        colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        colCity.setCellValueFactory(new PropertyValueFactory<>("city"));
+        colSector.setCellValueFactory(new PropertyValueFactory<>("sector"));
+    }
 
-    @FXML
-    private TextField txtPhoneNumber;
-
-    @FXML
-    private TextField txtAddress;
-
-    @FXML
-    private TextField txtCity;
-
-    @FXML
-    private TextField txtState;
-
-    @FXML
-    private TextField txtSector;
-
-    @FXML
-    private TextField txtDirectUserCount;
-
-    @FXML
-    private TextField txtIndirectUserCount;
-
-    @FXML
-    private TextField txtSearchName;
+    private void loadOrganizations() {
+        try {
+            List<LinkedOrganizationDTO> list = organizationDAO.findAll();
+            masterData = FXCollections.observableArrayList(list);
+            tblOrganizations.setItems(masterData);
+        } catch (BusinessException e) {
+            LOGGER.error("Error al cargar organizaciones", e);
+        }
+    }
 
     @FXML
     private void validateOrganizationForm() {
         try {
-            validateRequiredFields();
-            validateEmail();
-            validatePhoneNumber();
-            validateUserCounts();
-            FormAlertSupport.showInformation("Validación exitosa", "Los datos de la organización cumplen con el formato requerido.");
-        } catch (ValidationException exception) {
-            FormAlertSupport.showWarning("Error de validación", exception.getMessage());
-        } catch (NumberFormatException exception) {
-            FormAlertSupport.showWarning("Error de validación", "Los usuarios directos e indirectos deben ser numéricos.");
+            LinkedOrganizationDTO organization = new LinkedOrganizationDTO(
+                txtName.getText().trim(),
+                txtAddress.getText().trim(),
+                txtCity.getText().trim(),
+                txtState.getText().trim(),
+                txtEmail.getText().trim(),
+                txtPhoneNumber.getText().trim(),
+                txtSector.getText().trim(),
+                Integer.parseInt(txtIndirectUserCount.getText().trim()),
+                Integer.parseInt(txtDirectUserCount.getText().trim())
+            );
+
+            LinkedOrganizationValidator validator = new LinkedOrganizationValidator();
+            validator.validateFullOrganization(organization);
+
+            if (organizationDAO.createLikendOrganization(organization)) {
+                showNotification(Alert.AlertType.INFORMATION, "Registro exitoso", "Organización registrada correctamente.");
+                clearForm();
+                loadOrganizations();
+            }
+        } catch (NumberFormatException e) {
+            showNotification(Alert.AlertType.ERROR, "Error de formato", "Los campos de usuarios deben ser números.");
+        } catch (ValidationException e) {
+            showNotification(Alert.AlertType.ERROR, "Error de validación", e.getMessage());
+        } catch (BusinessException e) {
+            showNotification(Alert.AlertType.ERROR, "Error de base de datos", e.getMessage());
         }
     }
 
     @FXML
     private void validateSearchOrganization() {
-        try {
-            InputValidator.validateNotEmpty(txtSearchName.getText(), "Ingrese el nombre de la organización para buscar.");
-            FormAlertSupport.showInformation("Búsqueda válida", "El nombre de organización puede consultarse.");
-        } catch (ValidationException exception) {
-            FormAlertSupport.showWarning("Error de validación", exception.getMessage());
+        String query = txtSearchName.getText().toLowerCase().trim();
+        if (query.isEmpty()) {
+            tblOrganizations.setItems(masterData);
+        } else {
+            ObservableList<LinkedOrganizationDTO> filteredData = masterData.stream()
+                .filter(org -> org.getName().toLowerCase().contains(query))
+                .collect(Collectors.toCollection(FXCollections::observableArrayList));
+            tblOrganizations.setItems(filteredData);
         }
     }
 
@@ -76,37 +124,42 @@ public class LinkedOrganizationManagementController {
         txtDirectUserCount.clear();
         txtIndirectUserCount.clear();
     }
-
-    private void validateRequiredFields() throws ValidationException {
-        InputValidator.validateNotEmpty(txtName.getText(), "El nombre es obligatorio.");
-        InputValidator.validateNotEmpty(txtEmail.getText(), "El correo es obligatorio.");
-        InputValidator.validateNotEmpty(txtPhoneNumber.getText(), "El teléfono es obligatorio.");
-        InputValidator.validateNotEmpty(txtAddress.getText(), "La dirección es obligatoria.");
-        InputValidator.validateNotEmpty(txtCity.getText(), "La ciudad es obligatoria.");
-        InputValidator.validateNotEmpty(txtState.getText(), "El estado es obligatorio.");
-        InputValidator.validateNotEmpty(txtSector.getText(), "El sector es obligatorio.");
+    
+    @FXML
+     private void goHome(ActionEvent event) {
+        WindowManagerController.changeView("CoordinatorProfessorHomeDashboard.fxml");
+    }
+     
+    @FXML
+    private void logOut(ActionEvent event) {
+        WindowManagerController.changeView("LoginDashboard.fxml");
+    }
+    
+    @FXML
+    private void goLinkedOrganizationModule(ActionEvent event) {
+        WindowManagerController.changeView("LinkedOrganizationManagementGUI.fxml");
+    }
+    
+    @FXML
+    private void goInternModule(ActionEvent event) {
+        WindowManagerController.changeView("InternModuleDashboard.fxml");
+    }
+    
+    @FXML
+    private void goReportsModule(ActionEvent event) {
+        // TODO: lógica para abrir el módulo de reportes
     }
 
-    private void validateEmail() throws ValidationException {
-        if (!txtEmail.getText().matches(EMAIL_PATTERN)) {
-            throw new ValidationException("El correo de la organización no tiene un formato válido.");
-        }
+    @FXML
+    private void goProjectsModule(ActionEvent event) {
+        // TODO: lógica para abrir el módulo de proyectos
     }
 
-    private void validatePhoneNumber() throws ValidationException {
-        if (!txtPhoneNumber.getText().matches(PHONE_PATTERN)) {
-            throw new ValidationException("El teléfono debe contener 10 dígitos.");
-        }
-    }
-
-    private void validateUserCounts() throws ValidationException {
-        validatePositiveNumber(txtDirectUserCount.getText(), "usuarios directos");
-        validatePositiveNumber(txtIndirectUserCount.getText(), "usuarios indirectos");
-    }
-
-    private void validatePositiveNumber(String value, String fieldName) throws ValidationException {
-        InputValidator.validateNotEmpty(value, "El número de " + fieldName + " es obligatorio.");
-        int number = Integer.parseInt(value);
-        InputValidator.validatePositive(number, "El número de " + fieldName + " debe ser mayor a cero.");
+    private void showNotification(Alert.AlertType type, String title, String content) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="700.0"
@@ -19,6 +20,83 @@
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uv.internshipprogramsystem.gui.controllers.LinkedOrganizationManagementController">
+    
+    <left>
+        <VBox alignment="TOP_CENTER" 
+              prefWidth="70.0" 
+              spacing="18.0" 
+              style="-fx-background-color:#4a90e2;" 
+              BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" 
+                        top="20.0" >
+                </Insets>
+            </padding>
+            <StackPane prefHeight="40.0" 
+                       prefWidth="40.0" 
+                       style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                <children>
+                    <Label text="PC" 
+                           textFill="WHITE">
+                        <font>
+                            <Font name="System Bold" 
+                                  size="12.0" >
+                            </Font>
+                        </font>
+                    </Label>
+                </children>
+            </StackPane>
+            <Button fx:id="btnHome" 
+                    mnemonicParsing="false" 
+                    onAction="#goHome" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;" 
+                    text="⌂" 
+                    textFill="WHITE" />
+            <Button fx:id="btnIntern" 
+                    mnemonicParsing="false" 
+                    onAction="#goInternModule" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="👥" 
+                    textFill="WHITE" />
+            <Button fx:id="btnReports" 
+                    mnemonicParsing="false" 
+                    onAction="#goReportsModule" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="📋" textFill="WHITE" />
+            <Button fx:id="btnProjects" 
+                    mnemonicParsing="false" 
+                    onAction="#goProjectsModule" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="🛠️" textFill="WHITE" >
+            </Button>
+            <Button fx:id="btnLinkedOrganization" 
+                    mnemonicParsing="false" 
+                    onAction="#goLinkedOrganizationModule" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="💼" textFill="WHITE">
+            </Button>
+            <Region VBox.vgrow="ALWAYS" />
+            <Button fx:id="btnExit" 
+                    mnemonicParsing="false" 
+                    onAction="#logOut" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="🚪" textFill="WHITE" >
+            </Button>
+        </VBox>
+    </left>
+    
     <center>
         <VBox spacing="16.0">
             <padding>

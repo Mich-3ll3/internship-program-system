@@ -8,6 +8,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -19,6 +20,61 @@
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uv.internshipprogramsystem.gui.controllers.RegisterProfessorFormController">
+    <left>
+        <VBox alignment="TOP_CENTER"
+              prefWidth="70.0"
+              spacing="20.0"
+              style="-fx-background-color:#4a90e2;"
+              BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0"
+                           prefWidth="40.0"
+                           style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin> 
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                </StackPane>
+                <Button fx:id="btnHome" 
+                        mnemonicParsing="false" 
+                        prefHeight="40.0" 
+                        prefWidth="40.0" 
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" 
+                        text="⌂" 
+                        textFill="WHITE"
+                        onAction="#goHome"/>
+                <Button fx:id="btnProfessor"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;" 
+                        text="🎓"
+                        textFill="WHITE"
+                        onAction = "#goProfessorModule"/>
+                <Button fx:id="btnIntern"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        text="👥"
+                        textFill="WHITE"
+                        onAction = "#goInternModule"/>
+                        <Region VBox.vgrow="ALWAYS" />
+                <Button  fx:id="btnExit"
+                        mnemonicParsing="false"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="🚪"
+                        textFill="WHITE"
+                        onAction="#logOut">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+    
     <center>
         <VBox spacing="16.0">
             <padding>
@@ -43,8 +99,6 @@
                 <GridPane hgap="14.0" vgap="12.0">
                     <Label text="Correo institucional" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                     <TextField fx:id="txtInstitutionalEmail" promptText="ejemplo@uv.mx" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <Label text="Contraseña" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                    <PasswordField fx:id="txtPassword" promptText="Mínimo 8 caracteres" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                     <Label text="Nombre" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                     <TextField fx:id="txtName" promptText="Nombre(s)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                     <Label text="Apellido paterno" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="3" />
