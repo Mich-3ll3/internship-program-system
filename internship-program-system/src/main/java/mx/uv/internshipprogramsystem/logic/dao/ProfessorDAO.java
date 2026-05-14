@@ -33,7 +33,7 @@ public class ProfessorDAO implements IProfessorDAO {
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement insertProfessorStatement = connection.prepareStatement(insertProfessorQuery)) {
 
-            insertProfessorStatement.setInt(1, professor.getStaffNumber());
+            insertProfessorStatement.setString(1, professor.getStaffNumber());
             insertProfessorStatement.setBoolean(2, professor.getIsCoordinator());
             insertProfessorStatement.setInt(3, professor.getId());
 
@@ -61,7 +61,7 @@ public class ProfessorDAO implements IProfessorDAO {
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement updateProfessorStatement = connection.prepareStatement(updateProfessorQuery)) {
 
-            updateProfessorStatement.setInt(1, professor.getStaffNumber());
+            updateProfessorStatement.setString(1, professor.getStaffNumber());
             updateProfessorStatement.setBoolean(2, professor.getIsCoordinator());
             updateProfessorStatement.setInt(3, professor.getId());
 
@@ -101,7 +101,7 @@ public class ProfessorDAO implements IProfessorDAO {
             
             try (ResultSet resultSet = selectProfessorByStaffNumberStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    professor.setStaffNumber(resultSet.getInt("numero_personal"));
+                    professor.setStaffNumber(resultSet.getString("numero_personal"));
                     professor.setIsCoordinator(resultSet.getBoolean("es_coordinador"));
                     professor.setId(resultSet.getInt("id"));
                     professor.setInstitucionalEmail(resultSet.getString("correo_institucional"));
@@ -161,7 +161,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
             while (resultSet.next()) {
                 ProfessorDTO professor = new ProfessorDTO();
-                professor.setStaffNumber(resultSet.getInt("numero_personal"));
+                professor.setStaffNumber(resultSet.getString("numero_personal"));
                 professor.setIsCoordinator(resultSet.getBoolean("es_coordinador"));
                 professor.setId(resultSet.getInt("id"));
                 professor.setInstitucionalEmail(resultSet.getString("correo_institucional"));
@@ -192,7 +192,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
             if (resultSet.next()) {
                 return new ProfessorDTO(
-                    resultSet.getInt("numero_personal"),
+                    resultSet.getString("numero_personal"),
                     resultSet.getBoolean("es_coordinador"),
                     resultSet.getInt("id"),
                     resultSet.getString("correo_institucional"),

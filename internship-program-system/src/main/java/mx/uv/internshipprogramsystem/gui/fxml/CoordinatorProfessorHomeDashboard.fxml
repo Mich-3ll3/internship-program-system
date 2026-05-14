@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane 
-    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfesorHomeDashboardController" 
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.CoordinatorProfessorHomeDashboardController" 
     maxHeight="-Infinity" 
     maxWidth="-Infinity" 
     minHeight="-Infinity" 
@@ -71,6 +71,14 @@
                     prefWidth="40.0" 
                     style="-fx-background-color: transparent;" 
                     text="🛠️" textFill="WHITE" >
+            </Button>
+            <Button fx:id="btnLinkedOrganization" 
+                    mnemonicParsing="false" 
+                    onAction="#goLinkedOrganizationModule" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="💼" textFill="WHITE">
             </Button>
             <Region VBox.vgrow="ALWAYS" />
             <Button fx:id="btnExit" 

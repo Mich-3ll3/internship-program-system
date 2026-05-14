@@ -76,14 +76,19 @@ public class InternDAO implements IInternDAO{
             throw new BusinessException("Error actualizando estudiante con matrícula " + intern.getEnrollmentNumber(), sqlException);
         }
     }
-
+    
     public InternDTO findByMatricula(String enrollmentNumber) throws BusinessException {
         InputValidator.validateNotEmpty(enrollmentNumber, "La matrícula no puede estar vacía.");
 
         String selectInternQuery =
-            "SELECT e.matricula, u.* " +
-            "FROM ESTUDIANTE e JOIN USUARIO u ON e.usuario_id = u.id " +
+            "SELECT e.matricula, ee.NRC, u.id, u.correo_institucional, u.nombre, " +
+            "u.apellido_paterno, u.apellido_materno, u.activo " +
+            "FROM ESTUDIANTE e " +
+            "JOIN USUARIO u ON e.usuario_id = u.id " +
+            "LEFT JOIN EXPERIENCIA_ESTUDIANTES ee ON e.usuario_id = ee.estudiante_id " +
             "WHERE e.matricula = ?";
+        
+         InternDTO intern = null;
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectInternStatement = connection.prepareStatement(selectInternQuery)) {
@@ -92,32 +97,35 @@ public class InternDAO implements IInternDAO{
 
             try (ResultSet resultSet = selectInternStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return new InternDTO(
-                        resultSet.getString("matricula"),
-                        resultSet.getInt("id"),
-                        resultSet.getString("correo_institucional"),
-                        resultSet.getString("nombre"),
-                        resultSet.getString("apellido_paterno"),
-                        resultSet.getString("apellido_materno"),
-                        resultSet.getBoolean("activo")
-                    );
+                    intern = new InternDTO();
+                    intern.setEnrollmentNumber(resultSet.getString("matricula"));
+                    intern.setId(resultSet.getInt("id"));
+                    intern.setInstitucionalEmail(resultSet.getString("correo_institucional"));
+                    intern.setName(resultSet.getString("nombre"));
+                    intern.setFirstSurname(resultSet.getString("apellido_paterno"));
+                    intern.setSecondSurname(resultSet.getString("apellido_materno"));
+                    intern.setIsActive(resultSet.getBoolean("activo"));
+                    intern.setNRC(resultSet.getString("NRC"));
                 }
             }
-            return null;
-
         } catch (SQLTransientConnectionException connectionException) {
             throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
         } catch (SQLException selectException) {
+            LOGGER.error("Error SQL:", selectException);
             throw new BusinessException("Error buscando estudiante con matrícula " + enrollmentNumber, selectException);
         }
+        return intern;
     }
+
 
     public List<InternDTO> findAll() throws BusinessException {
         String selectAllInternsQuery =
-            "SELECT u.id, u.nombre, u.activo, e.NRC " +
-                   "FROM ESTUDIANTE s " +
-                   "JOIN USUARIO u ON s.usuario_id = u.id " +
-                   "LEFT JOIN EXPERIENCIA_ESTUDIANTES e ON s.usuario_id = e.estudiante_id";
+            "SELECT e.matricula, ee.NRC, u.id, u.correo_institucional, u.nombre, " +
+            "u.apellido_paterno, u.apellido_materno, u.activo " +
+            "FROM ESTUDIANTE e " +
+            "JOIN USUARIO u ON e.usuario_id = u.id " +
+            "LEFT JOIN EXPERIENCIA_ESTUDIANTES ee ON e.usuario_id = ee.estudiante_id";
+
         List<InternDTO> interns = new ArrayList<>();
 
         try (Connection connection = DataBaseManager.getConnection();
@@ -126,12 +134,17 @@ public class InternDAO implements IInternDAO{
 
             while (resultSet.next()) {
                 InternDTO intern = new InternDTO();
+                intern.setEnrollmentNumber(resultSet.getString("matricula"));
                 intern.setId(resultSet.getInt("id"));
+                intern.setInstitucionalEmail(resultSet.getString("correo_institucional"));
                 intern.setName(resultSet.getString("nombre"));
+                intern.setFirstSurname(resultSet.getString("apellido_paterno"));
+                intern.setSecondSurname(resultSet.getString("apellido_materno"));
                 intern.setIsActive(resultSet.getBoolean("activo"));
                 intern.setNRC(resultSet.getString("NRC"));
                 interns.add(intern);
             }
+
         } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error("Fallo de conexión con la base de datos", connectionException);
             throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);

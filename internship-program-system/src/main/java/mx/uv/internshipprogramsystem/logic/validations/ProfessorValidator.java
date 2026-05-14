@@ -6,14 +6,13 @@ public class ProfessorValidator {
 
     private static final String STAFF_NUMBER_REGEX = "^\\d{6}$";
 
-    public void validateStaffNumber(int staffNumber) throws BusinessException {
-        String staffNumberStr = String.valueOf(staffNumber);
+    public void validateStaffNumber(String staffNumber) throws BusinessException {
 
-        if (staffNumberStr == null || staffNumberStr.trim().isEmpty()) {
+        if (staffNumber == null || staffNumber.trim().isEmpty()) {
             throw new BusinessException("El número de personal no puede estar vacío.");
         }
 
-        if (!staffNumberStr.matches(STAFF_NUMBER_REGEX)) {
+        if (!staffNumber.matches(STAFF_NUMBER_REGEX)) {
             throw new BusinessException("El número de personal debe tener exactamente 6 dígitos numéricos.");
         }
     }

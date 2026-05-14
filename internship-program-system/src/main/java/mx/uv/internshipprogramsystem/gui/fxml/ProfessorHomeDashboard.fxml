@@ -36,7 +36,6 @@
                         </Label>
                     </children>
                 </StackPane>
-                <Button fx:id="btnDashboard" mnemonicParsing="false" onAction="#abrirDashboard" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" text="📊" textFill="WHITE" />
                 <Button fx:id="btnAlumnosNav" mnemonicParsing="false" onAction="#abrirAlumnos" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🎓" textFill="WHITE" />
                 <Button fx:id="btnReportesNav" mnemonicParsing="false" onAction="#abrirReportes" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📑" textFill="WHITE" />
                 <Region VBox.vgrow="ALWAYS" />

@@ -21,6 +21,11 @@ public class InternDTO extends UserDTO{
         super(id, institucionalEmail, name, firstSurname, secondSurname, isActive, null);
         this.enrollmentNumber = enrollmentNumber;
     }
+    
+    public InternDTO(String enrollmentNumber, Integer id) {
+        super(id);
+        this.enrollmentNumber = enrollmentNumber;
+    }
 
     public String getEnrollmentNumber() {
         return enrollmentNumber;
@@ -35,6 +40,6 @@ public class InternDTO extends UserDTO{
     }
 
     public void setNRC(String NRC) {
-        this.NRC = NRC;
+        this.NRC = (NRC != null) ? NRC : "N/A";
     }
 }
