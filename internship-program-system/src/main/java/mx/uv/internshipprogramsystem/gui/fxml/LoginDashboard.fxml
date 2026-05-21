@@ -52,6 +52,11 @@
             </VBox>
 
             <Button maxWidth="Infinity" onAction="#handleLoginAction" prefHeight="40.0" style="-fx-background-color: #534AB7; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;" text="Iniciar sesión" />
+            <Button maxWidth="Infinity"
+                    onAction="#handleOpenActivationView"
+                    prefHeight="35.0"
+                    style="-fx-background-color: transparent; -fx-text-fill: #534AB7; -fx-font-weight: bold;"
+                    text="Activar cuenta" />
          </children>
       </VBox>
    </children>

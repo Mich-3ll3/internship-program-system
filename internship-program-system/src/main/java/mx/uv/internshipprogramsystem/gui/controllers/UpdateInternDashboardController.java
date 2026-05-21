@@ -51,7 +51,7 @@ public class UpdateInternDashboardController {
         txtName.setText(intern.getName());
         txtFirstSurname.setText(intern.getFirstSurname());
         txtSecondSurname.setText(intern.getSecondSurname());
-        txtInstitutionalEmail.setText(intern.getInstitucionalEmail());
+        txtInstitutionalEmail.setText(intern.getInstitutionalEmail());
         txtInstitutionalEmail.setEditable(false);
         txtEnrollment.setEditable(false);
     }
@@ -69,7 +69,7 @@ public class UpdateInternDashboardController {
             currentIntern.setFirstSurname(txtFirstSurname.getText().trim());
             currentIntern.setSecondSurname(txtSecondSurname.getText().trim());
             
-            currentIntern.setRol(mx.uv.internshipprogramsystem.logic.dto.RolUsuario.ESTUDIANTE);
+            currentIntern.setRole(mx.uv.internshipprogramsystem.logic.dto.UserRole.STUDENT);
             
             new UserValidator().validateUserForUpdate(currentIntern);
 
@@ -79,10 +79,10 @@ public class UpdateInternDashboardController {
             boolean internUpdated = internDAO.update(currentIntern);
 
             if (userUpdated && internUpdated) {
-                showNotification(Alert.AlertType.INFORMATION, "Éxito", "Los datos se actualizaron correctamente.");
+                showNotification(Alert.AlertType.INFORMATION, "Ã‰xito", "Los datos se actualizaron correctamente.");
                 goInternModule(null);
             } else {
-                showNotification(Alert.AlertType.WARNING, "Atención", "No se pudieron actualizar todos los registros.");
+                showNotification(Alert.AlertType.WARNING, "AtenciÃ³n", "No se pudieron actualizar todos los registros.");
             }
 
         } catch (BusinessException exception) {
@@ -93,7 +93,7 @@ public class UpdateInternDashboardController {
     
     private boolean isFormValid() {
         if (txtName.getText().trim().isEmpty() || txtFirstSurname.getText().trim().isEmpty()) {
-            showNotification(Alert.AlertType.WARNING, "Campos vacíos", "El nombre y primer apellido son obligatorios.");
+            showNotification(Alert.AlertType.WARNING, "Campos vacios", "El nombre y primer apellido son obligatorios.");
             return false;
         }
         return true;

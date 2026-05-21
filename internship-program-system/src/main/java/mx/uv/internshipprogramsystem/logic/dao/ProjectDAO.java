@@ -1,145 +1,366 @@
 package mx.uv.internshipprogramsystem.logic.dao;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.SQLTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IProjectDAO;
+import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
 
-public class ProjectDAO implements IProjectDAO{
-    private static final Logger logger = LoggerFactory.getLogger(ProjectDAO.class);
+public class ProjectDAO implements IProjectDAO {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(ProjectDAO.class);
 
-    public ProjectDAO() {
-    }
+    private static final String INSERT_PROJECT_QUERY =
+        "INSERT INTO PROYECTO "
+        + "(nombre, descripcion_general, objetivo_general, "
+        + "objetivos_inmediatos, objetivos_mediatos, metodologia, "
+        + "recursos, responsabilidades, duracion, organizacion_id, "
+        + "responsable_id, activo) "
+        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public boolean createProject(ProjectDTO project) throws BusinessException {
-        String insertProjectQuery =
-            "INSERT INTO PROYECTO " +
-            "(nombre, descripcion_general, objetivo_general, objetivos_inmediatos, objetivos_mediatos, metodologia, recursos, responsabilidades, duracion, organizacion_id, responsable_id, activo) " +
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
+    private static final String SELECT_ALL_PROJECTS_QUERY =
+        "SELECT * FROM PROYECTO";
+
+    private static final String SELECT_PROJECTS_BY_STATUS_QUERY =
+        "SELECT * FROM PROYECTO WHERE activo = ?";
+
+    private static final String UPDATE_PROJECT_QUERY =
+        "UPDATE PROYECTO SET nombre = ?, "
+        + "descripcion_general = ?, objetivo_general = ?, "
+        + "objetivos_inmediatos = ?, objetivos_mediatos = ?, "
+        + "metodologia = ?, recursos = ?, responsabilidades = ?, "
+        + "duracion = ?, organizacion_id = ?, responsable_id = ?, "
+        + "activo = ? WHERE id = ?";
+
+    private static final String DELETE_PROJECT_QUERY =
+        "DELETE FROM PROYECTO WHERE id = ?";
+
+    @Override
+    public boolean createProject(ProjectDTO project)
+            throws BusinessException {
+        InputValidator.validateNotNull(
+            project,
+            "ProjectDTO no puede ser nulo."
+        );
+
+        boolean wasCreated;
 
         try (Connection connection = DataBaseManager.getConnection();
-                PreparedStatement insertProjectStatement = connection.prepareStatement(insertProjectQuery)) {
-            insertProjectStatement.setString(1, project.getName());
-            insertProjectStatement.setString(2, project.getGeneralDescription());
-            insertProjectStatement.setString(3, project.getGeneralObjetive());
-            insertProjectStatement.setString(4, project.getImmediateObjetives());
-            insertProjectStatement.setString(5, project.getMediateObjetive());
-            insertProjectStatement.setString(6, project.getMethodology());
-            insertProjectStatement.setString(7, project.getResources());
-            insertProjectStatement.setString(8, project.getResponsabilities());
-            insertProjectStatement.setInt(9, project.getDuration());
-            insertProjectStatement.setInt(10, project.getLinkedOrganizationId());
-            insertProjectStatement.setInt(11, project.getProjectResponsibleId());
-            insertProjectStatement.setBoolean(12, project.getIsActive());
-            return insertProjectStatement.executeUpdate() > 0;
+             PreparedStatement insertProjectStatement =
+                 connection.prepareStatement(
+                     INSERT_PROJECT_QUERY
+                 )) {
+            setProjectData(insertProjectStatement, project);
+
+            wasCreated =
+                insertProjectStatement.executeUpdate() > 0;
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
         } catch (SQLException sqlException) {
-            throw new BusinessException("Error creando proyecto: " + project.getName(), sqlException);
+            LOGGER.error(
+                "Error creando proyecto {}",
+                project.getName(),
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error creando proyecto: "
+                    + project.getName(),
+                sqlException
+            );
         }
+
+        return wasCreated;
     }
 
-    public List<ProjectDTO> findAll() throws BusinessException {
-        String selectAllProjectsQuery = "SELECT * FROM PROYECTO";
+    @Override
+    public List<ProjectDTO> findAll()
+            throws BusinessException {
         List<ProjectDTO> projects = new ArrayList<>();
-        try (Connection connection = DataBaseManager.getConnection();
-                Statement selectAllProjectsStatement = connection.createStatement();
-             ResultSet resultSet = selectAllProjectsStatement.executeQuery(selectAllProjectsQuery)) {
 
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectAllProjectsStatement =
+                 connection.prepareStatement(
+                     SELECT_ALL_PROJECTS_QUERY
+                 );
+             ResultSet resultSet =
+                 selectAllProjectsStatement.executeQuery()) {
             while (resultSet.next()) {
-                projects.add(new ProjectDTO(
-                    resultSet.getInt("id"),
-                    resultSet.getString("nombre"),
-                    resultSet.getString("descripcion_general"),
-                    resultSet.getString("objetivo_general"),
-                    resultSet.getString("objetivos_inmediatos"),
-                    resultSet.getString("objetivos_mediatos"),
-                    resultSet.getString("metodologia"),
-                    resultSet.getString("recursos"),
-                    resultSet.getString("responsabilidades"),
-                    resultSet.getInt("duracion"),
-                    resultSet.getInt("organizacion_id"),
-                    resultSet.getInt("responsable_id"),
-                    resultSet.getBoolean("activo")
-                ));
+                projects.add(buildProject(resultSet));
             }
-            return projects;
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
         } catch (SQLException sqlException) {
-            throw new BusinessException("Error listando proyectos", sqlException);
+            LOGGER.error(
+                "Error listando proyectos",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error listando proyectos.",
+                sqlException
+            );
         }
+
+        return List.copyOf(projects);
     }
 
-    public List<ProjectDTO> findByStatus(boolean isActive) throws BusinessException {
-        String selectProjectsByStatusQuery = "SELECT * FROM PROYECTO WHERE activo=?";
+    @Override
+    public List<ProjectDTO> findByStatus(boolean isActive)
+            throws BusinessException {
         List<ProjectDTO> projects = new ArrayList<>();
+
         try (Connection connection = DataBaseManager.getConnection();
-                PreparedStatement selectProjectsByStatusStatement = connection.prepareStatement(selectProjectsByStatusQuery)) {
-            selectProjectsByStatusStatement.setBoolean(1, isActive);
-            try (ResultSet resultSet = selectProjectsByStatusStatement.executeQuery()) {
+             PreparedStatement selectProjectsByStatusStatement =
+                 connection.prepareStatement(
+                     SELECT_PROJECTS_BY_STATUS_QUERY
+                 )) {
+            selectProjectsByStatusStatement.setBoolean(
+                1,
+                isActive
+            );
+
+            try (ResultSet resultSet =
+                    selectProjectsByStatusStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    projects.add(new ProjectDTO(
-                        resultSet.getInt("id"),
-                        resultSet.getString("nombre"),
-                        resultSet.getString("descripcion_general"),
-                        resultSet.getString("objetivo_general"),
-                        resultSet.getString("objetivos_inmediatos"),
-                        resultSet.getString("objetivos_mediatos"),
-                        resultSet.getString("metodologia"),
-                        resultSet.getString("recursos"),
-                        resultSet.getString("responsabilidades"),
-                        resultSet.getInt("duracion"),
-                        resultSet.getInt("organizacion_id"),
-                        resultSet.getInt("responsable_id"),
-                        resultSet.getBoolean("activo")
-                    ));
+                    projects.add(buildProject(resultSet));
                 }
             }
-            return projects;
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
         } catch (SQLException sqlException) {
-            throw new BusinessException("Error listando proyectos con estado activo=" + isActive, sqlException);
+            LOGGER.error(
+                "Error listando proyectos con estado activo={}",
+                isActive,
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error listando proyectos con estado activo="
+                    + isActive,
+                sqlException
+            );
         }
+
+        return List.copyOf(projects);
     }
 
-    public boolean update(ProjectDTO project) throws BusinessException {
-        String updateProjectQuery =
-            "UPDATE PROYECTO SET nombre=?, descripcion_general=?, objetivo_general=?, objetivos_inmediatos=?, objetivos_mediatos=?, metodologia=?, recursos=?, responsabilidades=?, duracion=?, organizacion_id=?, responsable_id=?, activo=? WHERE id=?";
+    @Override
+    public boolean update(ProjectDTO project)
+            throws BusinessException {
+        InputValidator.validateNotNull(
+            project,
+            "ProjectDTO no puede ser nulo."
+        );
+
+        boolean wasUpdated;
+
         try (Connection connection = DataBaseManager.getConnection();
-                PreparedStatement updateProjectStatement = connection.prepareStatement(updateProjectQuery)) {
-            updateProjectStatement.setString(1, project.getName());
-            updateProjectStatement.setString(2, project.getGeneralDescription());
-            updateProjectStatement.setString(3, project.getGeneralObjetive());
-            updateProjectStatement.setString(4, project.getImmediateObjetives());
-            updateProjectStatement.setString(5, project.getMediateObjetive());
-            updateProjectStatement.setString(6, project.getMethodology());
-            updateProjectStatement.setString(7, project.getResources());
-            updateProjectStatement.setString(8, project.getResponsabilities());
-            updateProjectStatement.setInt(9, project.getDuration());
-            updateProjectStatement.setInt(10, project.getLinkedOrganizationId());
-            updateProjectStatement.setInt(11, project.getProjectResponsibleId());
-            updateProjectStatement.setBoolean(12, project.getIsActive());
-            updateProjectStatement.setInt(13, project.getId());
-            return updateProjectStatement.executeUpdate() > 0;
+             PreparedStatement updateProjectStatement =
+                 connection.prepareStatement(
+                     UPDATE_PROJECT_QUERY
+                 )) {
+            setProjectData(updateProjectStatement, project);
+
+            updateProjectStatement.setInt(
+                13,
+                project.getId()
+            );
+
+            wasUpdated =
+                updateProjectStatement.executeUpdate() > 0;
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
         } catch (SQLException sqlException) {
-            throw new BusinessException("Error actualizando proyecto con id=" + project.getId(), sqlException);
+            LOGGER.error(
+                "Error actualizando proyecto con id {}",
+                project.getId(),
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error actualizando proyecto con id "
+                    + project.getId(),
+                sqlException
+            );
         }
+
+        return wasUpdated;
     }
 
-    public boolean delete(int id) throws BusinessException {
-        String deleteProjectQuery = "DELETE FROM PROYECTO WHERE id=?";
+    @Override
+    public boolean delete(int id)
+            throws BusinessException {
+        InputValidator.validatePositive(
+            id,
+            "El id del proyecto debe ser positivo."
+        );
+
+        boolean wasDeleted;
+
         try (Connection connection = DataBaseManager.getConnection();
-                PreparedStatement deleteProjectStatement = connection.prepareStatement(deleteProjectQuery)) {
+             PreparedStatement deleteProjectStatement =
+                 connection.prepareStatement(
+                     DELETE_PROJECT_QUERY
+                 )) {
             deleteProjectStatement.setInt(1, id);
-            return deleteProjectStatement.executeUpdate() > 0;
+
+            wasDeleted =
+                deleteProjectStatement.executeUpdate() > 0;
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
         } catch (SQLException sqlException) {
-            throw new BusinessException("Error eliminando proyecto con id=" + id, sqlException);
+            LOGGER.error(
+                "Error eliminando proyecto con id {}",
+                id,
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error eliminando proyecto con id "
+                    + id,
+                sqlException
+            );
         }
+
+        return wasDeleted;
+    }
+
+    private void setProjectData(
+            PreparedStatement statement,
+            ProjectDTO project
+    ) throws SQLException {
+        statement.setString(1, project.getName());
+        statement.setString(
+            2,
+            project.getGeneralDescription()
+        );
+        statement.setString(
+            3,
+            project.getGeneralObjective()
+        );
+        statement.setString(
+            4,
+            project.getImmediateObjectives()
+        );
+        statement.setString(
+            5,
+            project.getMediateObjective()
+        );
+        statement.setString(
+            6,
+            project.getMethodology()
+        );
+        statement.setString(
+            7,
+            project.getResources()
+        );
+        statement.setString(
+            8,
+            project.getResponsibilities()
+        );
+        statement.setInt(
+            9,
+            project.getDuration()
+        );
+        statement.setInt(
+            10,
+            project.getLinkedOrganizationId()
+        );
+        statement.setInt(
+            11,
+            project.getProjectResponsibleId()
+        );
+        statement.setBoolean(
+            12,
+            project.getIsActive()
+        );
+    }
+
+    private ProjectDTO buildProject(ResultSet resultSet)
+            throws SQLException {
+        ProjectDTO project =
+            new ProjectDTO(
+                resultSet.getInt("id"),
+                resultSet.getString("nombre"),
+                resultSet.getString(
+                    "descripcion_general"
+                ),
+                resultSet.getString(
+                    "objetivo_general"
+                ),
+                resultSet.getString(
+                    "objetivos_inmediatos"
+                ),
+                resultSet.getString(
+                    "objetivos_mediatos"
+                ),
+                resultSet.getString("metodologia"),
+                resultSet.getString("recursos"),
+                resultSet.getString(
+                    "responsabilidades"
+                ),
+                resultSet.getInt("duracion"),
+                resultSet.getInt(
+                    "organizacion_id"
+                ),
+                resultSet.getInt(
+                    "responsable_id"
+                ),
+                resultSet.getBoolean("activo")
+            );
+
+        return project;
     }
 }
-
