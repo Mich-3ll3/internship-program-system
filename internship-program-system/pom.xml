@@ -63,6 +63,12 @@
             <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -72,7 +78,7 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <release>17</release>
+                    <release>${maven.compiler.release}</release>
                 </configuration>
             </plugin>
 

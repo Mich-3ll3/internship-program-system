@@ -12,8 +12,15 @@ public class ProjectResponsibleDTO {
     public ProjectResponsibleDTO() {
     }
 
-    public ProjectResponsibleDTO(int id, String firstName, String lastNameFather, String lastNameMother,
-                                 String email, String position, int organizationId) {
+    public ProjectResponsibleDTO(
+            int id,
+            String firstName,
+            String lastNameFather,
+            String lastNameMother,
+            String email,
+            String position,
+            int organizationId
+    ) {
         this.id = id;
         this.firstName = firstName;
         this.lastNameFather = lastNameFather;
@@ -23,8 +30,14 @@ public class ProjectResponsibleDTO {
         this.organizationId = organizationId;
     }
 
-    public ProjectResponsibleDTO(String firstName, String lastNameFather, String lastNameMother,
-                                 String email, String position, int organizationId) {
+    public ProjectResponsibleDTO(
+            String firstName,
+            String lastNameFather,
+            String lastNameMother,
+            String email,
+            String position,
+            int organizationId
+    ) {
         this.firstName = firstName;
         this.lastNameFather = lastNameFather;
         this.lastNameMother = lastNameMother;

@@ -54,7 +54,7 @@ public class UpdateProfessorDashboardController {
         txtName.setText(professor.getName());
         txtFirstSurname.setText(professor.getFirstSurname());
         txtSecondSurname.setText(professor.getSecondSurname());
-        txtInstitutionalEmail.setText(professor.getInstitucionalEmail());
+        txtInstitutionalEmail.setText(professor.getInstitutionalEmail());
         txtStaffNumber.setText(String.valueOf(professor.getStaffNumber()));
         chkCoordinator.setSelected(professor.getIsCoordinator());
 
@@ -76,7 +76,7 @@ public class UpdateProfessorDashboardController {
             currentProfessor.setSecondSurname(txtSecondSurname.getText().trim());
             currentProfessor.setIsCoordinator(chkCoordinator.isSelected());
             
-            currentProfessor.setRol(mx.uv.internshipprogramsystem.logic.dto.RolUsuario.PROFESOR);
+            currentProfessor.setRole(mx.uv.internshipprogramsystem.logic.dto.UserRole.PROFESSOR);
             
             new UserValidator().validateUserForUpdate(currentProfessor);
 
@@ -86,10 +86,10 @@ public class UpdateProfessorDashboardController {
             boolean professorUpdated = professorDAO.update(currentProfessor);
 
             if (userUpdated && professorUpdated) {
-                showNotification(Alert.AlertType.INFORMATION, "Éxito", "Los datos se actualizaron correctamente.");
+                showNotification(Alert.AlertType.INFORMATION, "Ã‰xito", "Los datos se actualizaron correctamente.");
                 goProfessorModule(null);
             } else {
-                showNotification(Alert.AlertType.WARNING, "Atención", "No se pudieron actualizar todos los registros.");
+                showNotification(Alert.AlertType.WARNING, "AtenciÃ³n", "No se pudieron actualizar todos los registros.");
             }
 
         } catch (BusinessException exception) {
@@ -100,7 +100,7 @@ public class UpdateProfessorDashboardController {
 
     private boolean isFormValid() {
         if (txtName.getText().trim().isEmpty() || txtFirstSurname.getText().trim().isEmpty()) {
-            showNotification(Alert.AlertType.WARNING, "Campos vacíos", "El nombre y primer apellido son obligatorios.");
+            showNotification(Alert.AlertType.WARNING, "Campos vacios", "El nombre y primer apellido son obligatorios.");
             return false;
         }
         return true;

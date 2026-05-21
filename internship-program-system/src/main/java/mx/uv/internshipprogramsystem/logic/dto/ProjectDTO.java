@@ -4,12 +4,12 @@ public class ProjectDTO {
     private Integer id;
     private String name;
     private String generalDescription;
-    private String generalObjetive;
-    private String immediateObjetives;
-    private String mediateObjetive;
+    private String generalObjective;
+    private String immediateObjectives;
+    private String mediateObjective;
     private String methodology;
     private String resources;
-    private String responsabilities;
+    private String responsibilities;
     private Integer duration;
     private Integer linkedOrganizationId;
     private Integer projectResponsibleId;
@@ -18,31 +18,58 @@ public class ProjectDTO {
     public ProjectDTO() {
     }
 
-    public ProjectDTO(String name, String generalDescription, String generalObjetive, String immediateObjetives, String mediateObjetive, String methodology, String resources, String responsabilities, Integer duration, Integer linkedOrganizationId, Integer projectResponsibleId, Boolean isActive) {
+    public ProjectDTO(
+            String name,
+            String generalDescription,
+            String generalObjective,
+            String immediateObjectives,
+            String mediateObjective,
+            String methodology,
+            String resources,
+            String responsibilities,
+            Integer duration,
+            Integer linkedOrganizationId,
+            Integer projectResponsibleId,
+            Boolean isActive
+    ) {
         this.name = name;
         this.generalDescription = generalDescription;
-        this.generalObjetive = generalObjetive;
-        this.immediateObjetives = immediateObjetives;
-        this.mediateObjetive = mediateObjetive;
+        this.generalObjective = generalObjective;
+        this.immediateObjectives = immediateObjectives;
+        this.mediateObjective = mediateObjective;
         this.methodology = methodology;
         this.resources = resources;
-        this.responsabilities = responsabilities;
+        this.responsibilities = responsibilities;
         this.duration = duration;
         this.linkedOrganizationId = linkedOrganizationId;
         this.projectResponsibleId = projectResponsibleId;
         this.isActive = isActive;
     }
 
-    public ProjectDTO(Integer id, String name, String generalDescription, String generalObjetive, String immediateObjetives, String mediateObjetive, String methodology, String resources, String responsabilities, Integer duration, Integer linkedOrganizationId, Integer projectResponsibleId, Boolean isActive) {
+    public ProjectDTO(
+            Integer id,
+            String name,
+            String generalDescription,
+            String generalObjective,
+            String immediateObjectives,
+            String mediateObjective,
+            String methodology,
+            String resources,
+            String responsibilities,
+            Integer duration,
+            Integer linkedOrganizationId,
+            Integer projectResponsibleId,
+            Boolean isActive
+    ) {
         this.id = id;
         this.name = name;
         this.generalDescription = generalDescription;
-        this.generalObjetive = generalObjetive;
-        this.immediateObjetives = immediateObjetives;
-        this.mediateObjetive = mediateObjetive;
+        this.generalObjective = generalObjective;
+        this.immediateObjectives = immediateObjectives;
+        this.mediateObjective = mediateObjective;
         this.methodology = methodology;
         this.resources = resources;
-        this.responsabilities = responsabilities;
+        this.responsibilities = responsibilities;
         this.duration = duration;
         this.linkedOrganizationId = linkedOrganizationId;
         this.projectResponsibleId = projectResponsibleId;
@@ -73,28 +100,28 @@ public class ProjectDTO {
         this.generalDescription = generalDescription;
     }
 
-    public String getGeneralObjetive() {
-        return generalObjetive;
+    public String getGeneralObjective() {
+        return generalObjective;
     }
 
-    public void setGeneralObjetive(String generalObjetive) {
-        this.generalObjetive = generalObjetive;
+    public void setGeneralObjective(String generalObjective) {
+        this.generalObjective = generalObjective;
     }
 
-    public String getImmediateObjetives() {
-        return immediateObjetives;
+    public String getImmediateObjectives() {
+        return immediateObjectives;
     }
 
-    public void setImmediateObjetives(String immediateObjetives) {
-        this.immediateObjetives = immediateObjetives;
+    public void setImmediateObjectives(String immediateObjectives) {
+        this.immediateObjectives = immediateObjectives;
     }
 
-    public String getMediateObjetive() {
-        return mediateObjetive;
+    public String getMediateObjective() {
+        return mediateObjective;
     }
 
-    public void setMediateObjetive(String mediateObjetive) {
-        this.mediateObjetive = mediateObjetive;
+    public void setMediateObjective(String mediateObjective) {
+        this.mediateObjective = mediateObjective;
     }
 
     public String getMethodology() {
@@ -113,12 +140,12 @@ public class ProjectDTO {
         this.resources = resources;
     }
 
-    public String getResponsabilities() {
-        return responsabilities;
+    public String getResponsibilities() {
+        return responsibilities;
     }
 
-    public void setResponsabilities(String responsabilities) {
-        this.responsabilities = responsabilities;
+    public void setResponsibilities(String responsibilities) {
+        this.responsibilities = responsibilities;
     }
 
     public Integer getDuration() {

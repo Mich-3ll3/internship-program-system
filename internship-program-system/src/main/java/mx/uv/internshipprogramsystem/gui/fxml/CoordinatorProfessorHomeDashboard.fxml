@@ -5,689 +5,264 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane 
-    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.CoordinatorProfessorHomeDashboardController" 
-    maxHeight="-Infinity" 
-    maxWidth="-Infinity" 
-    minHeight="-Infinity" 
-    minWidth="-Infinity" 
-    prefHeight="700.0" 
-    prefWidth="1000.0" 
-    style="-fx-background-color: #f5f6fa;" 
-    xmlns="http://javafx.com/javafx/21" 
+<BorderPane
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.CoordinatorProfessorHomeDashboardController"
+    maxHeight="-Infinity"
+    maxWidth="-Infinity"
+    minHeight="-Infinity"
+    minWidth="-Infinity"
+    prefHeight="700.0"
+    prefWidth="1000.0"
+    style="-fx-background-color: #f5f6fa;"
+    xmlns="http://javafx.com/javafx/21"
     xmlns:fx="http://javafx.com/fxml/1">
+
     <left>
-        <VBox alignment="TOP_CENTER" 
-              prefWidth="70.0" 
-              spacing="18.0" 
-              style="-fx-background-color:#4a90e2;" 
+        <VBox alignment="TOP_CENTER"
+              prefWidth="70.0"
+              spacing="18.0"
+              style="-fx-background-color:#4a90e2;"
               BorderPane.alignment="CENTER">
+
             <padding>
-                <Insets bottom="20.0" 
-                        top="20.0" >
-                </Insets>
+                <Insets top="20.0" bottom="20.0"/>
             </padding>
-            <StackPane prefHeight="40.0" 
-                       prefWidth="40.0" 
+
+            <StackPane prefHeight="40.0"
+                       prefWidth="40.0"
                        style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+
                 <children>
-                    <Label text="PC" 
-                           textFill="WHITE">
+                    <Label text="PC" textFill="WHITE">
                         <font>
-                            <Font name="System Bold" 
-                                  size="12.0" >
-                            </Font>
+                            <Font name="System Bold" size="12.0"/>
                         </font>
                     </Label>
                 </children>
             </StackPane>
-            <Button fx:id="btnHome" 
-                    mnemonicParsing="false" 
-                    onAction="#goHome" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;" 
-                    text="⌂" 
-                    textFill="WHITE" />
-            <Button fx:id="btnIntern" 
-                    mnemonicParsing="false" 
-                    onAction="#goInternModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="👥" 
-                    textFill="WHITE" />
-            <Button fx:id="btnReports" 
-                    mnemonicParsing="false" 
-                    onAction="#goReportsModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="📋" textFill="WHITE" />
-            <Button fx:id="btnProjects" 
-                    mnemonicParsing="false" 
-                    onAction="#goProjectsModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="🛠️" textFill="WHITE" >
-            </Button>
-            <Button fx:id="btnLinkedOrganization" 
-                    mnemonicParsing="false" 
-                    onAction="#goLinkedOrganizationModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="💼" textFill="WHITE">
-            </Button>
-            <Region VBox.vgrow="ALWAYS" />
-            <Button fx:id="btnExit" 
-                    mnemonicParsing="false" 
-                    onAction="#logOut" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="🚪" textFill="WHITE" >
-            </Button>
+
+            <Button fx:id="btnHome"
+                    mnemonicParsing="false"
+                    onAction="#goHome"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;"
+                    text="⌂"
+                    textFill="WHITE"/>
+
+            <Button fx:id="btnIntern"
+                    mnemonicParsing="false"
+                    onAction="#goInternModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="👥"
+                    textFill="WHITE"/>
+
+            <Button fx:id="btnReports"
+                    mnemonicParsing="false"
+                    onAction="#goReportsModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="📋"
+                    textFill="WHITE"/>
+
+            <Button fx:id="btnProjects"
+                    mnemonicParsing="false"
+                    onAction="#goProjectsModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="🛠️"
+                    textFill="WHITE"/>
+
+            <Button fx:id="btnLinkedOrganization"
+                    mnemonicParsing="false"
+                    onAction="#goLinkedOrganizationModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="💼"
+                    textFill="WHITE"/>
+
+            <Region VBox.vgrow="ALWAYS"/>
+
+            <Button fx:id="btnExit"
+                    mnemonicParsing="false"
+                    onAction="#logOut"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="🚪"
+                    textFill="WHITE"/>
         </VBox>
     </left>
 
     <center>
-        <VBox spacing="12.0" 
+        <VBox spacing="12.0"
               style="-fx-background-color: #f5f6fa;">
+
             <padding>
-                <Insets bottom="18.0" 
-                        left="22.0" 
-                        right="22.0" 
-                        top="18.0" >
-                </Insets>
+                <Insets top="18.0"
+                        right="22.0"
+                        bottom="18.0"
+                        left="22.0"/>
             </padding>
 
-            <HBox alignment="CENTER_LEFT" 
-                  spacing="10.0">
-                <children>
-                    <VBox HBox.hgrow="ALWAYS">
-                        <children>
-                            <Label text="Home Profesor Coordinador" 
-                                   textFill="#1a2744">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="22.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label fx:id="lblDate"
-                                   textFill="#6b7280"
-                                   style="-fx-font-weight: bold; -fx-font-size: 24;" >
-                            </Label>
-                        </children>
-                    </VBox>
-                    <StackPane prefHeight="35.0" 
-                               prefWidth="35.0" 
-                               style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
-                        <children>
-                            <Label text="MF" 
-                                   textFill="WHITE">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="11.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                        </children>
-                    </StackPane>
-                </children>
-            </HBox>
-
-            <HBox alignment="CENTER_LEFT" 
-                  prefHeight="92.0" 
-                  spacing="16.0" 
-                  style="-fx-background-color: #4a90e2; -fx-background-radius: 10;">
-                <padding>
-                    <Insets left="20.0" 
-                            right="20.0" >
-                    </Insets>
-                </padding>
-                <children>
-                    <VBox alignment="CENTER_LEFT" 
-                          HBox.hgrow="ALWAYS">
-                        <children>
-                            <Label text="Bienvenido de nuevo" 
-                                   textFill="WHITE">
-                                <font>
-                                    <Font size="13.0" />
-                                </font>
-                            </Label>
-                            <Label text="Ingeniería en Software • Profesor coordinador • Periodo Ene-Jun 2026" 
-                                   textFill="#E5E7EB">
-                                <font>
-                                    <Font size="12.0" />
-                                </font>
-                            </Label>
-                        </children>
-                    </VBox>
-                    <VBox alignment="CENTER" 
-                          maxHeight="45.0" 
-                          prefWidth="120.0" 
-                          style="-fx-background-color: white; -fx-background-radius: 8;">
-                        <padding>
-                            <Insets bottom="8.0" 
-                                    left="10.0" 
-                                    right="10.0" 
-                                    top="8.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label fx:id="lblTotalInterns" 
-                                   text="64" 
-                                   textFill="#1E3A8A">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="24.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label text="Alumnos" 
-                                   textFill="#6b7280" >
-                            </Label>
-                        </children>
-                    </VBox>
-                    <VBox alignment="CENTER" 
-                          maxHeight="45.0" 
-                          prefWidth="120.0" 
-                          style="-fx-background-color: white; -fx-background-radius: 8;">
-                        <padding>
-                            <Insets bottom="8.0" 
-                                    left="10.0" 
-                                    right="10.0" 
-                                    top="8.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label fx:id="lblPendingCount" 
-                                   text="18" 
-                                   textFill="#1E3A8A">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="24.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label text="Por revisar"
-                                   textFill="#6b7280" >
-                            </Label>
-                        </children>
-                    </VBox>
-                    <VBox alignment="CENTER_LEFT" 
-                          maxHeight="75.0" 
-                          prefWidth="170.0" 
-                          style="-fx-background-color: white; -fx-background-radius: 8;">
-                        <padding>
-                            <Insets bottom="8.0" 
-                                    left="12.0" 
-                                    right="12.0" 
-                                    top="8.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label text="Avance global" 
-                                   textFill="#6b7280" >
-                            </Label>
-                            <Label text="72% completado" 
-                                   textFill="#1E3A8A">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="13.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <ProgressBar fx:id="pbGlobalProgress" 
-                                         prefWidth="145.0" 
-                                         progress="0.72" >
-                            </ProgressBar>
-                        </children>
-                    </VBox>
-                </children>
-            </HBox>
-
             <HBox spacing="12.0">
-                <children>
-                    <VBox prefHeight="74.0" 
-                          spacing="2.0" 
-                          style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;" 
-                          HBox.hgrow="ALWAYS">
-                        <padding>
-                            <Insets bottom="10.0" 
-                                    left="14.0" 
-                                    right="14.0" 
-                                    top="10.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label text="REPORTES" 
-                                   textFill="#6b7280">
-                                <font>
-                                    <Font size="10.0" />
-                                </font>
-                            </Label>
-                            <Label fx:id="lblReportStats" 
-                                   text="18 pendientes" 
-                                   textFill="#1a2744">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="18.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label text="7 urgentes" 
-                                   textFill="#e8a020" >
-                            </Label>
-                        </children>
-                    </VBox>
-                    <VBox prefHeight="74.0" 
-                          spacing="2.0" 
-                          style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;" 
-                          HBox.hgrow="ALWAYS">
-                        <padding>
-                            <Insets bottom="10.0" 
-                                    left="14.0" 
-                                    right="14.0" 
-                                    top="10.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label text="FORMATOS" 
-                                   textFill="#6b7280">
-                                <font>
-                                    <Font size="10.0" />
-                                </font>
-                            </Label>
-                            <Label fx:id="lblFormStats" 
-                                   text="11 iniciales" 
-                                   textFill="#1a2744">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="18.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label text="para dictamen"
-                                   textFill="#4a90e2" >
-                            </Label>
-                        </children>
-                    </VBox>
-                    <VBox prefHeight="74.0" 
-                          spacing="2.0" 
-                          style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;" 
-                          HBox.hgrow="ALWAYS">
-                        <padding>
-                            <Insets bottom="10.0" 
-                                    left="14.0" 
-                                    right="14.0" 
-                                    top="10.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label text="AUTOEVALUACIÓN" 
-                                   textFill="#6b7280">
-                                <font>
-                                    <Font size="10.0" />
-                                </font>
-                            </Label>
-                            <Label fx:id="lblSelfEvaluationStats" 
-                                   text="24 recibidas" 
-                                   textFill="#1a2744">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="18.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label text="8 sin comentario" 
-                                   textFill="#22c55e" >
-                            </Label>
-                        </children>
-                    </VBox>
-                    <VBox prefHeight="74.0"
-                          spacing="2.0"
-                          style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;"
-                          HBox.hgrow="ALWAYS">
-                        <padding>
-                            <Insets bottom="10.0"
-                                    left="14.0"
-                                    right="14.0" 
-                                    top="10.0" >
-                            </Insets>
-                        </padding>
-                        <children>
-                            <Label text="PROYECTOS" 
-                                   textFill="#6b7280">
-                                <font>
-                                    <Font size="10.0" />
-                                </font>
-                            </Label>
-                            <Label fx:id="lblProjectStats" 
-                                   text="39 activos" 
-                                   textFill="#1a2744">
-                                <font>
-                                    <Font name="System Bold" 
-                                          size="18.0" >
-                                    </Font>
-                                </font>
-                            </Label>
-                            <Label text="5 disponibles" 
-                                   textFill="#ef4444" >
-                            </Label>
-                        </children>
-                    </VBox>
-                </children>
-            </HBox>
 
-            <TabPane fx:id="tpCoordinatorDashboard" 
-                     tabClosingPolicy="UNAVAILABLE" 
-                     VBox.vgrow="ALWAYS">
-                <tabs>
-                    <Tab text="Reportes y documentos">
-                        <content>
-                            <HBox spacing="12.0">
-                                <padding>
-                                    <Insets top="10.0" />
-                                </padding>
-                                <children>
-                                    <VBox spacing="8.0" 
-                                          HBox.hgrow="ALWAYS">
+                <children>
+
+                    <TabPane fx:id="tpCoordinatorDashboard"
+                             tabClosingPolicy="UNAVAILABLE"
+                             VBox.vgrow="ALWAYS">
+
+                        <tabs>
+
+                            <Tab text="Alumnos">
+
+                                <content>
+
+                                    <VBox spacing="8.0">
+
+                                        <padding>
+                                            <Insets top="10.0"/>
+                                        </padding>
+
                                         <children>
-                                            <HBox alignment="CENTER_LEFT" 
-                                                  spacing="8.0">
+
+                                            <HBox spacing="8.0">
+
                                                 <children>
-                                                    <Label text="Pendientes de evaluación" 
-                                                           textFill="#1a2744" 
-                                                           HBox.hgrow="ALWAYS">
-                                                        <font>
-                                                            <Font name="System Bold" 
-                                                                  size="14.0" >
-                                                            </Font>
-                                                        </font>
-                                                    </Label>
-                                                    <ChoiceBox fx:id="cbReportStatus" 
-                                                               prefWidth="130.0" >
-                                                    </ChoiceBox>
-                                                    <Button fx:id="btnSaveReportStatus" 
-                                                            mnemonicParsing="false" 
-                                                            onAction="#saveStateReport" 
-                                                            style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;" 
-                                                            text="Guardar estado" >
-                                                    </Button>
+
+                                                    <TextField fx:id="txtSearchIntern"
+                                                               onAction="#goConsultIntern"
+                                                               promptText="Buscar alumno..."
+                                                               HBox.hgrow="ALWAYS"/>
+
+                                                    <Button fx:id="btnEvaluateIntern"
+                                                            mnemonicParsing="false"
+                                                            onAction="#evaluateIntern"
+                                                            style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;"
+                                                            text="Evaluar"/>
+
+                                                    <Button fx:id="btnCommentIntern"
+                                                            mnemonicParsing="false"
+                                                            onAction="#commentIntern"
+                                                            style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;"
+                                                            text="Comentar"/>
                                                 </children>
                                             </HBox>
-                                            <TableView fx:id="tblReportDocuments" 
-                                                       prefHeight="250.0">
+
+                                            <TableView fx:id="tvStudents"
+                                                       prefHeight="245.0">
+
                                                 <columns>
-                                                    <TableColumn fx:id="colNameAlumno" 
-                                                                 prefWidth="150.0" 
-                                                                 text="Alumno" />
-                                                    <TableColumn fx:id="colTypeDocument" 
-                                                                 prefWidth="155.0" 
-                                                                 text="Tipo" />
-                                                    <TableColumn fx:id="colDeliveryDate" 
-                                                                 prefWidth="105.0" 
-                                                                 text="Entrega" />
-                                                    <TableColumn fx:id="colStateDocument" 
-                                                                 prefWidth="110.0" 
-                                                                 text="Estado" >
-                                                    </TableColumn>
+
+                                                    <TableColumn fx:id="colNameIntern"
+                                                                 prefWidth="180.0"
+                                                                 text="Alumno"/>
+
+                                                    <TableColumn fx:id="colProjectIntern"
+                                                                 prefWidth="220.0"
+                                                                 text="Proyecto asignado"/>
+
+                                                    <TableColumn fx:id="colStateIntern"
+                                                                 prefWidth="120.0"
+                                                                 text="Estado"/>
                                                 </columns>
                                             </TableView>
-                                            <TextArea fx:id="taDocComment" 
-                                                      prefRowCount="3" 
-                                                      promptText="Comentario u observaciones para indicar el estado del documento." 
-                                                      wrapText="true" >
-                                            </TextArea>
+
+                                            <TextArea fx:id="taInternEvaluation"
+                                                      prefRowCount="3"
+                                                      promptText="Evaluación o retroalimentación del alumno seleccionado..."
+                                                      wrapText="true"/>
                                         </children>
                                     </VBox>
-                                    <VBox prefWidth="230.0" 
-                                          spacing="8.0" 
-                                          style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;">
+                                </content>
+                            </Tab>
+
+                            <Tab text="Proyectos">
+
+                                <content>
+
+                                    <VBox spacing="8.0">
+
                                         <padding>
-                                            <Insets bottom="12.0" 
-                                                    left="12.0" 
-                                                    right="12.0" 
-                                                    top="12.0" >
-                                            </Insets>
+                                            <Insets top="10.0"/>
                                         </padding>
+
                                         <children>
-                                            <Label text="Acciones rápidas" 
-                                                   textFill="#1a2744">
-                                                <font>
-                                                    <Font name="System Bold" 
-                                                          size="13.0" >
-                                                    </Font>
-                                                </font>
-                                            </Label>
-                                            <Button fx:id="btnApprove" 
-                                                    maxWidth="Infinity" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#approveDocument" 
-                                                    style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;" 
-                                                    text="Aprobar" />
-                                            <Button fx:id="btnRequestChanges" 
-                                                    maxWidth="Infinity" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#requestChangesDocument" 
-                                                    style="-fx-background-color: #FEF3E7; -fx-background-radius: 8; -fx-text-fill: #b45309;" 
-                                                    text="Solicitar cambios" />
-                                            <Button fx:id="btnReject" 
-                                                    maxWidth="Infinity" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#rejectDocument" 
-                                                    style="-fx-background-color: #FDECEC; -fx-background-radius: 8; -fx-text-fill: #dc2626;" 
-                                                    text="Rechazar" />
-                                            <Separator />
+
+                                            <GridPane hgap="8.0"
+                                                      vgap="8.0">
+
+                                                <columnConstraints>
+
+                                                    <ColumnConstraints percentWidth="25.0"/>
+                                                    <ColumnConstraints percentWidth="25.0"/>
+                                                    <ColumnConstraints percentWidth="25.0"/>
+                                                    <ColumnConstraints percentWidth="25.0"/>
+                                                </columnConstraints>
+
+                                                <children>
+
+                                                    <TextField fx:id="tfProjectName"
+                                                               onAction="#addProject"
+                                                               promptText="Nombre del proyecto"
+                                                               GridPane.columnIndex="0"/>
+
+                                                    <ComboBox fx:id="cbProjectOrg"
+                                                              onAction="#filterResponsiblesByOrganization"
+                                                              promptText="Organización"
+                                                              GridPane.columnIndex="1"
+                                                              maxWidth="Infinity"/>
+
+                                                    <ComboBox fx:id="cbProjectManager"
+                                                              promptText="Responsable"
+                                                              GridPane.columnIndex="2"
+                                                              maxWidth="Infinity"/>
+
+                                                    <Button fx:id="btnAddProject"
+                                                            mnemonicParsing="false"
+                                                            onAction="#addProject"
+                                                            style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;"
+                                                            text="+ Proyecto"
+                                                            GridPane.columnIndex="3"/>
+
+                                                    <ComboBox fx:id="cbProjectIntern"
+                                                              promptText="Alumno para asignar"
+                                                              GridPane.columnIndex="0"
+                                                              GridPane.columnSpan="2"
+                                                              GridPane.rowIndex="1"
+                                                              maxWidth="Infinity"/>
+
+                                                    <Button fx:id="btnAssignProject"
+                                                            mnemonicParsing="false"
+                                                            onAction="#assignInternProject"
+                                                            style="-fx-background-color: #e8a020; -fx-background-radius: 8; -fx-text-fill: white;"
+                                                            text="Asignar proyecto a alumno"
+                                                            GridPane.columnIndex="2"
+                                                            GridPane.columnSpan="2"
+                                                            GridPane.rowIndex="1"
+                                                            maxWidth="Infinity"/>
+                                                </children>
+
+                                                <rowConstraints>
+                                                    <RowConstraints/>
+                                                    <RowConstraints/>
+                                                </rowConstraints>
+                                            </GridPane>
                                         </children>
                                     </VBox>
-                                </children>
-                            </HBox>
-                        </content>
-                    </Tab>
+                                </content>
+                            </Tab>
 
-                    <Tab text="Alumnos">
-                        <content>
-                            <VBox spacing="8.0">
-                                <padding>
-                                    <Insets top="10.0" />
-                                </padding>
-                                <children>
-                                    <HBox spacing="8.0">
-                                        <children>
-                                            <TextField fx:id="txtSearchIntern" 
-                                                       onAction="#goConsultIntern" 
-                                                       promptText="Buscar alumno..." 
-                                                       HBox.hgrow="ALWAYS" />
-                                            <Button fx:id="btnEvaluateIntern" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#EvaluateIntern" 
-                                                    style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;" 
-                                                    text="Evaluar" />
-                                            <Button fx:id="btnCommentIntern" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#CommentIntern" 
-                                                    style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" 
-                                                    text="Comentar" >
-                                            </Button>
-                                        </children>
-                                    </HBox>
-                                    <TableView fx:id="tvStudents" 
-                                               prefHeight="245.0">
-                                        <columns>
-                                            <TableColumn fx:id="colNameIntern" 
-                                                         prefWidth="180.0" 
-                                                         text="Alumno" />
-                                            <TableColumn fx:id="colProjectIntern" 
-                                                         prefWidth="220.0" 
-                                                         text="Proyecto asignado" />
-                                            <TableColumn fx:id="colStateIntern"
-                                                         prefWidth="120.0" 
-                                                         text="Estado" >
-                                            </TableColumn>
-                                        </columns>
-                                    </TableView>
-                                    <TextArea fx:id="taInternEvaluation" 
-                                              prefRowCount="3" 
-                                              promptText="Evaluación o retroalimentación del alumno seleccionado..." 
-                                              wrapText="true" >
-                                    </TextArea>
-                                </children>
-                            </VBox>
-                        </content>
-                    </Tab>
-
-                    <Tab text="Organizaciones">
-                        <content>
-                            <VBox spacing="8.0">
-                                <padding>
-                                    <Insets top="10.0" />
-                                </padding>
-                                <children>
-                                    <GridPane hgap="8.0" 
-                                              vgap="8.0">
-                                        <columnConstraints>
-                                            <ColumnConstraints percentWidth="25.0" />
-                                            <ColumnConstraints percentWidth="25.0" />
-                                            <ColumnConstraints percentWidth="25.0" />
-                                            <ColumnConstraints percentWidth="25.0" />
-                                        </columnConstraints>
-                                        <children>
-                                            <TextField fx:id="txtNameLinkedOrganization" 
-                                                       onAction="#addLinkedOrganization" 
-                                                       promptText="Organización" 
-                                                       GridPane.columnIndex="0" />
-                                            <TextField fx:id="txtNameResponsible" 
-                                                       onAction="#addLinkedOrganization" 
-                                                       promptText="Responsable" 
-                                                       GridPane.columnIndex="1" />
-                                            <TextField fx:id="tfManagerEmail" 
-                                                       onAction="#addLinkedOrganization" 
-                                                       promptText="Correo" 
-                                                       GridPane.columnIndex="2" />
-                                            <Button fx:id="btnAddOrganization" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#addLinkedOrganization" 
-                                                    style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;" 
-                                                    text="+ Agregar" 
-                                                    GridPane.columnIndex="3" />
-                                        </children>
-                                        <rowConstraints>
-                                            <RowConstraints />
-                                        </rowConstraints>
-                                    </GridPane>
-                                    <TableView fx:id="tvOrganizations" 
-                                               prefHeight="300.0">
-                                        <columns>
-                                            <TableColumn fx:id="tcOrgName" 
-                                                         prefWidth="220.0" 
-                                                         text="Organización" />
-                                            <TableColumn fx:id="tcOrgManager" 
-                                                         prefWidth="180.0" 
-                                                         text="Responsable" />
-                                            <TableColumn fx:id="tcOrgEmail" 
-                                                         prefWidth="210.0" 
-                                                         text="Correo" />
-                                            <TableColumn fx:id="tcOrgProjects" 
-                                                         prefWidth="130.0" 
-                                                         text="Proyectos" />
-                                        </columns>
-                                    </TableView>
-                                </children>
-                            </VBox>
-                        </content>
-                    </Tab>
-
-                    <Tab text="Proyectos">
-                        <content>
-                            <VBox spacing="8.0">
-                                <padding>
-                                    <Insets top="10.0" />
-                                </padding>
-                                <children>
-                                    <GridPane hgap="8.0" 
-                                              vgap="8.0">
-                                        <columnConstraints>
-                                            <ColumnConstraints 
-                                                percentWidth="25.0" />
-                                            <ColumnConstraints 
-                                                percentWidth="25.0" />
-                                            <ColumnConstraints 
-                                                percentWidth="25.0" />
-                                            <ColumnConstraints 
-                                                percentWidth="25.0" />
-                                        </columnConstraints>
-                                        <children>
-                                            <TextField fx:id="tfProjectName" 
-                                                       onAction="#addProject" 
-                                                       promptText="Nombre del proyecto" 
-                                                       GridPane.columnIndex="0" />
-                                            <ComboBox fx:id="cbProjectOrg" 
-                                                      onAction="#filtrarResponsablesPorOrganizacion" 
-                                                      promptText="Organización" 
-                                                      GridPane.columnIndex="1" 
-                                                      maxWidth="Infinity" />
-                                            <ComboBox fx:id="cbProjectManager" 
-                                                      promptText="Responsable" 
-                                                      GridPane.columnIndex="2" 
-                                                      maxWidth="Infinity" />
-                                            <Button fx:id="btnAddProject" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#addProject" 
-                                                    style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;" 
-                                                    text="+ Proyecto" 
-                                                    GridPane.columnIndex="3" />
-                                            <ComboBox fx:id="cbProjectIntern" 
-                                                      promptText="Alumno para asignar" 
-                                                      GridPane.columnIndex="0" 
-                                                      GridPane.columnSpan="2" 
-                                                      GridPane.rowIndex="1" 
-                                                      maxWidth="Infinity" />
-                                            <Button fx:id="btnAssignProject" 
-                                                    mnemonicParsing="false" 
-                                                    onAction="#assignInternProject" 
-                                                    style="-fx-background-color: #e8a020; -fx-background-radius: 8; -fx-text-fill: white;" 
-                                                    text="Asignar proyecto a alumno" 
-                                                    GridPane.columnIndex="2" 
-                                                    GridPane.columnSpan="2" 
-                                                    GridPane.rowIndex="1" 
-                                                    maxWidth="Infinity" >
-                                            </Button>
-                                        </children>
-                                        <rowConstraints>
-                                            <RowConstraints />
-                                            <RowConstraints />
-                                        </rowConstraints>
-                                    </GridPane>
-                                    <TableView fx:id="tvProjects" 
-                                               prefHeight="255.0">
-                                        <columns>
-                                            <TableColumn fx:id="tcProjectTitle" 
-                                                         prefWidth="230.0" 
-                                                         text="Proyecto" />
-                                            <TableColumn fx:id="tcProjectOrg" 
-                                                         prefWidth="170.0" 
-                                                         text="Organización" />
-                                            <TableColumn fx:id="tcProjectManager" 
-                                                         prefWidth="165.0" 
-                                                         text="Responsable" />
-                                            <TableColumn fx:id="tcProjectIntern" 
-                                                         prefWidth="170.0" 
-                                                         text="Alumno asignado" >
-                                            </TableColumn>
-                                        </columns>
-                                    </TableView>
-                                </children>
-                            </VBox>
-                        </content>
-                    </Tab>
-                </tabs>
-            </TabPane>
+                        </tabs>
+                    </TabPane>
+                </children>
+            </HBox>
         </VBox>
     </center>
 </BorderPane>
-

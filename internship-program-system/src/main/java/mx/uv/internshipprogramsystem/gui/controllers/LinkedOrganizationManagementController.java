@@ -85,7 +85,7 @@ public class LinkedOrganizationManagementController {
             LinkedOrganizationValidator validator = new LinkedOrganizationValidator();
             validator.validateFullOrganization(organization);
 
-            if (organizationDAO.createLikendOrganization(organization)) {
+            if (organizationDAO.createLinkedOrganization(organization)) {
                 showNotification(Alert.AlertType.INFORMATION, "Registro exitoso", "Organización registrada correctamente.");
                 clearForm();
                 loadOrganizations();

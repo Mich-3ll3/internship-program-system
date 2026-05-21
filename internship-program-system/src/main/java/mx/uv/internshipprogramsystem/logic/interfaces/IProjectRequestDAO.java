@@ -1,8 +1,9 @@
 package mx.uv.internshipprogramsystem.logic.interfaces;
 
+import java.util.List;
+
 import mx.uv.internshipprogramsystem.logic.dto.ProjectRequestDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import java.util.List;
 
 public interface IProjectRequestDAO {
 

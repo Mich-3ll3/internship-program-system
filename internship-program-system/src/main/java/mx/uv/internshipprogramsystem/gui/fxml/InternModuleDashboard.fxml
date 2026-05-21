@@ -130,7 +130,7 @@
                               HBox.hgrow="ALWAYS" />
                     <VBox spacing="8.0">
                         <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goUpdateIntern" text="Modificar" />
-                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#showPendingFunctionalityMessage" text="Cambiar estado" />
+                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleChangeInternStatus" text="Cambiar estado" />
                     </VBox>
                 </HBox>
             </VBox>

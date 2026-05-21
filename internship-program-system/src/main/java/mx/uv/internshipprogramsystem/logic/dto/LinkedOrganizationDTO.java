@@ -16,7 +16,17 @@ public class LinkedOrganizationDTO {
     
     }
 
-    public LinkedOrganizationDTO(String name, String address, String city, String state, String email, String phoneNumber, String sector, Integer indirectUserCount, Integer directUserCount) {
+    public LinkedOrganizationDTO(
+            String name,
+            String address,
+            String city,
+            String state,
+            String email,
+            String phoneNumber,
+            String sector,
+            Integer indirectUserCount,
+            Integer directUserCount
+    ) {
         this.name = name;
         this.address = address;
         this.city = city;
@@ -28,7 +38,18 @@ public class LinkedOrganizationDTO {
         this.directUserCount = directUserCount;
     }
 
-    public LinkedOrganizationDTO(Integer id, String name, String address, String city, String state, String email, String phoneNumber, String sector, Integer indirectUserCount, Integer directUserCount) {
+    public LinkedOrganizationDTO(
+            Integer id,
+            String name,
+            String address,
+            String city,
+            String state,
+            String email,
+            String phoneNumber,
+            String sector,
+            Integer indirectUserCount,
+            Integer directUserCount
+    ) {
         this.id = id;
         this.name = name;
         this.address = address;

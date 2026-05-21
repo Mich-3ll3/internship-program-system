@@ -15,7 +15,10 @@ public class InternValidator {
         }
         
         if(!enrollmentNumber.matches(ENROLLMENT_FORMAT_REGEX)) {
-            LOGGER.warn("Validación fallida: formato inválido para matrícula [{}]", enrollmentNumber);
+            LOGGER.warn(
+                "Validación fallida: formato inválido para matrícula [{}]",
+                enrollmentNumber
+            );
             throw new BusinessException("El formato de la matrícula es inválido.");
         }
     }
