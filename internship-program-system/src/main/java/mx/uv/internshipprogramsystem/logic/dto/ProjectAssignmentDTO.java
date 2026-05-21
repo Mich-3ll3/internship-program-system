@@ -1,32 +1,21 @@
 package mx.uv.internshipprogramsystem.logic.dto;
 
+import java.time.LocalDate;
+
 public class ProjectAssignmentDTO {
-    private int id;
     private int studentId;
     private int projectId;
-    private String assignmentDate;
+    private int professorId;
+    private LocalDate assignmentDate;
 
     public ProjectAssignmentDTO() {
     }
 
-    public ProjectAssignmentDTO(int id, int studentId, int projectId, String assignmentDate) {
-        this.id = id;
+    public ProjectAssignmentDTO(int studentId, int projectId, int professorId, LocalDate assignmentDate) {
         this.studentId = studentId;
         this.projectId = projectId;
+        this.professorId = professorId;
         this.assignmentDate = assignmentDate;
-    }
-
-    public ProjectAssignmentDTO(int studentId, int projectId, String assignmentDate) {
-        this.studentId = studentId;
-        this.projectId = projectId;
-        this.assignmentDate = assignmentDate;
-    }
-
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
     }
 
     public int getStudentId() {
@@ -43,10 +32,17 @@ public class ProjectAssignmentDTO {
         this.projectId = projectId;
     }
 
-    public String getAssignmentDate() {
+    public int getProfessorId() {
+        return professorId;
+    }
+    public void setProfessorId(int professorId) {
+        this.professorId = professorId;
+    }
+
+    public LocalDate getAssignmentDate() {
         return assignmentDate;
     }
-    public void setAssignmentDate(String assignmentDate) {
+    public void setAssignmentDate(LocalDate assignmentDate) {
         this.assignmentDate = assignmentDate;
     }
 }
