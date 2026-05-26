@@ -20,4 +20,14 @@ public class InputValidator {
             throw new ValidationException(message);
         }
     }
+
+    public static void validateMaxLength(
+            String value,
+            int maxLength,
+            String message
+    ) throws ValidationException {
+        if (value != null && value.length() > maxLength) {
+            throw new ValidationException(message);
+        }
+    }
 }

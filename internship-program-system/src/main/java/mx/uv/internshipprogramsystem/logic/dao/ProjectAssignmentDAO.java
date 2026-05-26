@@ -208,6 +208,9 @@ public class ProjectAssignmentDAO
                     id
                 );
             }
+
+            LOGGER.warn("No se eliminó asignación con id {}", id);
+            return false;
         } catch (SQLException sqlException) {
             LOGGER.error(
                 "Error eliminando asignación con id {}",
