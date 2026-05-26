@@ -9,12 +9,14 @@ import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import mx.uv.internshipprogramsystem.logic.managers.ProfessorRegistrationManager;
-import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
+import mx.uv.internshipprogramsystem.logic.security.UserRegistrationManager;
+import mx.uv.internshipprogramsystem.logic.validations.ProfessorValidator;
+import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
 
 public class RegisterProfessorFormController {
     private static final Logger LOGGER =
@@ -22,14 +24,19 @@ public class RegisterProfessorFormController {
 
     @FXML
     private TextField txtInstitutionalEmail;
+
     @FXML
     private TextField txtName;
+
     @FXML
     private TextField txtFirstSurname;
+
     @FXML
     private TextField txtSecondSurname;
+
     @FXML
     private TextField txtStaffNumber;
+
     @FXML
     private CheckBox chkCoordinator;
 
@@ -62,13 +69,13 @@ public class RegisterProfessorFormController {
 
     private boolean isFormValid() {
         boolean isValid = true;
-
         String email = txtInstitutionalEmail.getText().trim();
         String name = txtName.getText().trim();
         String firstSurname = txtFirstSurname.getText().trim();
         String staffNumber = txtStaffNumber.getText().trim();
 
-        if (email.isEmpty() || name.isEmpty() || firstSurname.isEmpty() || staffNumber.isEmpty()) {
+        if (email.isEmpty() || name.isEmpty()
+                || firstSurname.isEmpty() || staffNumber.isEmpty()) {
             showNotification(
                 Alert.AlertType.WARNING,
                 "Campos incompletos",
@@ -90,25 +97,30 @@ public class RegisterProfessorFormController {
             );
             isValid = false;
         }
+
         return isValid;
     }
 
     private void registerProfessor() {
         try {
             UserDTO user = buildUser();
-            ProfessorDTO professor = buildProfessor(0);
-            ProfessorRegistrationManager professorRegistrationManager =
-                new ProfessorRegistrationManager();
+            validateUser(user);
 
-            boolean wasCreated =
-                professorRegistrationManager.registerProfessor(
-                    user,
-                    professor
-                );
+            UserRegistrationManager registrationManager =
+                new UserRegistrationManager();
+
+            int userId = registrationManager.registerUser(user);
+            ProfessorDTO professor = buildProfessor(userId);
+
+            validateProfessor(professor);
+
+            ProfessorDAO professorDAO = new ProfessorDAO();
+            boolean wasCreated = professorDAO.create(professor);
 
             if (wasCreated) {
                 LOGGER.info(
-                    "Profesor registrado correctamente."
+                    "Profesor registrado correctamente: {}",
+                    user.getInstitutionalEmail()
                 );
 
                 showNotification(
@@ -125,41 +137,59 @@ public class RegisterProfessorFormController {
                 "Error de negocio al registrar profesor",
                 businessException
             );
+
             showNotification(
                 Alert.AlertType.ERROR,
                 "Error de registro",
                 businessException.getMessage()
             );
+        } catch (Exception exception) {
+            LOGGER.error(
+                "Error inesperado al registrar profesor",
+                exception
+            );
+
+            showNotification(
+                Alert.AlertType.ERROR,
+                "Error de sistema",
+                "No se pudo completar el registro."
+            );
         }
     }
 
     private UserDTO buildUser() {
-        String cleanEmail = InputCleaner.sanitizeText(txtInstitutionalEmail.getText());
-        String cleanName = InputCleaner.sanitizeText(txtName.getText());
-        String cleanFirstSurname = InputCleaner.sanitizeText(txtFirstSurname.getText());
-        String cleanSecondSurname = InputCleaner.sanitizeText(txtSecondSurname.getText());
-
         UserDTO user = new UserDTO(
-            cleanEmail,
+            txtInstitutionalEmail.getText().trim(),
             null,
-            cleanName,
-            cleanFirstSurname,
-            cleanSecondSurname,
+            txtName.getText().trim(),
+            txtFirstSurname.getText().trim(),
+            txtSecondSurname.getText().trim(),
             false,
             UserRole.PROFESSOR
         );
+
         return user;
     }
 
     private ProfessorDTO buildProfessor(int userId) {
-        String cleanStaffNumber = InputCleaner.sanitizeText(txtStaffNumber.getText());
-        ProfessorDTO professor = 
-        new ProfessorDTO(
-            cleanStaffNumber, 
+        ProfessorDTO professor = new ProfessorDTO(
+            txtStaffNumber.getText().trim(),
             chkCoordinator.isSelected(),
             userId
         );
+
         return professor;
+    }
+
+    private void validateUser(UserDTO user) throws BusinessException {
+        UserValidator userValidator = new UserValidator();
+        userValidator.validateUserForCreation(user);
+    }
+
+    private void validateProfessor(ProfessorDTO professor)
+            throws BusinessException {
+        ProfessorValidator professorValidator = new ProfessorValidator();
+        professorValidator.validateStaffNumber(professor.getStaffNumber());
     }
 
     @FXML

@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
-import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -84,25 +83,48 @@ public class ProfessorDAO implements IProfessorDAO {
         "SELECT COUNT(*) AS total FROM PROFESOR";
 
     @Override
-    public boolean create(ProfessorDTO professor, Connection connection) throws BusinessException {
-        InputValidator.validateNotNull(connection, "La conexión no puede ser nula.");
-        ProfessorValidator professorValidator = new ProfessorValidator();
-        professorValidator.validateProfessorForCreation(professor);
+    public boolean create(ProfessorDTO professor)
+            throws BusinessException {
+        InputValidator.validateNotNull(
+            professor,
+            "ProfessorDTO no puede ser nulo."
+        );
+
+        validateProfessor(professor);
 
         boolean wasCreated;
 
-        try (PreparedStatement insertProfessorStatement =
-                connection.prepareStatement(
-                    INSERT_PROFESSOR_QUERY
-                )) {
-            insertProfessorStatement.setString(1, professor.getStaffNumber());
-            insertProfessorStatement.setBoolean(2, professor.getIsCoordinator());
-            insertProfessorStatement.setInt(3, professor.getId());
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement insertProfessorStatement =
+                 connection.prepareStatement(
+                     INSERT_PROFESSOR_QUERY
+                 )) {
+            insertProfessorStatement.setString(
+                1,
+                professor.getStaffNumber()
+            );
+            insertProfessorStatement.setBoolean(
+                2,
+                professor.getIsCoordinator()
+            );
+            insertProfessorStatement.setInt(
+                3,
+                professor.getId()
+            );
 
-            wasCreated = insertProfessorStatement.executeUpdate() > 0;
-        } catch (
-                SQLIntegrityConstraintViolationException integrityException
-        ) {
+            wasCreated =
+                insertProfessorStatement.executeUpdate() > 0;
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo establecer conexión con la base de datos.",
+                connectionException
+            );
+        } catch (SQLIntegrityConstraintViolationException integrityException) {
             LOGGER.error(
                 "Violación de integridad: número de personal duplicado",
                 integrityException
@@ -128,9 +150,8 @@ public class ProfessorDAO implements IProfessorDAO {
     }
 
     @Override
-    public boolean update(
-            ProfessorDTO professor
-    ) throws BusinessException {
+    public boolean update(ProfessorDTO professor)
+            throws BusinessException {
         InputValidator.validateNotNull(
             professor,
             "ProfessorDTO no puede ser nulo."
@@ -142,19 +163,17 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement updateProfessorStatement =
-                    connection.prepareStatement(
-                        UPDATE_PROFESSOR_QUERY
-                    )) {
+                 connection.prepareStatement(
+                     UPDATE_PROFESSOR_QUERY
+                 )) {
             updateProfessorStatement.setString(
                 1,
                 professor.getStaffNumber()
             );
-
             updateProfessorStatement.setBoolean(
                 2,
                 professor.getIsCoordinator()
             );
-
             updateProfessorStatement.setInt(
                 3,
                 professor.getId()
@@ -162,9 +181,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
             wasUpdated =
                 updateProfessorStatement.executeUpdate() > 0;
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -174,9 +191,7 @@ public class ProfessorDAO implements IProfessorDAO {
                 "No se pudo conectar con la base de datos.",
                 connectionException
             );
-        } catch (
-                SQLIntegrityConstraintViolationException integrityException
-        ) {
+        } catch (SQLIntegrityConstraintViolationException integrityException) {
             LOGGER.error(
                 "Violación de integridad al actualizar profesor",
                 integrityException
@@ -184,7 +199,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
             throw new BusinessException(
                 "El número de personal ya existe o "
-                + "el usuario asociado no es válido.",
+                    + "el usuario asociado no es válido.",
                 integrityException
             );
         } catch (SQLException sqlException) {
@@ -196,7 +211,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
             throw new BusinessException(
                 "Error actualizando profesor con número de personal "
-                + professor.getStaffNumber(),
+                    + professor.getStaffNumber(),
                 sqlException
             );
         }
@@ -217,9 +232,9 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectProfessorStatement =
-                    connection.prepareStatement(
-                        SELECT_PROFESSOR_BY_STAFF_NUMBER_QUERY
-                    )) {
+                 connection.prepareStatement(
+                     SELECT_PROFESSOR_BY_STAFF_NUMBER_QUERY
+                 )) {
             selectProfessorStatement.setString(1, staffNumber);
 
             try (ResultSet resultSet =
@@ -227,9 +242,7 @@ public class ProfessorDAO implements IProfessorDAO {
                 professor =
                     buildOptionalProfessorWithGroups(resultSet);
             }
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -247,7 +260,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
             throw new BusinessException(
                 "Error buscando profesor con número de personal "
-                + staffNumber,
+                    + staffNumber,
                 selectException
             );
         }
@@ -256,9 +269,8 @@ public class ProfessorDAO implements IProfessorDAO {
     }
 
     @Override
-    public List<ProfessorDTO> findByName(
-            String searchName
-    ) throws BusinessException {
+    public List<ProfessorDTO> findByName(String searchName)
+            throws BusinessException {
         InputValidator.validateNotEmpty(
             searchName,
             "El nombre del profesor no puede estar vacío."
@@ -269,9 +281,9 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectProfessorsStatement =
-                    connection.prepareStatement(
-                        SELECT_PROFESSORS_BY_NAME_QUERY
-                    )) {
+                 connection.prepareStatement(
+                     SELECT_PROFESSORS_BY_NAME_QUERY
+                 )) {
             selectProfessorsStatement.setString(1, searchPattern);
 
             try (ResultSet resultSet =
@@ -280,9 +292,7 @@ public class ProfessorDAO implements IProfessorDAO {
                     professors.add(buildProfessor(resultSet));
                 }
             }
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -314,23 +324,19 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectAllProfessorsStatement =
-                    connection.prepareStatement(
-                        SELECT_ALL_PROFESSORS_NAME_QUERY
-                    );
+                 connection.prepareStatement(
+                     SELECT_ALL_PROFESSORS_NAME_QUERY
+                 );
              ResultSet resultSet =
-                    selectAllProfessorsStatement.executeQuery()) {
+                 selectAllProfessorsStatement.executeQuery()) {
             while (resultSet.next()) {
                 ProfessorDTO professor = new ProfessorDTO();
 
-                professor.setName(
-                    resultSet.getString("nombre")
-                );
+                professor.setName(resultSet.getString("nombre"));
 
                 professors.add(professor);
             }
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -362,17 +368,15 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectAllProfessorsStatement =
-                    connection.prepareStatement(
-                        SELECT_ALL_PROFESSORS_QUERY
-                    );
+                 connection.prepareStatement(
+                     SELECT_ALL_PROFESSORS_QUERY
+                 );
              ResultSet resultSet =
-                    selectAllProfessorsStatement.executeQuery()) {
+                 selectAllProfessorsStatement.executeQuery()) {
             while (resultSet.next()) {
                 professors.add(buildProfessor(resultSet));
             }
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -404,16 +408,14 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectCoordinatorStatement =
-                    connection.prepareStatement(
-                        SELECT_COORDINATOR_QUERY
-                    );
+                 connection.prepareStatement(
+                     SELECT_COORDINATOR_QUERY
+                 );
              ResultSet resultSet =
-                    selectCoordinatorStatement.executeQuery()) {
+                 selectCoordinatorStatement.executeQuery()) {
             coordinator =
                 buildOptionalCoordinator(resultSet);
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -444,18 +446,15 @@ public class ProfessorDAO implements IProfessorDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectCountProfessorStatement =
-                    connection.prepareStatement(
-                        SELECT_COUNT_PROFESSORS_QUERY
-                    );
+                 connection.prepareStatement(
+                     SELECT_COUNT_PROFESSORS_QUERY
+                 );
              ResultSet resultSet =
-                    selectCountProfessorStatement.executeQuery()) {
+                 selectCountProfessorStatement.executeQuery()) {
             if (resultSet.next()) {
-                totalProfessors =
-                    resultSet.getInt("total");
+                totalProfessors = resultSet.getInt("total");
             }
-        } catch (
-                SQLTransientConnectionException connectionException
-        ) {
+        } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
                 connectionException
@@ -480,10 +479,13 @@ public class ProfessorDAO implements IProfessorDAO {
         return totalProfessors;
     }
 
-    private void validateProfessor(ProfessorDTO professor) throws BusinessException {
+    private void validateProfessor(ProfessorDTO professor)
+            throws BusinessException {
         ProfessorValidator validator = new ProfessorValidator();
 
-        validator.validateStaffNumber(professor.getStaffNumber());
+        validator.validateStaffNumber(
+            professor.getStaffNumber()
+        );
     }
 
     private Optional<ProfessorDTO> buildOptionalProfessorWithGroups(
@@ -492,9 +494,8 @@ public class ProfessorDAO implements IProfessorDAO {
         Optional<ProfessorDTO> professor;
 
         if (resultSet.next()) {
-            professor = Optional.of(
-                buildProfessorWithGroups(resultSet)
-            );
+            professor =
+                Optional.of(buildProfessorWithGroups(resultSet));
         } else {
             professor = Optional.empty();
         }
@@ -508,9 +509,8 @@ public class ProfessorDAO implements IProfessorDAO {
         Optional<ProfessorDTO> coordinator;
 
         if (resultSet.next()) {
-            coordinator = Optional.of(
-                buildCoordinator(resultSet)
-            );
+            coordinator =
+                Optional.of(buildCoordinator(resultSet));
         } else {
             coordinator = Optional.empty();
         }
@@ -518,17 +518,30 @@ public class ProfessorDAO implements IProfessorDAO {
         return coordinator;
     }
 
-    private ProfessorDTO buildProfessor(ResultSet resultSet) throws SQLException {
+    private ProfessorDTO buildProfessor(ResultSet resultSet)
+            throws SQLException {
         ProfessorDTO professor = new ProfessorDTO();
 
-        professor.setStaffNumber(resultSet.getString("numero_personal"));
+        professor.setStaffNumber(
+            resultSet.getString("numero_personal")
+        );
+        professor.setIsCoordinator(
+            resultSet.getBoolean("es_coordinador")
+        );
         professor.setId(resultSet.getInt("id"));
-        professor.setInstitutionalEmail(resultSet.getString("correo_institucional"));
-        professor.setIsCoordinator(resultSet.getBoolean("es_coordinador"));
+        professor.setInstitutionalEmail(
+            resultSet.getString("correo_institucional")
+        );
         professor.setName(resultSet.getString("nombre"));
-        professor.setFirstSurname(resultSet.getString("apellido_paterno"));
-        professor.setSecondSurname(resultSet.getString("apellido_materno"));
-        professor.setIsActive(resultSet.getBoolean("activo"));
+        professor.setFirstSurname(
+            resultSet.getString("apellido_paterno")
+        );
+        professor.setSecondSurname(
+            resultSet.getString("apellido_materno")
+        );
+        professor.setIsActive(
+            resultSet.getBoolean("activo")
+        );
 
         return professor;
     }
@@ -539,16 +552,13 @@ public class ProfessorDAO implements IProfessorDAO {
         ProfessorDTO professor =
             buildProfessor(resultSet);
 
-        professor.setGroups(
-            resultSet.getInt("grupos")
-        );
+        professor.setGroups(resultSet.getInt("grupos"));
 
         return professor;
     }
 
-    private ProfessorDTO buildCoordinator(
-            ResultSet resultSet
-    ) throws SQLException {
+    private ProfessorDTO buildCoordinator(ResultSet resultSet)
+            throws SQLException {
         ProfessorDTO professor =
             buildProfessor(resultSet);
 

@@ -8,10 +8,10 @@ import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import mx.uv.internshipprogramsystem.logic.managers.LoginManager;
 
 public class LoginDashboardController {
     private static final Logger LOGGER =
@@ -29,8 +29,8 @@ public class LoginDashboardController {
         String password = txtPassword.getText();
 
         try {
-            LoginManager loginManager = new LoginManager();
-            UserDTO loggedUser = loginManager.login(email, password);
+            UserDAO userDAO = new UserDAO();
+            UserDTO loggedUser = userDAO.login(email, password);
 
             LOGGER.info(
                 "Inicio de sesión exitoso para usuario con rol {}",

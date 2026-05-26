@@ -12,10 +12,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
+import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IUserDAO;
+import mx.uv.internshipprogramsystem.logic.security.SecurityManager;
 import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
 
@@ -33,15 +36,17 @@ public class UserDAO implements IUserDAO {
         + "apellido_materno = ?, activo = ?, rol = ? "
         + "WHERE correo_institucional = ?";
 
-    private static final String SELECT_USER_BY_EMAIL_QUERY =
-        "SELECT id, correo_institucional, nombre, "
-        + "apellido_paterno, apellido_materno, "
-        + "activo, rol "
-        + "FROM USUARIO "
-        + "WHERE correo_institucional = ?";
-
     private static final String CHANGE_USER_STATUS_QUERY =
         "UPDATE USUARIO SET activo = ? WHERE correo_institucional = ?";
+
+    private static final String SELECT_USER_BY_EMAIL_FOR_LOGIN_QUERY =
+        "SELECT u.id, u.correo_institucional, u.contrasena, u.nombre, "
+        + "u.apellido_paterno, u.apellido_materno, u.activo, u.rol, "
+        + "e.matricula, p.numero_personal, p.es_coordinador "
+        + "FROM USUARIO u "
+        + "LEFT JOIN ESTUDIANTE e ON u.id = e.usuario_id "
+        + "LEFT JOIN PROFESOR p ON u.id = p.usuario_id "
+        + "WHERE u.correo_institucional = ?";
 
     private static final String SELECT_COUNT_ACTIVE_USERS_QUERY =
         "SELECT COUNT(*) AS totalActivos FROM USUARIO WHERE activo = true";
@@ -53,13 +58,14 @@ public class UserDAO implements IUserDAO {
         "UPDATE USUARIO SET activo = ? WHERE id = ?";
 
     @Override
-    public int create(UserDTO user, Connection connection) throws BusinessException {
-        InputValidator.validateNotNull(connection, "La conexión no puede ser nula.");
+    public int create(UserDTO user) throws BusinessException {
+        InputValidator.validateNotNull(user, "UserDTO no puede ser nulo.");
         validateUserForCreation(user);
 
         int generatedUserId;
 
-        try (PreparedStatement insertUserStatement =
+        try (Connection connection = DataBaseManager.getConnection();
+            PreparedStatement insertUserStatement =
             connection.prepareStatement(
             INSERT_USER_QUERY,
             Statement.RETURN_GENERATED_KEYS
@@ -72,13 +78,14 @@ public class UserDAO implements IUserDAO {
                     + user.getInstitutionalEmail()
                 );
             }
+
             generatedUserId = getGeneratedUserId(insertUserStatement);
         } catch (SQLIntegrityConstraintViolationException integrityException) {
             LOGGER.error("Violación de integridad al crear usuario", integrityException);
             throw new BusinessException(
                 "El correo institucional ya existe.", integrityException);
         } catch (SQLTransientConnectionException connectionException) {
-            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            LOGGER.error( "Fallo de conexión con la base de datos", connectionException);
             throw new BusinessException(
                 "No se pudo establecer conexión con la base de datos.", connectionException);
         } catch (SQLException insertException) {
@@ -91,21 +98,6 @@ public class UserDAO implements IUserDAO {
                 "Error creando el usuario "
                 + user.getInstitutionalEmail(),
                 insertException
-            );
-        }
-
-        return generatedUserId;
-    }
-
-    public int create(UserDTO user) throws BusinessException {
-        int generatedUserId;
-
-        try (Connection connection = DataBaseManager.getConnection()) {
-            generatedUserId = create(user, connection);
-        } catch (SQLException exception) {
-            throw new BusinessException(
-                "Error al crear el usuario.",
-                exception
             );
         }
 
@@ -163,83 +155,6 @@ public class UserDAO implements IUserDAO {
 
         return wasUpdated;
     }
-
-    public UserDTO findByInstitutionalEmail(
-        String institutionalEmail
-    ) throws BusinessException {
-        InputValidator.validateNotEmpty(
-            institutionalEmail,
-            "El correo institucional no puede estar vacío."
-        );
-
-        UserDTO user;
-
-        try (Connection connection = DataBaseManager.getConnection();
-            PreparedStatement selectUserStatement =
-                connection.prepareStatement(
-                    SELECT_USER_BY_EMAIL_QUERY
-                )) {
-            selectUserStatement.setString(
-                1,
-                institutionalEmail
-            );
-
-            try (ResultSet resultSet =
-                    selectUserStatement.executeQuery()) {
-
-                if (!resultSet.next()) {
-                    throw new BusinessException(
-                        "No existe un usuario con el correo proporcionado."
-                    );
-                }
-
-                user = new UserDTO();
-
-                user.setId(resultSet.getInt("id"));
-                user.setInstitutionalEmail(
-                    resultSet.getString("correo_institucional")
-                );
-                user.setName(resultSet.getString("nombre"));
-                user.setFirstSurname(
-                    resultSet.getString("apellido_paterno")
-                );
-                user.setSecondSurname(
-                    resultSet.getString("apellido_materno")
-                );
-                user.setIsActive(
-                    resultSet.getBoolean("activo")
-                );
-                user.setRole(
-                    UserRole.fromDatabaseValue(
-                        resultSet.getString("rol")
-                    )
-                );
-            }
-        } catch (SQLTransientConnectionException connectionException) {
-            LOGGER.error(
-                "Fallo de conexión con la base de datos",
-                connectionException
-            );
-
-            throw new BusinessException(
-                "No se pudo conectar con la base de datos.",
-                connectionException
-            );
-        } catch (SQLException sqlException) {
-            LOGGER.error(
-                "Error SQL al buscar usuario por correo {}",
-                institutionalEmail,
-                sqlException
-            );
-
-            throw new BusinessException(
-                "Error al buscar el usuario.",
-                sqlException
-            );
-        }
-
-        return user;
-    }
     
     @Override
     public boolean changeStatus(int userId, boolean isActive) throws BusinessException {
@@ -271,6 +186,41 @@ public class UserDAO implements IUserDAO {
         }
 
         return wasChanged;
+    }
+
+    @Override
+    public UserDTO login(String email, String plainPassword)
+            throws BusinessException {
+        InputValidator.validateNotEmpty(email, "El correo institucional es obligatorio.");
+        InputValidator.validateNotEmpty(plainPassword,"La contraseña es obligatoria.");
+
+        UserValidator validator = new UserValidator();
+        validator.validateEmailFormat(email);
+
+        UserDTO loggedUser;
+
+        try (Connection connection = DataBaseManager.getConnection();
+            PreparedStatement loginUserStatement =
+            connection.prepareStatement(
+            SELECT_USER_BY_EMAIL_FOR_LOGIN_QUERY
+            )) {
+            loginUserStatement.setString(1, email);
+
+            try (ResultSet resultSet = loginUserStatement.executeQuery()) {
+                loggedUser = buildLoggedUser(resultSet, plainPassword);
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al verificar login para {}", email, sqlException);
+            throw new BusinessException("Error verificando login para " + email, sqlException);
+        }
+
+        return loggedUser;
     }
 
     @Override
@@ -378,5 +328,112 @@ public class UserDAO implements IUserDAO {
         }
 
         return generatedUserId;
+    }
+
+    private UserDTO buildLoggedUser(ResultSet resultSet, String plainPassword)
+        throws SQLException, BusinessException {
+        UserDTO loggedUser;
+
+        if (!resultSet.next()) {
+            throw new BusinessException("Credenciales inválidas.");
+        }
+
+        validateUserIsActive(resultSet);
+        validateStoredPassword(resultSet, plainPassword);
+
+        loggedUser = buildUserByRole(resultSet);
+
+        return loggedUser;
+    }
+
+    private void validateStoredPassword(
+            ResultSet resultSet,
+            String plainPassword
+    ) throws SQLException, BusinessException {
+        String passwordHash = resultSet.getString("contrasena");
+
+        if (passwordHash == null) {
+            throw new BusinessException(
+                "La cuenta aún no ha sido activada."
+            );
+        }
+
+        SecurityManager securityManager = new SecurityManager();
+
+        if (!securityManager.verifyPassword(plainPassword, passwordHash)) {
+            throw new BusinessException("Credenciales inválidas.");
+        }
+    }
+
+    private void validateUserIsActive(ResultSet resultSet) throws SQLException, BusinessException {
+        if (!resultSet.getBoolean("activo")) {
+            throw new BusinessException("La cuenta está desactivada.");
+        }
+    }
+
+    private UserDTO buildUserByRole(ResultSet resultSet) throws SQLException, BusinessException {
+        UserDTO user;
+        String role = resultSet.getString("rol");
+
+        switch (UserRole.fromDatabaseValue(role)) {
+            case PROFESSOR:
+                user = buildProfessor(resultSet);
+                break;
+            case STUDENT:
+                user = buildIntern(resultSet);
+                break;
+            case ADMINISTRATOR:
+                user = buildAdmin(resultSet);
+                break;
+            default:
+                throw new BusinessException("Rol de usuario inválido.");
+        }
+
+        return user;
+    }
+
+    private ProfessorDTO buildProfessor(ResultSet resultSet) throws SQLException {
+        ProfessorDTO professor = new ProfessorDTO();
+
+        professor.setId(resultSet.getInt("id"));
+        professor.setInstitutionalEmail(resultSet.getString("correo_institucional"));
+        professor.setName(resultSet.getString("nombre"));
+        professor.setFirstSurname(resultSet.getString("apellido_paterno"));
+        professor.setSecondSurname(resultSet.getString("apellido_materno"));
+        professor.setIsActive(resultSet.getBoolean("activo"));
+        professor.setStaffNumber(resultSet.getString("numero_personal"));
+        professor.setIsCoordinator(resultSet.getBoolean("es_coordinador"));
+        professor.setRole(UserRole.PROFESSOR);
+
+        return professor;
+    }
+
+    private InternDTO buildIntern(ResultSet resultSet) throws SQLException {
+        InternDTO intern = new InternDTO();
+
+        intern.setId(resultSet.getInt("id"));
+        intern.setInstitutionalEmail(resultSet.getString("correo_institucional"));
+        intern.setName(resultSet.getString("nombre"));
+        intern.setFirstSurname(resultSet.getString("apellido_paterno"));
+        intern.setSecondSurname(resultSet.getString("apellido_materno"));
+        intern.setIsActive(resultSet.getBoolean("activo"));
+        intern.setEnrollmentNumber(resultSet.getString("matricula"));
+        intern.setRole(UserRole.STUDENT);
+
+        return intern;
+    }
+
+    private UserDTO buildAdmin(ResultSet resultSet) throws SQLException {
+        UserDTO admin = new UserDTO();
+
+        admin.setId(resultSet.getInt("id"));
+        admin.setInstitutionalEmail(resultSet.getString("correo_institucional"));
+        admin.setName(resultSet.getString("nombre"));
+        admin.setFirstSurname(resultSet.getString("apellido_paterno"));
+        admin.setSecondSurname(resultSet.getString("apellido_materno"));
+        admin.setIsActive(resultSet.getBoolean("activo"));
+        admin.setRole(UserRole.ADMINISTRATOR);
+
+        return admin;
     }
 }
