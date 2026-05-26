@@ -53,60 +53,30 @@ public class InternDAO implements IInternDAO {
         "SELECT COUNT(*) AS total FROM ESTUDIANTE";
 
     @Override
-    public boolean create(InternDTO intern) throws BusinessException {
-        InputValidator.validateNotNull(
-            intern,
-            "InternDTO no puede ser nulo."
-        );
-        validateIntern(intern);
+    public boolean create(InternDTO intern, Connection connection) throws BusinessException {
+        InputValidator.validateNotNull(connection,"La conexión no puede ser nula.");
+        InternValidator internValidator = new InternValidator();
+        internValidator.validateInternForCreation(intern);
 
         boolean wasCreated;
 
-        try (Connection connection = DataBaseManager.getConnection();
-             PreparedStatement insertInternStatement =
-                 connection.prepareStatement(INSERT_INTERN_QUERY)) {
-            insertInternStatement.setString(
-                1,
-                intern.getEnrollmentNumber()
-            );
-            insertInternStatement.setInt(
-                2,
-                intern.getId()
-            );
+        try (PreparedStatement insertInternStatement =
+            connection.prepareStatement(INSERT_INTERN_QUERY)) {
+            insertInternStatement.setString(1, intern.getEnrollmentNumber());
+            insertInternStatement.setInt(2,intern.getId());
 
             wasCreated = insertInternStatement.executeUpdate() > 0;
-        } catch (SQLTransientConnectionException connectionException) {
-            LOGGER.error(
-                "Fallo de conexión con la base de datos",
-                connectionException
-            );
-
-            throw new BusinessException(
-                "No se pudo establecer conexión con la base de datos.",
-                connectionException
-            );
+            
         } catch (SQLIntegrityConstraintViolationException integrityException) {
-            LOGGER.error(
-                "Violación de integridad: matrícula duplicada",
-                integrityException
-            );
-
-            throw new BusinessException(
-                "La matrícula ya existe.",
-                integrityException
-            );
+            LOGGER.error("Violación de integridad: matrícula duplicada", integrityException);
+            throw new BusinessException("La matrícula ya existe.",integrityException);
         } catch (SQLException insertException) {
-            LOGGER.error(
-                "Error SQL al insertar estudiante",
-                insertException
-            );
-
+            LOGGER.error("Error SQL al insertar estudiante", insertException);
             throw new BusinessException(
                 "Error al insertar el estudiante en la base de datos.",
                 insertException
             );
         }
-
         return wasCreated;
     }
 
@@ -289,8 +259,7 @@ public class InternDAO implements IInternDAO {
         return totalInterns;
     }
 
-    private void validateIntern(InternDTO intern)
-            throws BusinessException {
+    private void validateIntern(InternDTO intern) throws BusinessException {
         InternValidator validator = new InternValidator();
 
         validator.validateEnrollmentNumber(
@@ -311,8 +280,7 @@ public class InternDAO implements IInternDAO {
         return intern;
     }
 
-    private InternDTO buildIntern(ResultSet resultSet)
-            throws SQLException {
+    private InternDTO buildIntern(ResultSet resultSet) throws SQLException {
         InternDTO intern = new InternDTO();
 
         intern.setEnrollmentNumber(resultSet.getString("matricula"));
