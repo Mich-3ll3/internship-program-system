@@ -9,14 +9,22 @@ import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+<<<<<<< HEAD
 import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
+=======
+>>>>>>> feature/setup-gui
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+<<<<<<< HEAD
 import mx.uv.internshipprogramsystem.logic.security.UserRegistrationManager;
 import mx.uv.internshipprogramsystem.logic.validations.ProfessorValidator;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
+=======
+import mx.uv.internshipprogramsystem.logic.managers.ProfessorRegistrationManager;
+import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
+>>>>>>> feature/setup-gui
 
 public class RegisterProfessorFormController {
     private static final Logger LOGGER =
@@ -24,6 +32,7 @@ public class RegisterProfessorFormController {
 
     @FXML
     private TextField txtInstitutionalEmail;
+<<<<<<< HEAD
 
     @FXML
     private TextField txtName;
@@ -37,6 +46,16 @@ public class RegisterProfessorFormController {
     @FXML
     private TextField txtStaffNumber;
 
+=======
+    @FXML
+    private TextField txtName;
+    @FXML
+    private TextField txtFirstSurname;
+    @FXML
+    private TextField txtSecondSurname;
+    @FXML
+    private TextField txtStaffNumber;
+>>>>>>> feature/setup-gui
     @FXML
     private CheckBox chkCoordinator;
 
@@ -69,13 +88,21 @@ public class RegisterProfessorFormController {
 
     private boolean isFormValid() {
         boolean isValid = true;
+<<<<<<< HEAD
+=======
+
+>>>>>>> feature/setup-gui
         String email = txtInstitutionalEmail.getText().trim();
         String name = txtName.getText().trim();
         String firstSurname = txtFirstSurname.getText().trim();
         String staffNumber = txtStaffNumber.getText().trim();
 
+<<<<<<< HEAD
         if (email.isEmpty() || name.isEmpty()
                 || firstSurname.isEmpty() || staffNumber.isEmpty()) {
+=======
+        if (email.isEmpty() || name.isEmpty() || firstSurname.isEmpty() || staffNumber.isEmpty()) {
+>>>>>>> feature/setup-gui
             showNotification(
                 Alert.AlertType.WARNING,
                 "Campos incompletos",
@@ -97,13 +124,17 @@ public class RegisterProfessorFormController {
             );
             isValid = false;
         }
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature/setup-gui
         return isValid;
     }
 
     private void registerProfessor() {
         try {
             UserDTO user = buildUser();
+<<<<<<< HEAD
             validateUser(user);
 
             UserRegistrationManager registrationManager =
@@ -121,6 +152,21 @@ public class RegisterProfessorFormController {
                 LOGGER.info(
                     "Profesor registrado correctamente: {}",
                     user.getInstitutionalEmail()
+=======
+            ProfessorDTO professor = buildProfessor(0);
+            ProfessorRegistrationManager professorRegistrationManager =
+                new ProfessorRegistrationManager();
+
+            boolean wasCreated =
+                professorRegistrationManager.registerProfessor(
+                    user,
+                    professor
+                );
+
+            if (wasCreated) {
+                LOGGER.info(
+                    "Profesor registrado correctamente."
+>>>>>>> feature/setup-gui
                 );
 
                 showNotification(
@@ -137,12 +183,16 @@ public class RegisterProfessorFormController {
                 "Error de negocio al registrar profesor",
                 businessException
             );
+<<<<<<< HEAD
 
+=======
+>>>>>>> feature/setup-gui
             showNotification(
                 Alert.AlertType.ERROR,
                 "Error de registro",
                 businessException.getMessage()
             );
+<<<<<<< HEAD
         } catch (Exception exception) {
             LOGGER.error(
                 "Error inesperado al registrar profesor",
@@ -154,10 +204,13 @@ public class RegisterProfessorFormController {
                 "Error de sistema",
                 "No se pudo completar el registro."
             );
+=======
+>>>>>>> feature/setup-gui
         }
     }
 
     private UserDTO buildUser() {
+<<<<<<< HEAD
         UserDTO user = new UserDTO(
             txtInstitutionalEmail.getText().trim(),
             null,
@@ -168,10 +221,27 @@ public class RegisterProfessorFormController {
             UserRole.PROFESSOR
         );
 
+=======
+        String cleanEmail = InputCleaner.sanitizeText(txtInstitutionalEmail.getText());
+        String cleanName = InputCleaner.sanitizeText(txtName.getText());
+        String cleanFirstSurname = InputCleaner.sanitizeText(txtFirstSurname.getText());
+        String cleanSecondSurname = InputCleaner.sanitizeText(txtSecondSurname.getText());
+
+        UserDTO user = new UserDTO(
+            cleanEmail,
+            null,
+            cleanName,
+            cleanFirstSurname,
+            cleanSecondSurname,
+            false,
+            UserRole.PROFESSOR
+        );
+>>>>>>> feature/setup-gui
         return user;
     }
 
     private ProfessorDTO buildProfessor(int userId) {
+<<<<<<< HEAD
         ProfessorDTO professor = new ProfessorDTO(
             txtStaffNumber.getText().trim(),
             chkCoordinator.isSelected(),
@@ -192,6 +262,18 @@ public class RegisterProfessorFormController {
         professorValidator.validateStaffNumber(professor.getStaffNumber());
     }
 
+=======
+        String cleanStaffNumber = InputCleaner.sanitizeText(txtStaffNumber.getText());
+        ProfessorDTO professor = 
+        new ProfessorDTO(
+            cleanStaffNumber, 
+            chkCoordinator.isSelected(),
+            userId
+        );
+        return professor;
+    }
+
+>>>>>>> feature/setup-gui
     @FXML
     private void clearForm() {
         txtInstitutionalEmail.clear();

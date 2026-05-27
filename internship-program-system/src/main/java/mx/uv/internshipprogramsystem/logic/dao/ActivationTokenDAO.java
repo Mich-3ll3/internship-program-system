@@ -34,62 +34,88 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
         "UPDATE TOKEN_ACTIVACION SET usado = true, fecha_uso = NOW() "
         + "WHERE id = ?";
 
+    private static final String INVALIDATE_USER_TOKENS_QUERY =
+        "UPDATE TOKEN_ACTIVACION "
+        + "SET usado = true, fecha_uso = NOW() "
+        + "WHERE usuario_id = ? AND usado = false";
+
     @Override
-    public boolean create(ActivationTokenDTO activationToken)
-            throws BusinessException {
+    public boolean create(ActivationTokenDTO activationToken) throws BusinessException {
         InputValidator.validateNotNull(
-            activationToken,
-            "El token de activación no puede ser nulo."
+        activationToken,
+        "El token de activación no puede ser nulo."
         );
 
         boolean wasCreated;
 
         try (Connection connection = DataBaseManager.getConnection();
-             PreparedStatement insertActivationTokenStatement =
-                 connection.prepareStatement(INSERT_ACTIVATION_TOKEN_QUERY)) {
-            insertActivationTokenStatement.setInt(
-                1,
-                activationToken.getUserId()
-            );
-            insertActivationTokenStatement.setString(
-                2,
-                activationToken.getTokenHash()
-            );
-            insertActivationTokenStatement.setTimestamp(
-                3,
-                activationToken.getExpirationDate()
-            );
-            insertActivationTokenStatement.setBoolean(
-                4,
-                activationToken.isUsed()
-            );
+            PreparedStatement insertActivationTokenStatement =
+                connection.prepareStatement(INSERT_ACTIVATION_TOKEN_QUERY)) {
+            insertActivationTokenStatement.setInt(1, activationToken.getUserId());
+            insertActivationTokenStatement.setString(2, activationToken.getTokenHash());
+            insertActivationTokenStatement.setTimestamp(3,activationToken.getExpirationDate());
+            insertActivationTokenStatement.setBoolean(4,activationToken.isUsed());
 
-            wasCreated =
-                insertActivationTokenStatement.executeUpdate() > 0;
+            wasCreated = insertActivationTokenStatement.executeUpdate() > 0;
+            
         } catch (SQLTransientConnectionException connectionException) {
-            LOGGER.error(
-                "Fallo de conexión con la base de datos",
-                connectionException
-            );
-
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
             throw new BusinessException(
                 "No se pudo conectar con la base de datos.",
                 connectionException
             );
         } catch (SQLException sqlException) {
-            LOGGER.error(
-                "Error SQL al crear token de activación",
-                sqlException
-            );
-
-            throw new BusinessException(
-                "Error al crear el token de activación.",
-                sqlException
-            );
+            LOGGER.error("Error SQL al crear token de activación", sqlException);
+            throw new BusinessException("Error al crear el token de activación.", sqlException);
         }
-
         return wasCreated;
     }
+
+    public boolean create(
+        ActivationTokenDTO activationToken,
+        Connection connection
+        ) throws BusinessException {
+            InputValidator.validateNotNull(
+                activationToken,
+                "El token de activación no puede ser nulo."
+            );
+
+            InputValidator.validateNotNull(
+                connection,
+                "La conexión no puede ser nula."
+            );
+
+            boolean wasCreated;
+
+            try (PreparedStatement insertActivationTokenStatement =
+                    connection.prepareStatement(INSERT_ACTIVATION_TOKEN_QUERY)) {
+                insertActivationTokenStatement.setInt(
+                    1,
+                    activationToken.getUserId()
+                );
+                insertActivationTokenStatement.setString(
+                    2,
+                    activationToken.getTokenHash()
+                );
+                insertActivationTokenStatement.setTimestamp(
+                    3,
+                    activationToken.getExpirationDate()
+                );
+                insertActivationTokenStatement.setBoolean(
+                    4,
+                    activationToken.isUsed()
+                );
+
+                wasCreated = insertActivationTokenStatement.executeUpdate() > 0;
+            } catch (SQLException sqlException) {
+                throw new BusinessException(
+                    "Error al crear el token de activación.",
+                    sqlException
+                );
+            }
+
+            return wasCreated;
+        }
 
     @Override
     public Optional<ActivationTokenDTO> findByTokenHash(String tokenHash)
@@ -175,6 +201,52 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
         }
 
         return wasMarkedAsUsed;
+    }
+
+    public boolean invalidateTokensByUserId(int userId)
+        throws BusinessException {
+        InputValidator.validatePositive(
+            userId,
+            "El identificador del usuario no es válido."
+        );
+
+        boolean wereTokensInvalidated;
+
+        try (Connection connection = DataBaseManager.getConnection();
+            PreparedStatement invalidateTokensStatement =
+                connection.prepareStatement(
+                    INVALIDATE_USER_TOKENS_QUERY
+                )) {
+
+            invalidateTokensStatement.setInt(1, userId);
+
+            wereTokensInvalidated =
+                invalidateTokensStatement.executeUpdate() > 0;
+
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al invalidar tokens del usuario {}",
+                userId,
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al invalidar los tokens de activación.",
+                sqlException
+            );
+        }
+
+        return wereTokensInvalidated;
     }
 
     private void validateTokenId(int tokenId) throws BusinessException {

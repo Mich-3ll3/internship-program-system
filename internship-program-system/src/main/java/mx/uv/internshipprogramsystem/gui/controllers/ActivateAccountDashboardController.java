@@ -9,7 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+<<<<<<< HEAD
 import mx.uv.internshipprogramsystem.logic.security.AccountActivationManager;
+=======
+import mx.uv.internshipprogramsystem.logic.managers.AccountActivationManager;
+import mx.uv.internshipprogramsystem.logic.managers.ActivationTokenResendManager;
+>>>>>>> feature/setup-gui
 
 public class ActivateAccountDashboardController {
     private static final Logger LOGGER =
@@ -19,12 +24,22 @@ public class ActivateAccountDashboardController {
 
     @FXML
     private TextField txtActivationToken;
+<<<<<<< HEAD
 
     @FXML
     private PasswordField pwdNewPassword;
 
     @FXML
     private PasswordField pwdConfirmPassword;
+=======
+    @FXML
+    private PasswordField pwdNewPassword;
+    @FXML
+    private PasswordField pwdConfirmPassword;
+    @FXML
+    private TextField txtInstitutionalEmail;
+
+>>>>>>> feature/setup-gui
 
     @FXML
     private void handleActivateAccount() {
@@ -88,6 +103,46 @@ public class ActivateAccountDashboardController {
     }
 
     @FXML
+<<<<<<< HEAD
+=======
+    private void handleResendActivationToken() {
+        String institutionalEmail =
+            txtInstitutionalEmail.getText();
+
+        try {
+            ActivationTokenResendManager activationTokenResendManager =
+                new ActivationTokenResendManager();
+
+            activationTokenResendManager.resendActivationToken(
+                institutionalEmail
+            );
+
+            LOGGER.info(
+                "Solicitud de reenvío de token procesada."
+            );
+
+            showNotification(
+                Alert.AlertType.INFORMATION,
+                "Token enviado",
+                "Si la cuenta existe y no está activa, "
+                + "se enviará un nuevo token de activación."
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "No se pudo reenviar el token de activación",
+                businessException
+            );
+
+            showNotification(
+                Alert.AlertType.ERROR,
+                "Error de reenvío",
+                businessException.getMessage()
+            );
+        }
+    }
+
+    @FXML
+>>>>>>> feature/setup-gui
     private void handleBackToLogin() {
         WindowManagerController.changeView(
             "LoginDashboard.fxml"
