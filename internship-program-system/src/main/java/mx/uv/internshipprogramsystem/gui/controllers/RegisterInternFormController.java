@@ -8,22 +8,13 @@ import javafx.scene.control.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-<<<<<<< HEAD
-import mx.uv.internshipprogramsystem.logic.dao.InternDAO;
-=======
->>>>>>> feature/setup-gui
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-<<<<<<< HEAD
-import mx.uv.internshipprogramsystem.logic.security.UserRegistrationManager;
-import mx.uv.internshipprogramsystem.logic.validations.InternValidator;
-import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
-=======
+
 import mx.uv.internshipprogramsystem.logic.managers.InternRegistrationManager;
 import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
->>>>>>> feature/setup-gui
 
 public class RegisterInternFormController {
     private static final Logger LOGGER =
@@ -108,34 +99,11 @@ public class RegisterInternFormController {
     private void registerIntern() {
         try {
             UserDTO user = buildUser();
-<<<<<<< HEAD
 
-            UserValidator userValidator = new UserValidator();
-            userValidator.validateUserForCreation(user);
-
-            UserRegistrationManager registrationManager =
-                new UserRegistrationManager();
-
-            int userId = registrationManager.registerUser(user);
-
-            InternDTO intern = new InternDTO(
-                txtEnrollment.getText().trim(),
-                userId
-            );
-
-            InternValidator internValidator = new InternValidator();
-            internValidator.validateEnrollmentNumber(
-                intern.getEnrollmentNumber()
-            );
-
-            InternDAO internDAO = new InternDAO();
-            boolean wasCreated = internDAO.create(intern);
-=======
             InternDTO intern = buildIntern(0);
             InternRegistrationManager internRegistrationManager =
                 new InternRegistrationManager();
             boolean wasCreated = internRegistrationManager.registerIntern(user, intern);
->>>>>>> feature/setup-gui
 
             if (wasCreated) {
                 LOGGER.info(
@@ -153,49 +121,19 @@ public class RegisterInternFormController {
                 clearForm();
             }
         } catch (BusinessException exception) {
-<<<<<<< HEAD
-            LOGGER.error("Error de negocio al registrar estudiante", exception);
-=======
             LOGGER.error(
                 "Error de negocio al registrar estudiante",
                 exception
             );
-
->>>>>>> feature/setup-gui
             showNotification(
                 Alert.AlertType.ERROR,
                 "Error de registro",
                 exception.getMessage()
             );
-<<<<<<< HEAD
-        } catch (Exception exception) {
-            LOGGER.error("Error inesperado al registrar estudiante", exception);
-            showNotification(
-                Alert.AlertType.ERROR,
-                "Error de sistema",
-                "No se pudo completar el registro."
-            );
-=======
->>>>>>> feature/setup-gui
         }
     }
 
     private UserDTO buildUser() {
-<<<<<<< HEAD
-        UserDTO user = new UserDTO(
-            txtInstitutionalEmail.getText().trim(),
-            null,
-            txtName.getText().trim(),
-            txtFirstSurname.getText().trim(),
-            txtSecondSurname.getText().trim(),
-            false,
-            UserRole.STUDENT
-        );
-
-        return user;
-    }
-
-=======
         String cleanEmail = InputCleaner.sanitizeText(txtInstitutionalEmail.getText());
         String cleanName = InputCleaner.sanitizeText(txtName.getText());
         String cleanFirstSurname = InputCleaner.sanitizeText(txtFirstSurname.getText());
@@ -219,7 +157,6 @@ public class RegisterInternFormController {
         return intern;
     }
 
->>>>>>> feature/setup-gui
     @FXML
     private void clearForm() {
         txtInstitutionalEmail.clear();
