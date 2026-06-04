@@ -1,4 +1,4 @@
-package mx.uv.internshipprogramsystem.test;
+package mx.uv.internshipprogramsystem.logic.test;
 
 import mx.uv.internshipprogramsystem.logic.security.SecurityManager;
 
