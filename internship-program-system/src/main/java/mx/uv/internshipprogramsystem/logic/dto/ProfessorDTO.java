@@ -89,4 +89,9 @@ public class ProfessorDTO extends UserDTO {
     public String getCoordinator() {
         return (getIsCoordinator() != null && getIsCoordinator()) ? "Si" : "No";
     }
+    
+    @Override
+    public String toString() {
+        return getFullName();
+    }
 }

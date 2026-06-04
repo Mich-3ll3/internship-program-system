@@ -3,6 +3,7 @@ package mx.uv.internshipprogramsystem.logic.validations;
 import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
 
 public class PasswordValidator {
+    
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Z])(?=.*[0-9])(?=.*[@#$%^&+=!]).{8,}$";
     
     public void validatePassword(String plainPassword) throws ValidationException {

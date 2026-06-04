@@ -24,6 +24,7 @@ import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
 public class AdminHomeDashboardController {
     private static final Logger LOGGER =
@@ -253,10 +254,8 @@ public class AdminHomeDashboardController {
 
     @FXML
     private void logOut(ActionEvent event) {
-        LOGGER.info(
-            "Cierre de sesión realizado correctamente."
-        );
-
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
         WindowManagerController.changeView(
             "LoginDashboard.fxml"
         );

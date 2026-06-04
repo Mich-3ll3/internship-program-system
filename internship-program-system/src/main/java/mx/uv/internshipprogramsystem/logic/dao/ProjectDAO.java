@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.sql.SQLTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +31,24 @@ public class ProjectDAO implements IProjectDAO {
         + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_ALL_PROJECTS_QUERY =
-        "SELECT * FROM PROYECTO";
+        "SELECT * "
+        + "FROM PROYECTO "
+        + "WHERE activo = TRUE";
+
+    private static final String SELECT_PROJECT_BY_ID_QUERY =
+        "SELECT * "
+        + "FROM PROYECTO "
+        + "WHERE id = ?";
 
     private static final String SELECT_PROJECTS_BY_STATUS_QUERY =
-        "SELECT * FROM PROYECTO WHERE activo = ?";
+        "SELECT * "
+        + "FROM PROYECTO "
+        + "WHERE activo = ?";
+
+    private static final String COUNT_ALL_PROJECTS_QUERY =
+        "SELECT COUNT(*) AS total "
+        + "FROM PROYECTO "
+        + "WHERE activo = TRUE";
 
     private static final String UPDATE_PROJECT_QUERY =
         "UPDATE PROYECTO SET nombre = ?, "
@@ -41,13 +56,16 @@ public class ProjectDAO implements IProjectDAO {
         + "objetivos_inmediatos = ?, objetivos_mediatos = ?, "
         + "metodologia = ?, recursos = ?, responsabilidades = ?, "
         + "duracion = ?, organizacion_id = ?, responsable_id = ?, "
-        + "activo = ? WHERE id = ?";
+        + "activo = ? "
+        + "WHERE id = ?";
 
-    private static final String DELETE_PROJECT_QUERY =
-        "DELETE FROM PROYECTO WHERE id = ?";
+    private static final String DEACTIVATE_PROJECT_QUERY =
+        "UPDATE PROYECTO "
+        + "SET activo = FALSE "
+        + "WHERE id = ?";
 
     @Override
-    public boolean createProject(ProjectDTO project)
+    public boolean create(ProjectDTO project)
             throws BusinessException {
         InputValidator.validateNotNull(
             project,
@@ -58,9 +76,7 @@ public class ProjectDAO implements IProjectDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement insertProjectStatement =
-                 connection.prepareStatement(
-                     INSERT_PROJECT_QUERY
-                 )) {
+                 connection.prepareStatement(INSERT_PROJECT_QUERY)) {
             setProjectData(insertProjectStatement, project);
 
             wasCreated =
@@ -99,9 +115,7 @@ public class ProjectDAO implements IProjectDAO {
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement selectAllProjectsStatement =
-                 connection.prepareStatement(
-                     SELECT_ALL_PROJECTS_QUERY
-                 );
+                 connection.prepareStatement(SELECT_ALL_PROJECTS_QUERY);
              ResultSet resultSet =
                  selectAllProjectsStatement.executeQuery()) {
             while (resultSet.next()) {
@@ -119,17 +133,67 @@ public class ProjectDAO implements IProjectDAO {
             );
         } catch (SQLException sqlException) {
             LOGGER.error(
-                "Error listando proyectos",
+                "Error listando proyectos activos",
                 sqlException
             );
 
             throw new BusinessException(
-                "Error listando proyectos.",
+                "Error listando proyectos activos.",
                 sqlException
             );
         }
 
         return List.copyOf(projects);
+    }
+
+    @Override
+    public Optional<ProjectDTO> findById(int id)
+            throws BusinessException {
+        InputValidator.validatePositive(
+            id,
+            "El id del proyecto debe ser positivo."
+        );
+
+        Optional<ProjectDTO> project = Optional.empty();
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectProjectByIdStatement =
+                 connection.prepareStatement(SELECT_PROJECT_BY_ID_QUERY)) {
+            selectProjectByIdStatement.setInt(
+                1,
+                id
+            );
+
+            try (ResultSet resultSet =
+                    selectProjectByIdStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    project = Optional.of(buildProject(resultSet));
+                }
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error buscando proyecto con id {}",
+                id,
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error buscando proyecto con id " + id,
+                sqlException
+            );
+        }
+
+        return project;
     }
 
     @Override
@@ -181,6 +245,44 @@ public class ProjectDAO implements IProjectDAO {
     }
 
     @Override
+    public int countAll()
+            throws BusinessException {
+        int totalProjects = 0;
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement countAllProjectsStatement =
+                 connection.prepareStatement(COUNT_ALL_PROJECTS_QUERY);
+             ResultSet resultSet =
+                 countAllProjectsStatement.executeQuery()) {
+            if (resultSet.next()) {
+                totalProjects = resultSet.getInt("total");
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error contando proyectos activos",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error contando proyectos activos.",
+                sqlException
+            );
+        }
+
+        return totalProjects;
+    }
+
+    @Override
     public boolean update(ProjectDTO project)
             throws BusinessException {
         InputValidator.validateNotNull(
@@ -188,13 +290,16 @@ public class ProjectDAO implements IProjectDAO {
             "ProjectDTO no puede ser nulo."
         );
 
+        InputValidator.validatePositive(
+            project.getId(),
+            "El id del proyecto debe ser positivo."
+        );
+
         boolean wasUpdated;
 
         try (Connection connection = DataBaseManager.getConnection();
              PreparedStatement updateProjectStatement =
-                 connection.prepareStatement(
-                     UPDATE_PROJECT_QUERY
-                 )) {
+                 connection.prepareStatement(UPDATE_PROJECT_QUERY)) {
             setProjectData(updateProjectStatement, project);
 
             updateProjectStatement.setInt(
@@ -232,24 +337,27 @@ public class ProjectDAO implements IProjectDAO {
     }
 
     @Override
-    public boolean delete(int id)
+    public boolean deactivate(int id)
             throws BusinessException {
         InputValidator.validatePositive(
             id,
             "El id del proyecto debe ser positivo."
         );
 
-        boolean wasDeleted;
+        boolean wasDeactivated;
 
         try (Connection connection = DataBaseManager.getConnection();
-             PreparedStatement deleteProjectStatement =
+             PreparedStatement deactivateProjectStatement =
                  connection.prepareStatement(
-                     DELETE_PROJECT_QUERY
+                     DEACTIVATE_PROJECT_QUERY
                  )) {
-            deleteProjectStatement.setInt(1, id);
+            deactivateProjectStatement.setInt(
+                1,
+                id
+            );
 
-            wasDeleted =
-                deleteProjectStatement.executeUpdate() > 0;
+            wasDeactivated =
+                deactivateProjectStatement.executeUpdate() > 0;
         } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
                 "Fallo de conexión con la base de datos",
@@ -262,19 +370,18 @@ public class ProjectDAO implements IProjectDAO {
             );
         } catch (SQLException sqlException) {
             LOGGER.error(
-                "Error eliminando proyecto con id {}",
+                "Error desactivando proyecto con id {}",
                 id,
                 sqlException
             );
 
             throw new BusinessException(
-                "Error eliminando proyecto con id "
-                    + id,
+                "Error desactivando proyecto con id " + id,
                 sqlException
             );
         }
 
-        return wasDeleted;
+        return wasDeactivated;
     }
 
     private void setProjectData(
@@ -330,36 +437,21 @@ public class ProjectDAO implements IProjectDAO {
 
     private ProjectDTO buildProject(ResultSet resultSet)
             throws SQLException {
-        ProjectDTO project =
-            new ProjectDTO(
-                resultSet.getInt("id"),
-                resultSet.getString("nombre"),
-                resultSet.getString(
-                    "descripcion_general"
-                ),
-                resultSet.getString(
-                    "objetivo_general"
-                ),
-                resultSet.getString(
-                    "objetivos_inmediatos"
-                ),
-                resultSet.getString(
-                    "objetivos_mediatos"
-                ),
-                resultSet.getString("metodologia"),
-                resultSet.getString("recursos"),
-                resultSet.getString(
-                    "responsabilidades"
-                ),
-                resultSet.getInt("duracion"),
-                resultSet.getInt(
-                    "organizacion_id"
-                ),
-                resultSet.getInt(
-                    "responsable_id"
-                ),
-                resultSet.getBoolean("activo")
-            );
+        ProjectDTO project = new ProjectDTO(
+            resultSet.getInt("id"),
+            resultSet.getString("nombre"),
+            resultSet.getString("descripcion_general"),
+            resultSet.getString("objetivo_general"),
+            resultSet.getString("objetivos_inmediatos"),
+            resultSet.getString("objetivos_mediatos"),
+            resultSet.getString("metodologia"),
+            resultSet.getString("recursos"),
+            resultSet.getString("responsabilidades"),
+            resultSet.getInt("duracion"),
+            resultSet.getInt("organizacion_id"),
+            resultSet.getInt("responsable_id"),
+            resultSet.getBoolean("activo")
+        );
 
         return project;
     }

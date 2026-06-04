@@ -81,6 +81,11 @@ public class ProfessorDAO implements IProfessorDAO {
 
     private static final String SELECT_COUNT_PROFESSORS_QUERY =
         "SELECT COUNT(*) AS total FROM PROFESOR";
+    
+    private static final String EXISTS_COORDINATOR_QUERY =
+        "SELECT COUNT(*) AS total "
+        + "FROM PROFESOR "
+        + "WHERE es_coordinador = TRUE";
 
     @Override
     public boolean create(ProfessorDTO professor, Connection connection) throws BusinessException {
@@ -472,6 +477,44 @@ public class ProfessorDAO implements IProfessorDAO {
         }
 
         return totalProfessors;
+    }
+    
+    @Override
+    public boolean existsCoordinator() throws BusinessException {
+        boolean coordinatorExists = false;
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement statement =
+                    connection.prepareStatement(EXISTS_COORDINATOR_QUERY);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                coordinatorExists = resultSet.getInt("total") > 0;
+            }
+
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al verificar existencia de coordinador",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al verificar si ya existe coordinador.",
+                sqlException
+            );
+        }
+
+        return coordinatorExists;
     }
 
     private void validateProfessor(ProfessorDTO professor) throws BusinessException {

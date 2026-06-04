@@ -12,6 +12,7 @@ import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.managers.LoginManager;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
 public class LoginDashboardController {
     private static final Logger LOGGER =
@@ -31,11 +32,8 @@ public class LoginDashboardController {
         try {
             LoginManager loginManager = new LoginManager();
             UserDTO loggedUser = loginManager.login(email, password);
-
-            LOGGER.info(
-                "Inicio de sesión exitoso para usuario con rol {}",
-                loggedUser.getRole()
-            );
+            UserSessionManager.setCurrentUser(loggedUser);
+            LOGGER.info("Inicio de sesión exitoso para usuario con rol {}", loggedUser.getRole());
 
             redirectUserByRole(loggedUser);
         } catch (BusinessException businessException) {

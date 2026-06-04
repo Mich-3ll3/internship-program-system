@@ -14,6 +14,7 @@ import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 
 import mx.uv.internshipprogramsystem.logic.managers.InternRegistrationManager;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
 
 public class RegisterInternFormController {
@@ -52,7 +53,11 @@ public class RegisterInternFormController {
 
     @FXML
     private void logOut(ActionEvent event) {
-        WindowManagerController.changeView("LoginDashboard.fxml");
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
+        WindowManagerController.changeView(
+            "LoginDashboard.fxml"
+        );
     }
 
     @FXML

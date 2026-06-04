@@ -5,12 +5,15 @@ import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+
 public class InternValidator {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(InternValidator.class);
     private static final int MAX_ENROLLMENT_LENGTH = 10;
     private static final String ENROLLMENT_FORMAT_REGEX = "^zS\\d{8}$";
 
     public void validateInternForCreation(InternDTO intern) throws BusinessException {
+        
         InputValidator.validateNotNull(intern, "Los datos del estudiante no pueden ser nulos.");
         validateEnrollmentNumber(intern.getEnrollmentNumber());
         InputValidator.validatePositive(
@@ -20,6 +23,7 @@ public class InternValidator {
     }
     
     public void validateEnrollmentNumber(String enrollmentNumber) throws BusinessException {
+        
         InputValidator.validateNotEmpty(enrollmentNumber, "La matrícula no puede estar vacía.");
         InputValidator.validateMaxLength(
             enrollmentNumber,

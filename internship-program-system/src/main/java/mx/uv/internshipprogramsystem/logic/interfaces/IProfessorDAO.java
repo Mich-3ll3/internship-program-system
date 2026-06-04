@@ -14,6 +14,7 @@ public interface IProfessorDAO {
     List<ProfessorDTO> findByName(String searchName) throws BusinessException;
     List<ProfessorDTO> findAll() throws BusinessException;
     List<ProfessorDTO> findAllName() throws BusinessException;
+    boolean existsCoordinator() throws BusinessException;
     Optional<ProfessorDTO> findCoordinator() throws BusinessException;
     int countAll() throws BusinessException;
 }

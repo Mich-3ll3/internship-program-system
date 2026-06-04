@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.fxml.Initializable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +15,15 @@ import org.slf4j.LoggerFactory;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
+import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-
 import mx.uv.internshipprogramsystem.logic.managers.ProfessorRegistrationManager;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
 
-public class RegisterProfessorFormController {
+
+
+public class RegisterProfessorFormController implements Initializable {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(RegisterProfessorFormController.class);
 
@@ -33,6 +39,11 @@ public class RegisterProfessorFormController {
     private TextField txtStaffNumber;
     @FXML
     private CheckBox chkCoordinator;
+    
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        configureCoordinatorCheckBox();
+    }
 
     @FXML
     private void goHome(ActionEvent event) {
@@ -51,13 +62,41 @@ public class RegisterProfessorFormController {
 
     @FXML
     private void logOut(ActionEvent event) {
-        WindowManagerController.changeView("LoginDashboard.fxml");
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
+        WindowManagerController.changeView(
+            "LoginDashboard.fxml"
+        );
     }
 
     @FXML
     private void validateRegisterProfessorForm() {
         if (isFormValid()) {
             registerProfessor();
+        }
+    }
+    
+    private void configureCoordinatorCheckBox() {
+        ProfessorDAO professorDAO = new ProfessorDAO();
+
+        try {
+            if (professorDAO.existsCoordinator()) {
+                chkCoordinator.setSelected(false);
+                chkCoordinator.setDisable(true);
+                chkCoordinator.setText("Ya existe un coordinador registrado");
+            } else {
+                chkCoordinator.setDisable(false);
+                chkCoordinator.setText("Asignar como coordinador");
+            }
+        } catch (BusinessException businessException) {
+            LOGGER.error(
+                "No se pudo verificar si existe coordinador registrado",
+                businessException
+            );
+
+            chkCoordinator.setSelected(false);
+            chkCoordinator.setDisable(true);
+            chkCoordinator.setText("No disponible");
         }
     }
 
@@ -171,6 +210,7 @@ public class RegisterProfessorFormController {
         txtSecondSurname.clear();
         txtStaffNumber.clear();
         chkCoordinator.setSelected(false);
+        configureCoordinatorCheckBox();
     }
 
     private void showNotification(

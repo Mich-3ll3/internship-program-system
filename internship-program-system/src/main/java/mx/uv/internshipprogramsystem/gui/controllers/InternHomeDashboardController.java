@@ -7,6 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,10 +68,8 @@ public class InternHomeDashboardController
 
     @FXML
     private void logOut(ActionEvent event) {
-        LOGGER.info(
-            "Cierre de sesión realizado correctamente."
-        );
-
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
         WindowManagerController.changeView(
             "LoginDashboard.fxml"
         );

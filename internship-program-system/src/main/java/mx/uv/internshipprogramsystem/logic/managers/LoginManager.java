@@ -11,15 +11,8 @@ public class LoginManager {
         loginDAO = new LoginDAO();
     }
 
-    public UserDTO login(
-            String email,
-            String plainPassword
-    ) throws BusinessException {
-        UserDTO loggedUser = loginDAO.login(
-            email,
-            plainPassword
-        );
-
+    public UserDTO login(String email, String plainPassword) throws BusinessException {
+        UserDTO loggedUser = loginDAO.login(email, plainPassword);
         return loggedUser;
     }
 }

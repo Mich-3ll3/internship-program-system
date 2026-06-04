@@ -10,6 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
 
 public class UpdateInternDashboardController {
@@ -42,7 +43,11 @@ public class UpdateInternDashboardController {
 
     @FXML
     private void logOut(ActionEvent event) {
-        WindowManagerController.changeView("LoginDashboard.fxml");
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
+        WindowManagerController.changeView(
+            "LoginDashboard.fxml"
+        );
     }
 
     public void setInternData(InternDTO intern) {

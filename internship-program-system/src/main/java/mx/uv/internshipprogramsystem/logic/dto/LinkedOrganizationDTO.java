@@ -141,5 +141,10 @@ public class LinkedOrganizationDTO {
     public void setDirectUserCount(Integer directUserCount) {
         this.directUserCount = directUserCount;
     }
+    
+    @Override
+    public String toString() {
+        return getName();
+    }
 
 }

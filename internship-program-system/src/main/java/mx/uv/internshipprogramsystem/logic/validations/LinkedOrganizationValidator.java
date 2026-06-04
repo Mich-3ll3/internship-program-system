@@ -6,11 +6,13 @@ import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
 
 public class LinkedOrganizationValidator {
+    
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@(.+)$";
     private static final String PHONE_REGEX = "^\\d{10}$";
 
     public void validateFullOrganization(LinkedOrganizationDTO organization)
             throws ValidationException {
+        
         if (organization == null) {
             throw new ValidationException("La organización no puede ser nula.");
         }
@@ -26,6 +28,7 @@ public class LinkedOrganizationValidator {
 
     private void validateRequiredFields(LinkedOrganizationDTO organization)
             throws ValidationException {
+        
         if (isNullOrEmpty(organization.getName())
                 || isNullOrEmpty(organization.getAddress())
                 || isNullOrEmpty(organization.getCity())
@@ -38,12 +41,14 @@ public class LinkedOrganizationValidator {
     }
 
     private void validateEmailFormat(String email) throws ValidationException {
+        
         if (email == null || !Pattern.compile(EMAIL_REGEX).matcher(email).matches()) {
             throw new ValidationException("El formato del correo electrónico es inválido.");
         }
     }
 
     private void validatePhoneNumber(String phone) throws ValidationException {
+        
         if (phone == null || !Pattern.compile(PHONE_REGEX).matcher(phone).matches()) {
             throw new ValidationException(
                 "El teléfono debe contener exactamente 10 dígitos numéricos."
@@ -53,12 +58,14 @@ public class LinkedOrganizationValidator {
 
     private void validateUserCounts(Integer direct, Integer indirect)
             throws ValidationException {
+        
         if (direct == null || direct < 0 || indirect == null || indirect < 0) {
             throw new ValidationException("El número de usuarios no puede ser negativo.");
         }
     }
 
     private boolean isNullOrEmpty(String value) {
+        
         return value == null || value.trim().isEmpty();
     }
 }

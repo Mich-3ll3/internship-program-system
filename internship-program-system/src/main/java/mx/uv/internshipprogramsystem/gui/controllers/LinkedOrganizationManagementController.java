@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 import javafx.event.ActionEvent;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.validations.LinkedOrganizationValidator;
 
 public class LinkedOrganizationManagementController {
@@ -132,7 +133,11 @@ public class LinkedOrganizationManagementController {
      
     @FXML
     private void logOut(ActionEvent event) {
-        WindowManagerController.changeView("LoginDashboard.fxml");
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
+        WindowManagerController.changeView(
+            "LoginDashboard.fxml"
+        );
     }
     
     @FXML

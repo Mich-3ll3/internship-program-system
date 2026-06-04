@@ -8,6 +8,8 @@ public class ProjectResponsibleDTO {
     private String email;
     private String position;
     private int organizationId;
+    private String organizationName;
+    private String projectName;
 
     public ProjectResponsibleDTO() {
     }
@@ -44,6 +46,28 @@ public class ProjectResponsibleDTO {
         this.email = email;
         this.position = position;
         this.organizationId = organizationId;
+    }
+    
+    public ProjectResponsibleDTO(
+        int id,
+        String firstName,
+        String lastNameFather,
+        String lastNameMother,
+        String email,
+        String position,
+        int organizationId,
+        String organizationName,
+        String projectName
+    ) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastNameFather = lastNameFather;
+        this.lastNameMother = lastNameMother;
+        this.email = email;
+        this.position = position;
+        this.organizationId = organizationId;
+        this.organizationName = organizationName;
+        this.projectName = projectName;
     }
 
     public int getId() {
@@ -91,7 +115,40 @@ public class ProjectResponsibleDTO {
     public int getOrganizationId() {
         return organizationId;
     }
+    
     public void setOrganizationId(int organizationId) {
         this.organizationId = organizationId;
+    }
+    
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+    
+    public String getProjectName() {
+        return projectName;
+    }
+
+    public void setProjectName(String projectName) {
+        this.projectName = projectName;
+    }
+    
+    public String getFullName() {
+        String fullName =
+            firstName + " " + lastNameFather;
+
+        if (
+            lastNameMother != null
+            && !lastNameMother.isBlank()
+        ) {
+            fullName =
+                fullName + " "
+                + lastNameMother;
+        }
+
+        return fullName.trim();
     }
 }

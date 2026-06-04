@@ -1,11 +1,13 @@
 package mx.uv.internshipprogramsystem.logic.validations;
 
 public final class InputCleaner {
+    
     private InputCleaner() {
 
     }
 
     public static String sanitizeText(String input) {
+        
         String sanitizedText = "";
 
         if (input != null) {

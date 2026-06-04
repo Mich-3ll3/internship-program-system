@@ -29,8 +29,7 @@ public class ActivateAccountDashboardController {
 
     @FXML
     private void handleActivateAccount() {
-        String activationToken =
-            txtActivationToken.getText();
+        String activationToken = txtActivationToken.getText();
 
         String newPassword =
             pwdNewPassword.getText();

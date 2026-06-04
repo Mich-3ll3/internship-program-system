@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.EducationalExperienceRegisterDashboardController"
+    maxHeight="-Infinity"
+    maxWidth="-Infinity"
+    minHeight="-Infinity"
+    minWidth="-Infinity"
+    prefHeight="700.0"
+    prefWidth="1000.0"
+    style="-fx-background-color: #f5f6fa;"
+    xmlns="http://javafx.com/javafx/26"
+    xmlns:fx="http://javafx.com/fxml/1">
+
+    <left>
+        <VBox
+            alignment="TOP_CENTER"
+            prefWidth="70.0"
+            spacing="20.0"
+            style="-fx-background-color:#4a90e2;"
+            BorderPane.alignment="CENTER">
+
+            <children>
+                <StackPane
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+
+                    <VBox.margin>
+                        <Insets top="20.0" />
+                    </VBox.margin>
+
+                    <children>
+                        <Label text="PC" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </StackPane>
+
+                <Button
+                    fx:id="btnHome"
+                    mnemonicParsing="false"
+                    onAction="#goHome"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="⌂"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnEducationalExperience"
+                    mnemonicParsing="false"
+                    onAction="#goEducationalExperienceModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                    text="📚"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnIntern"
+                    mnemonicParsing="false"
+                    onAction="#goInternModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="👥"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnProject"
+                    mnemonicParsing="false"
+                    onAction="#goProjectsModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="🛠️"
+                    textFill="WHITE" />
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Button
+                    fx:id="btnExit"
+                    mnemonicParsing="false"
+                    onAction="#logOut"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="🚪"
+                    textFill="WHITE">
+
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16.0">
+            <padding>
+                <Insets
+                    bottom="24.0"
+                    left="24.0"
+                    right="24.0"
+                    top="20.0" />
+            </padding>
+
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label
+                                    text="Registrar experiencia educativa"
+                                    textFill="#1a2744">
+
+                                    <font>
+                                        <Font name="System Bold" size="22.0" />
+                                    </font>
+                                </Label>
+
+                                <Label
+                                    text="Capture los datos requeridos para registrar una experiencia educativa."
+                                    textFill="#6b7280" />
+                            </children>
+                        </VBox>
+
+                        <Region HBox.hgrow="ALWAYS" />
+                    </children>
+                </HBox>
+
+                <VBox
+                    spacing="18.0"
+                    style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;">
+
+                    <padding>
+                        <Insets
+                            bottom="24.0"
+                            left="24.0"
+                            right="24.0"
+                            top="24.0" />
+                    </padding>
+
+                    <children>
+                        <GridPane hgap="18.0" vgap="16.0">
+                            <columnConstraints>
+                                <javafx.scene.layout.ColumnConstraints percentWidth="30.0" />
+                                <javafx.scene.layout.ColumnConstraints percentWidth="70.0" />
+                            </columnConstraints>
+
+                            <children>
+                                <Label
+                                    text="NRC"
+                                    textFill="#1a2744"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="0" />
+
+                                <TextField
+                                    fx:id="txtNrc"
+                                    promptText="Ejemplo: 50562"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="0" />
+
+                                <Label
+                                    text="Periodo escolar"
+                                    textFill="#1a2744"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="1" />
+                                
+                                <TextField
+                                    fx:id="txtSchoolPeriod"
+                                    promptText="Formato: YYYY-51 (Febrero-Julio) o YYYY-01 (Agosto-Enero)"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="1" />
+
+                                <Label
+                                    text="Sección"
+                                    textFill="#1a2744"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="2" />
+
+                                <TextField
+                                    fx:id="txtSection"
+                                    promptText="Ejemplo: E"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="2" />
+                                
+                                <Label
+                                    text="Profesor"
+                                    textFill="#1a2744"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="3" />
+
+                                <ComboBox
+                                    fx:id="cmbProfessor"
+                                    maxWidth="Infinity"
+                                    promptText="Seleccione un profesor"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="3" />
+
+                                <Label
+                                    text="Estado"
+                                    textFill="#1a2744"
+                                    GridPane.columnIndex="0"
+                                    GridPane.rowIndex="4" />
+
+                                <CheckBox
+                                    fx:id="chkActive"
+                                    selected="true"
+                                    text="Experiencia educativa activa"
+                                    GridPane.columnIndex="1"
+                                    GridPane.rowIndex="4" />
+                            </children>
+
+                            <rowConstraints>
+                                <javafx.scene.layout.RowConstraints />
+                                <javafx.scene.layout.RowConstraints />
+                                <javafx.scene.layout.RowConstraints />
+                                <javafx.scene.layout.RowConstraints />
+                                <javafx.scene.layout.RowConstraints />
+                                <javafx.scene.layout.RowConstraints />
+                            </rowConstraints>
+                        </GridPane>
+
+                        <Label
+                            text="Validaciones: NRC de 5 dígitos, periodo escolar, sección y profesor obligatorio."
+                            textFill="#6b7280" />
+
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                            <children>
+                                <Button
+                                    fx:id="btnCancel"
+                                    mnemonicParsing="false"
+                                    onAction="#clearForm"
+                                    style="-fx-background-color: #f5f6fa; -fx-background-radius: 8; -fx-border-color: rgba(0,0,0,0.10); -fx-border-radius: 8; -fx-text-fill: #4b5563;"
+                                    text="Cancelar" />
+
+                                <Button
+                                    fx:id="btnRegisterEducationalExperience"
+                                    mnemonicParsing="false"
+                                    onAction="#validateRegisterEducationalExperienceForm"
+                                    style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;"
+                                    text="Registrar experiencia" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

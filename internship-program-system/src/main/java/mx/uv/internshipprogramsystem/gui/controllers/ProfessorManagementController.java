@@ -19,6 +19,7 @@ import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.validations.ProfessorValidator;
 
 public class ProfessorManagementController {
@@ -198,7 +199,11 @@ public class ProfessorManagementController {
 
     @FXML
     private void logOut(ActionEvent event) {
-        WindowManagerController.changeView("LoginDashboard.fxml");
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado correctamente.");
+        WindowManagerController.changeView(
+            "LoginDashboard.fxml"
+        );
     }
 
     @FXML

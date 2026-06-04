@@ -9,7 +9,7 @@ public class TestHash {
             new SecurityManager();
 
         String hash =
-            securityManager.hashPassword("UnaContra33$");
+            securityManager.hashPassword("ContraCOR77$");
 
         System.out.println(hash);
     }

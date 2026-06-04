@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/25.0.3"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProjectRegisterDashboardController"
+            prefHeight="720.0"
+            prefWidth="1080.0"
+            style="-fx-background-color: #f4f7fb;">
+
+    <left>
+        <VBox alignment="TOP_CENTER"
+              prefWidth="70.0"
+              spacing="20.0"
+              style="-fx-background-color:#4a90e2;"
+              BorderPane.alignment="CENTER">
+
+            <children>
+                <StackPane prefHeight="40.0"
+                           prefWidth="40.0"
+                           style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+
+                    <VBox.margin>
+                        <Insets top="20.0" />
+                    </VBox.margin>
+
+                    <children>
+                        <Label text="PC" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </StackPane>
+
+                <Button fx:id="btnHome"
+                        mnemonicParsing="false"
+                        onAction="#goHome"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        text="⌂"
+                        textFill="WHITE" />
+
+                <Button fx:id="btnEducationalExperience"
+                        mnemonicParsing="false"
+                        onAction="#goEducationalExperienceModule"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="📚"
+                        textFill="WHITE" />
+
+                <Button fx:id="btnIntern"
+                        mnemonicParsing="false"
+                        onAction="#goInternModule"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="👥"
+                        textFill="WHITE" />
+
+                <Button fx:id="btnLinkedOrganization"
+                        mnemonicParsing="false"
+                        onAction="#goLinkedOrganizationModule"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="🏢"
+                        textFill="WHITE" />
+
+                <Button fx:id="btnProjects"
+                        mnemonicParsing="false"
+                        onAction="#goProjectsModule"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="🛠️"
+                        textFill="WHITE" />
+
+                <Button fx:id="btnDocuments"
+                        mnemonicParsing="false"
+                        onAction="#goDocumentsModule"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="📑"
+                        textFill="WHITE" />
+
+                <Button fx:id="btnReports"
+                        mnemonicParsing="false"
+                        onAction="#goReportsModule"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="📋"
+                        textFill="WHITE" />
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Button fx:id="btnExit"
+                        mnemonicParsing="false"
+                        onAction="#logOut"
+                        prefHeight="40.0"
+                        prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        text="🚪"
+                        textFill="WHITE">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="22.0"
+              style="-fx-padding: 30 40 30 40;">
+
+            <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                    <Label text="Registrar proyecto"
+                           style="-fx-font-size: 28px;
+                                  -fx-font-weight: bold;
+                                  -fx-text-fill: #1e293b;" />
+
+                    <Label text="Captura la información del proyecto, la organización vinculada y su responsable."
+                           style="-fx-font-size: 14px;
+                                  -fx-text-fill: #64748b;" />
+                </VBox>
+
+                <Button fx:id="btnCancel"
+                        text="Cancelar"
+                        onAction="#handleBtnCancel"
+                        style="-fx-background-color: #e2e8f0;
+                               -fx-text-fill: #334155;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 12;
+                               -fx-padding: 12 22 12 22;" />
+
+                <Button fx:id="btnSaveProject"
+                        text="Guardar proyecto"
+                        onAction="#handleBtnSaveProject"
+                        style="-fx-background-color: #2563eb;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14px;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 12;
+                               -fx-padding: 12 24 12 24;" />
+            </HBox>
+
+            <ScrollPane fitToWidth="true"
+                        hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED"
+                        VBox.vgrow="ALWAYS"
+                        style="-fx-background-color: transparent;
+                               -fx-background: transparent;
+                               -fx-border-color: transparent;">
+
+                <content>
+                    <VBox spacing="20.0"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 16;
+                                 -fx-border-radius: 16;
+                                 -fx-border-color: #dbe1ea;
+                                 -fx-padding: 26;
+                                 -fx-effect: dropshadow(
+                                     gaussian,
+                                     rgba(15,23,42,0.08),
+                                     12,
+                                     0.15,
+                                     0,
+                                     3
+                                 );">
+
+                        <VBox spacing="6.0">
+                            <Label text="Datos principales"
+                                   style="-fx-font-size: 18px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #1e293b;" />
+
+                            <Label text="Información básica que identifica al proyecto."
+                                   style="-fx-font-size: 13px;
+                                          -fx-text-fill: #64748b;" />
+                        </VBox>
+
+                        <Separator />
+
+                        <VBox spacing="8.0">
+                            <Label text="Nombre del proyecto"
+                                   style="-fx-font-size: 13px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #334155;" />
+
+                            <TextField fx:id="txtProjectName"
+                                       promptText="Ej. Sistema de seguimiento de prácticas profesionales"
+                                       style="-fx-background-color: #f8fafc;
+                                              -fx-background-radius: 10;
+                                              -fx-border-color: #cbd5e1;
+                                              -fx-border-radius: 10;
+                                              -fx-padding: 10;" />
+                        </VBox>
+
+                        <HBox spacing="16.0">
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                <Label text="Metodología"
+                                       style="-fx-font-size: 13px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #334155;" />
+
+                                <TextField fx:id="txtMethodology"
+                                           promptText="Ej. Scrum, Kanban, Cascada"
+                                           style="-fx-background-color: #f8fafc;
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-color: #cbd5e1;
+                                                  -fx-border-radius: 10;
+                                                  -fx-padding: 10;" />
+                            </VBox>
+
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                <Label text="Duración en meses"
+                                       style="-fx-font-size: 13px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #334155;" />
+
+                                <TextField fx:id="txtDuration"
+                                           promptText="Ej. 6"
+                                           style="-fx-background-color: #f8fafc;
+                                                  -fx-background-radius: 10;
+                                                  -fx-border-color: #cbd5e1;
+                                                  -fx-border-radius: 10;
+                                                  -fx-padding: 10;" />
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="6.0">
+                            <Label text="Asociación del proyecto"
+                                   style="-fx-font-size: 18px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #1e293b;" />
+
+                            <Label text="Selecciona la organización vinculada y el responsable asignado."
+                                   style="-fx-font-size: 13px;
+                                          -fx-text-fill: #64748b;" />
+                        </VBox>
+
+                        <Separator />
+
+                        <HBox spacing="16.0">
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                <Label text="Organización vinculada"
+                                       style="-fx-font-size: 13px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #334155;" />
+
+                                <ComboBox fx:id="cmbOrganization"
+                                          promptText="Selecciona una organización"
+                                          maxWidth="Infinity"
+                                          style="-fx-background-color: #f8fafc;
+                                                 -fx-background-radius: 10;
+                                                 -fx-border-color: #cbd5e1;
+                                                 -fx-border-radius: 10;
+                                                 -fx-padding: 4;" />
+                            </VBox>
+
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                <Label text="Responsable del proyecto"
+                                       style="-fx-font-size: 13px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #334155;" />
+
+                                <ComboBox fx:id="cmbResponsible"
+                                          promptText="Selecciona un responsable"
+                                          maxWidth="Infinity"
+                                          style="-fx-background-color: #f8fafc;
+                                                 -fx-background-radius: 10;
+                                                 -fx-border-color: #cbd5e1;
+                                                 -fx-border-radius: 10;
+                                                 -fx-padding: 4;" />
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="6.0">
+                            <Label text="Descripción y objetivos"
+                                   style="-fx-font-size: 18px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #1e293b;" />
+
+                            <Label text="Agrega el propósito del proyecto y los objetivos que se atenderán."
+                                   style="-fx-font-size: 13px;
+                                          -fx-text-fill: #64748b;" />
+                        </VBox>
+
+                        <Separator />
+
+                        <VBox spacing="8.0">
+                            <Label text="Descripción general"
+                                   style="-fx-font-size: 13px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #334155;" />
+
+                            <TextArea fx:id="txaGeneralDescription"
+                                      promptText="Describe de manera general el proyecto."
+                                      prefRowCount="3"
+                                      wrapText="true"
+                                      style="-fx-background-color: #f8fafc;
+                                             -fx-background-radius: 10;
+                                             -fx-border-color: #cbd5e1;
+                                             -fx-border-radius: 10;
+                                             -fx-padding: 8;" />
+                        </VBox>
+
+                        <VBox spacing="8.0">
+                            <Label text="Objetivo general"
+                                   style="-fx-font-size: 13px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #334155;" />
+
+                            <TextArea fx:id="txaGeneralObjective"
+                                      promptText="Escribe el objetivo general del proyecto."
+                                      prefRowCount="3"
+                                      wrapText="true"
+                                      style="-fx-background-color: #f8fafc;
+                                             -fx-background-radius: 10;
+                                             -fx-border-color: #cbd5e1;
+                                             -fx-border-radius: 10;
+                                             -fx-padding: 8;" />
+                        </VBox>
+
+                        <HBox spacing="16.0">
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                <Label text="Objetivos inmediatos"
+                                       style="-fx-font-size: 13px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #334155;" />
+
+                                <TextArea fx:id="txaImmediateObjectives"
+                                          promptText="Objetivos de corto plazo."
+                                          prefRowCount="4"
+                                          wrapText="true"
+                                          style="-fx-background-color: #f8fafc;
+                                                 -fx-background-radius: 10;
+                                                 -fx-border-color: #cbd5e1;
+                                                 -fx-border-radius: 10;
+                                                 -fx-padding: 8;" />
+                            </VBox>
+
+                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                <Label text="Objetivos mediatos"
+                                       style="-fx-font-size: 13px;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #334155;" />
+
+                                <TextArea fx:id="txaMediateObjectives"
+                                          promptText="Objetivos de mediano plazo."
+                                          prefRowCount="4"
+                                          wrapText="true"
+                                          style="-fx-background-color: #f8fafc;
+                                                 -fx-background-radius: 10;
+                                                 -fx-border-color: #cbd5e1;
+                                                 -fx-border-radius: 10;
+                                                 -fx-padding: 8;" />
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="6.0">
+                            <Label text="Recursos y responsabilidades"
+                                   style="-fx-font-size: 18px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #1e293b;" />
+
+                            <Label text="Indica los recursos necesarios y las responsabilidades principales."
+                                   style="-fx-font-size: 13px;
+                                          -fx-text-fill: #64748b;" />
+                        </VBox>
+
+                        <Separator />
+
+                        <VBox spacing="8.0">
+                            <Label text="Recursos"
+                                   style="-fx-font-size: 13px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #334155;" />
+
+                            <TextArea fx:id="txaResources"
+                                      promptText="Describe los recursos necesarios."
+                                      prefRowCount="3"
+                                      wrapText="true"
+                                      style="-fx-background-color: #f8fafc;
+                                             -fx-background-radius: 10;
+                                             -fx-border-color: #cbd5e1;
+                                             -fx-border-radius: 10;
+                                             -fx-padding: 8;" />
+                        </VBox>
+
+                        <VBox spacing="8.0">
+                            <Label text="Responsabilidades"
+                                   style="-fx-font-size: 13px;
+                                          -fx-font-weight: bold;
+                                          -fx-text-fill: #334155;" />
+
+                            <TextField fx:id="txtResponsibilities"
+                                       promptText="Ej. Desarrollo, documentación, pruebas y seguimiento"
+                                       style="-fx-background-color: #f8fafc;
+                                              -fx-background-radius: 10;
+                                              -fx-border-color: #cbd5e1;
+                                              -fx-border-radius: 10;
+                                              -fx-padding: 10;" />
+                        </VBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+        </VBox>
+    </center>
+</BorderPane>
