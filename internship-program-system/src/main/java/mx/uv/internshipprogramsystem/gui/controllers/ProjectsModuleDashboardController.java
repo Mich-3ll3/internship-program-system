@@ -78,7 +78,7 @@ public class ProjectsModuleDashboardController implements Initializable {
         selectedProject = Optional.of(project);
 
         WindowManagerController.changeView(
-            "ProjectFormDashboard.fxml"
+        "ProjectUpdateDashboard.fxml"
         );
     }
 

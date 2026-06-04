@@ -17,80 +17,89 @@ public class ProjectManager {
         projectDAO = new ProjectDAO();
     }
 
-    public boolean registerProject(ProjectDTO project)
-            throws BusinessException {
-        try {
-            ProjectValidator.validateForCreate(project);
-
-            return projectDAO.create(project);
-        } catch (ValidationException validationException) {
-            throw new BusinessException(
-                validationException.getMessage(),
-                validationException
-            );
-        }
-    }
-
     public boolean updateProject(ProjectDTO project)
             throws BusinessException {
+        boolean wasUpdated;
+
         try {
             ProjectValidator.validateForUpdate(project);
 
-            return projectDAO.update(project);
+            wasUpdated = projectDAO.update(project);
         } catch (ValidationException validationException) {
             throw new BusinessException(
                 validationException.getMessage(),
                 validationException
             );
         }
+
+        return wasUpdated;
     }
 
     public boolean deactivateProject(int projectId)
             throws BusinessException {
+        boolean wasDeactivated;
+
         try {
             ProjectValidator.validateProjectId(projectId);
 
-            return projectDAO.deactivate(projectId);
+            wasDeactivated = projectDAO.deactivate(projectId);
         } catch (ValidationException validationException) {
             throw new BusinessException(
                 validationException.getMessage(),
                 validationException
             );
         }
+
+        return wasDeactivated;
     }
 
-    public Optional<ProjectDTO> findProjectById(
-            int projectId
-    ) throws BusinessException {
+    public Optional<ProjectDTO> findProjectById(int projectId)
+            throws BusinessException {
+        Optional<ProjectDTO> project;
+
         try {
             ProjectValidator.validateProjectId(projectId);
 
-            return projectDAO.findById(projectId);
+            project = projectDAO.findById(projectId);
         } catch (ValidationException validationException) {
             throw new BusinessException(
                 validationException.getMessage(),
                 validationException
             );
         }
+
+        return project;
     }
 
     public List<ProjectDTO> findAllProjects()
             throws BusinessException {
-        return projectDAO.findAll();
+        List<ProjectDTO> projects =
+            projectDAO.findAll();
+
+        return projects;
     }
 
     public List<ProjectDTO> findActiveProjects()
             throws BusinessException {
-        return projectDAO.findByStatus(true);
+        List<ProjectDTO> projects =
+            projectDAO.findByStatus(true);
+
+        return projects;
     }
 
     public List<ProjectDTO> findInactiveProjects()
             throws BusinessException {
-        return projectDAO.findByStatus(false);
+        List<ProjectDTO> projects =
+            projectDAO.findByStatus(false);
+
+        return projects;
     }
 
     public int countProjects()
             throws BusinessException {
-        return projectDAO.countAll();
+        int totalProjects =
+            projectDAO.countAll();
+
+        return totalProjects;
     }
 }

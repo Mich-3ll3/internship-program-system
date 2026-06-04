@@ -8,8 +8,8 @@ public final class ProjectValidator {
     private static final int MAX_METHODOLOGY_LENGTH = 100;
     private static final int MAX_RESPONSIBILITIES_LENGTH = 255;
     private static final int MAX_TEXT_LENGTH = 5000;
-    private static final int MIN_DURATION = 1;
-    private static final int MAX_DURATION = 60;
+    private static final int MIN_DURATION_HOURS = 120;
+    private static final int MAX_DURATION_HOURS = 960;
 
     private ProjectValidator() {
     }
@@ -176,9 +176,14 @@ public final class ProjectValidator {
             );
         }
 
-        if (duration < MIN_DURATION || duration > MAX_DURATION) {
+        if (duration < MIN_DURATION_HOURS
+                || duration > MAX_DURATION_HOURS) {
             throw new ValidationException(
-                "La duración debe estar entre 1 y 60 meses."
+                "La duración debe estar entre "
+                    + MIN_DURATION_HOURS
+                    + " y "
+                    + MAX_DURATION_HOURS
+                    + " horas."
             );
         }
     }
@@ -197,8 +202,14 @@ public final class ProjectValidator {
         validateSafeText(project.getName(), "nombre");
         validateSafeText(project.getGeneralDescription(), "descripción");
         validateSafeText(project.getGeneralObjective(), "objetivo general");
-        validateSafeText(project.getImmediateObjectives(), "objetivos inmediatos");
-        validateSafeText(project.getMediateObjective(), "objetivos mediatos");
+        validateSafeText(
+            project.getImmediateObjectives(),
+            "objetivos inmediatos"
+        );
+        validateSafeText(
+            project.getMediateObjective(),
+            "objetivos mediatos"
+        );
         validateSafeText(project.getMethodology(), "metodología");
         validateSafeText(project.getResources(), "recursos");
         validateSafeText(project.getResponsibilities(), "responsabilidades");

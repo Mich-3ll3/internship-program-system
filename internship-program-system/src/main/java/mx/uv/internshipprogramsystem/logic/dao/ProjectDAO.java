@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.SQLTransientConnectionException;
 import java.util.ArrayList;
 import java.util.List;
@@ -335,6 +336,56 @@ public class ProjectDAO implements IProjectDAO {
 
         return wasUpdated;
     }
+    
+    @Override
+    public boolean update(
+            ProjectDTO project,
+            Connection connection
+    ) throws BusinessException {
+        InputValidator.validateNotNull(
+            project,
+            "ProjectDTO no puede ser nulo."
+        );
+
+        InputValidator.validateNotNull(
+            connection,
+            "La conexión no puede ser nula."
+        );
+
+        InputValidator.validatePositive(
+            project.getId(),
+            "El id del proyecto debe ser positivo."
+        );
+
+        boolean wasUpdated;
+
+        try (PreparedStatement updateProjectStatement =
+                connection.prepareStatement(UPDATE_PROJECT_QUERY)) {
+            setProjectData(updateProjectStatement, project);
+
+            updateProjectStatement.setInt(
+                13,
+                project.getId()
+            );
+
+            wasUpdated =
+                updateProjectStatement.executeUpdate() > 0;
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error actualizando proyecto con id {}",
+                project.getId(),
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error actualizando proyecto con id "
+                    + project.getId(),
+                sqlException
+            );
+        }
+
+        return wasUpdated;
+    }
 
     @Override
     public boolean deactivate(int id)
@@ -382,6 +433,62 @@ public class ProjectDAO implements IProjectDAO {
         }
 
         return wasDeactivated;
+    }
+    
+    @Override
+    public int createAndReturnId(
+            ProjectDTO project,
+            Connection connection
+    ) throws BusinessException {
+        InputValidator.validateNotNull(
+            project,
+            "ProjectDTO no puede ser nulo."
+        );
+
+        InputValidator.validateNotNull(
+            connection,
+            "La conexión no puede ser nula."
+        );
+
+        int generatedId = 0;
+
+        try (PreparedStatement insertProjectStatement =
+                connection.prepareStatement(
+                    INSERT_PROJECT_QUERY,
+                    Statement.RETURN_GENERATED_KEYS
+                )) {
+            setProjectData(
+                insertProjectStatement,
+                project
+            );
+
+            insertProjectStatement.executeUpdate();
+
+            try (ResultSet resultSet =
+                    insertProjectStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    generatedId = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error creando proyecto y obteniendo id generado",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error creando proyecto.",
+                sqlException
+            );
+        }
+
+        if (generatedId <= 0) {
+            throw new BusinessException(
+                "No se pudo obtener el identificador del proyecto."
+            );
+        }
+
+        return generatedId;
     }
 
     private void setProjectData(

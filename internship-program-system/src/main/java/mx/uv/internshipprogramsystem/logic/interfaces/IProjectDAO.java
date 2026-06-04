@@ -1,5 +1,6 @@
 package mx.uv.internshipprogramsystem.logic.interfaces;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +13,11 @@ public interface IProjectDAO {
 
     boolean update(ProjectDTO project)
             throws BusinessException;
+    
+    boolean update(
+            ProjectDTO project,
+            Connection connection
+    ) throws BusinessException;
 
     boolean deactivate(int id)
             throws BusinessException;
@@ -27,4 +33,8 @@ public interface IProjectDAO {
 
     int countAll()
             throws BusinessException;
+    int createAndReturnId(
+            ProjectDTO project,
+            Connection connection
+    ) throws BusinessException;
 }

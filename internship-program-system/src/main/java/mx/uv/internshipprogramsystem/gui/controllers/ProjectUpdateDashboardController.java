@@ -4,13 +4,13 @@ import java.net.URL;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
@@ -20,27 +20,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
+import mx.uv.internshipprogramsystem.logic.dao.ProjectActivityDAO;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectResponsibleDAO;
+import mx.uv.internshipprogramsystem.logic.dao.ProjectScheduleDAO;
 import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectScheduleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import mx.uv.internshipprogramsystem.logic.managers.ProjectRegisterManager;
+import mx.uv.internshipprogramsystem.logic.managers.ProjectUpdateManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
-public class ProjectRegisterDashboardController implements Initializable {
+public class ProjectUpdateDashboardController implements Initializable {
     private static final Logger LOGGER =
-        LoggerFactory.getLogger(
-            ProjectRegisterDashboardController.class
-        );
-
-    @FXML
-    private Button btnCancel;
-
-    @FXML
-    private Button btnSaveProject;
+        LoggerFactory.getLogger(ProjectUpdateDashboardController.class);
 
     @FXML
     private TextField txtProjectName;
@@ -102,24 +96,33 @@ public class ProjectRegisterDashboardController implements Initializable {
     @FXML
     private ListView<String> lstSchedules;
 
-    private ProjectRegisterManager projectRegisterManager;
+    private ProjectUpdateManager projectUpdateManager;
     private LinkedOrganizationDAO linkedOrganizationDAO;
     private ProjectResponsibleDAO projectResponsibleDAO;
+    private ProjectActivityDAO projectActivityDAO;
+    private ProjectScheduleDAO projectScheduleDAO;
+
     private List<LinkedOrganizationDTO> linkedOrganizations;
     private List<ProjectResponsibleDTO> projectResponsibles;
     private List<ProjectActivityDTO> activities;
     private List<ProjectScheduleDTO> schedules;
 
+    private ProjectDTO selectedProject;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        projectRegisterManager = new ProjectRegisterManager();
+        projectUpdateManager = new ProjectUpdateManager();
         linkedOrganizationDAO = new LinkedOrganizationDAO();
         projectResponsibleDAO = new ProjectResponsibleDAO();
+        projectActivityDAO = new ProjectActivityDAO();
+        projectScheduleDAO = new ProjectScheduleDAO();
+
         activities = new ArrayList<>();
         schedules = new ArrayList<>();
 
-        loadComboBoxData();
         loadScheduleDays();
+        loadComboBoxData();
+        loadSelectedProject();
     }
 
     @FXML
@@ -127,35 +130,26 @@ public class ProjectRegisterDashboardController implements Initializable {
         try {
             ProjectDTO project = buildProjectFromForm();
 
-            projectRegisterManager.registerProject(
+            projectUpdateManager.updateProject(
                 project,
                 activities,
                 schedules
             );
 
-            LOGGER.info(
-                "Proyecto registrado correctamente."
-            );
-
             showInformationAlert(
-                "Proyecto registrado correctamente."
+                "Proyecto actualizado correctamente."
             );
 
             WindowManagerController.changeView(
                 "ProjectsModuleDashboard.fxml"
             );
         } catch (NumberFormatException numberFormatException) {
-            LOGGER.error(
-                "Error convirtiendo datos numéricos del proyecto",
-                numberFormatException
-            );
-
             showErrorAlert(
                 "Revisa los campos numéricos: duración y semanas."
             );
         } catch (BusinessException businessException) {
             LOGGER.error(
-                "Error registrando proyecto",
+                "Error actualizando proyecto",
                 businessException
             );
 
@@ -175,8 +169,7 @@ public class ProjectRegisterDashboardController implements Initializable {
     @FXML
     private void handleBtnAddActivity(ActionEvent event) {
         try {
-            ProjectActivityDTO activity =
-                buildActivityFromForm();
+            ProjectActivityDTO activity = buildActivityFromForm();
 
             activities.add(activity);
             lstActivities.getItems().add(
@@ -213,8 +206,7 @@ public class ProjectRegisterDashboardController implements Initializable {
     @FXML
     private void handleBtnAddSchedule(ActionEvent event) {
         try {
-            ProjectScheduleDTO schedule =
-                buildScheduleFromForm();
+            ProjectScheduleDTO schedule = buildScheduleFromForm();
 
             schedules.add(schedule);
             lstSchedules.getItems().add(
@@ -244,66 +236,96 @@ public class ProjectRegisterDashboardController implements Initializable {
         }
     }
 
-    @FXML
-    private void goHome(ActionEvent event) {
-        WindowManagerController.changeView(
-            "CoordinatorProfessorHomeDashboard.fxml"
-        );
+    private void loadSelectedProject() {
+        try {
+            Optional<ProjectDTO> optionalProject =
+                ProjectsModuleDashboardController.getSelectedProject();
+
+            if (optionalProject.isPresent()) {
+                selectedProject = optionalProject.get();
+
+                fillProjectFields();
+                loadProjectActivities();
+                loadProjectSchedules();
+            } else {
+                showErrorAlert(
+                    "No se seleccionó un proyecto para modificar."
+                );
+
+                WindowManagerController.changeView(
+                    "ProjectsModuleDashboard.fxml"
+                );
+            }
+        } catch (BusinessException businessException) {
+            showErrorAlert(
+                businessException.getMessage()
+            );
+        }
     }
 
-    @FXML
-    private void goEducationalExperienceModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "EducationalExperienceRegisterDashboard.fxml"
+    private void fillProjectFields() {
+        txtProjectName.setText(selectedProject.getName());
+        txaGeneralDescription.setText(
+            selectedProject.getGeneralDescription()
         );
+        txaGeneralObjective.setText(
+            selectedProject.getGeneralObjective()
+        );
+        txaImmediateObjectives.setText(
+            selectedProject.getImmediateObjectives()
+        );
+        txaMediateObjectives.setText(
+            selectedProject.getMediateObjective()
+        );
+        txtMethodology.setText(
+            selectedProject.getMethodology()
+        );
+        txaResources.setText(
+            selectedProject.getResources()
+        );
+        txtResponsibilities.setText(
+            selectedProject.getResponsibilities()
+        );
+        txtDuration.setText(
+            String.valueOf(selectedProject.getDuration())
+        );
+
+        selectOrganization();
+        selectResponsible();
     }
 
-    @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
+    private void loadProjectActivities()
+            throws BusinessException {
+        activities = new ArrayList<>(
+            projectActivityDAO.findByProjectId(
+                selectedProject.getId()
+            )
         );
+
+        lstActivities.getItems().clear();
+
+        for (ProjectActivityDTO activity : activities) {
+            lstActivities.getItems().add(
+                buildActivityDisplayText(activity)
+            );
+        }
     }
 
-    @FXML
-    private void goLinkedOrganizationModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "LinkedOrganizationManagementGUI.fxml"
-        );
-    }
-
-    @FXML
-    private void goProjectsModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectsModuleDashboard.fxml"
-        );
-    }
-
-    @FXML
-    private void goDocumentsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de documentos."
-        );
-    }
-
-    @FXML
-    private void goReportsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
-        );
-    }
-
-    @FXML
-    private void logOut(ActionEvent event) {
-        UserSessionManager.clearSession();
-
-        LOGGER.info(
-            "Cierre de sesión realizado correctamente."
+    private void loadProjectSchedules()
+            throws BusinessException {
+        schedules = new ArrayList<>(
+            projectScheduleDAO.findByProjectId(
+                selectedProject.getId()
+            )
         );
 
-        WindowManagerController.changeView(
-            "LoginDashboard.fxml"
-        );
+        lstSchedules.getItems().clear();
+
+        for (ProjectScheduleDTO schedule : schedules) {
+            lstSchedules.getItems().add(
+                buildScheduleDisplayText(schedule)
+            );
+        }
     }
 
     private void loadComboBoxData() {
@@ -314,11 +336,6 @@ public class ProjectRegisterDashboardController implements Initializable {
             loadOrganizations();
             loadResponsibles();
         } catch (BusinessException businessException) {
-            LOGGER.error(
-                "Error cargando datos para registrar proyecto",
-                businessException
-            );
-
             showErrorAlert(
                 "No se pudieron cargar las organizaciones o responsables."
             );
@@ -360,19 +377,36 @@ public class ProjectRegisterDashboardController implements Initializable {
         cmbScheduleDay.getItems().add("VIERNES");
     }
 
+    private void selectOrganization() {
+        for (String organization : cmbOrganization.getItems()) {
+            if (organization.startsWith(
+                    selectedProject.getLinkedOrganizationId()
+                        + " - "
+            )) {
+                cmbOrganization.setValue(organization);
+            }
+        }
+    }
+
+    private void selectResponsible() {
+        for (String responsible : cmbResponsible.getItems()) {
+            if (responsible.startsWith(
+                    selectedProject.getProjectResponsibleId()
+                        + " - "
+            )) {
+                cmbResponsible.setValue(responsible);
+            }
+        }
+    }
+
     private ProjectDTO buildProjectFromForm()
             throws BusinessException {
         Integer duration = Integer.valueOf(
             txtDuration.getText().trim()
         );
 
-        Integer organizationId =
-            getSelectedOrganizationId();
-
-        Integer responsibleId =
-            getSelectedResponsibleId();
-
         ProjectDTO project = new ProjectDTO(
+            selectedProject.getId(),
             getTrimmedText(txtProjectName),
             getTrimmedText(txaGeneralDescription),
             getTrimmedText(txaGeneralObjective),
@@ -382,9 +416,9 @@ public class ProjectRegisterDashboardController implements Initializable {
             getTrimmedText(txaResources),
             getTrimmedText(txtResponsibilities),
             duration,
-            organizationId,
-            responsibleId,
-            true
+            getSelectedOrganizationId(),
+            getSelectedResponsibleId(),
+            selectedProject.getIsActive()
         );
 
         return project;
@@ -402,20 +436,16 @@ public class ProjectRegisterDashboardController implements Initializable {
             "El mes de la actividad es obligatorio."
         );
 
-        Integer startWeek = Integer.valueOf(
-            txtActivityStartWeek.getText().trim()
-        );
-
-        Integer endWeek = Integer.valueOf(
-            txtActivityEndWeek.getText().trim()
-        );
-
         ProjectActivityDTO activity = new ProjectActivityDTO(
             getTrimmedText(txtActivityName),
             getTrimmedText(txtActivityMonth),
-            startWeek,
-            endWeek,
-            0
+            Integer.valueOf(
+                txtActivityStartWeek.getText().trim()
+            ),
+            Integer.valueOf(
+                txtActivityEndWeek.getText().trim()
+            ),
+            selectedProject.getId()
         );
 
         return activity;
@@ -423,8 +453,7 @@ public class ProjectRegisterDashboardController implements Initializable {
 
     private ProjectScheduleDTO buildScheduleFromForm()
             throws BusinessException {
-        String selectedDay =
-            cmbScheduleDay.getValue();
+        String selectedDay = cmbScheduleDay.getValue();
 
         if (selectedDay == null || selectedDay.trim().isEmpty()) {
             throw new BusinessException(
@@ -432,25 +461,11 @@ public class ProjectRegisterDashboardController implements Initializable {
             );
         }
 
-        validateRequiredTextField(
-            txtEntryTime,
-            "La hora de entrada es obligatoria."
-        );
-
-        validateRequiredTextField(
-            txtExitTime,
-            "La hora de salida es obligatoria."
-        );
-
         ProjectScheduleDTO schedule = new ProjectScheduleDTO(
             selectedDay,
-            LocalTime.parse(
-                txtEntryTime.getText().trim()
-            ),
-            LocalTime.parse(
-                txtExitTime.getText().trim()
-            ),
-            0
+            LocalTime.parse(txtEntryTime.getText().trim()),
+            LocalTime.parse(txtExitTime.getText().trim()),
+            selectedProject.getId()
         );
 
         return schedule;
@@ -458,28 +473,20 @@ public class ProjectRegisterDashboardController implements Initializable {
 
     private Integer getSelectedOrganizationId()
             throws BusinessException {
-        String selectedOrganization =
-            cmbOrganization.getValue();
-
-        Integer organizationId =
-            getIdFromComboValue(
-                selectedOrganization,
-                "Debe seleccionar una organización."
-            );
+        Integer organizationId = getIdFromComboValue(
+            cmbOrganization.getValue(),
+            "Debe seleccionar una organización."
+        );
 
         return organizationId;
     }
 
     private Integer getSelectedResponsibleId()
             throws BusinessException {
-        String selectedResponsible =
-            cmbResponsible.getValue();
-
-        Integer responsibleId =
-            getIdFromComboValue(
-                selectedResponsible,
-                "Debe seleccionar un responsable."
-            );
+        Integer responsibleId = getIdFromComboValue(
+            cmbResponsible.getValue(),
+            "Debe seleccionar un responsable."
+        );
 
         return responsibleId;
     }
@@ -563,10 +570,68 @@ public class ProjectRegisterDashboardController implements Initializable {
         return trimmedText;
     }
 
+    @FXML
+    private void goHome(ActionEvent event) {
+        WindowManagerController.changeView(
+            "CoordinatorProfessorHomeDashboard.fxml"
+        );
+    }
+
+    @FXML
+    private void goEducationalExperienceModule(ActionEvent event) {
+        WindowManagerController.changeView(
+            "EducationalExperienceRegisterDashboard.fxml"
+        );
+    }
+
+    @FXML
+    private void goInternModule(ActionEvent event) {
+        WindowManagerController.changeView(
+            "InternModuleDashboard.fxml"
+        );
+    }
+
+    @FXML
+    private void goLinkedOrganizationModule(ActionEvent event) {
+        WindowManagerController.changeView(
+            "LinkedOrganizationManagementGUI.fxml"
+        );
+    }
+
+    @FXML
+    private void goProjectsModule(ActionEvent event) {
+        WindowManagerController.changeView(
+            "ProjectsModuleDashboard.fxml"
+        );
+    }
+
+    @FXML
+    private void goDocumentsModule(ActionEvent event) {
+        LOGGER.info(
+            "Acceso al módulo de documentos."
+        );
+    }
+
+    @FXML
+    private void goReportsModule(ActionEvent event) {
+        LOGGER.info(
+            "Acceso al módulo de reportes."
+        );
+    }
+
+    @FXML
+    private void logOut(ActionEvent event) {
+        UserSessionManager.clearSession();
+
+        WindowManagerController.changeView(
+            "LoginDashboard.fxml"
+        );
+    }
+
     private void showInformationAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
 
-        alert.setTitle("Registro exitoso");
+        alert.setTitle("Actualización exitosa");
         alert.setHeaderText("Operación completada");
         alert.setContentText(message);
         alert.showAndWait();
@@ -576,7 +641,7 @@ public class ProjectRegisterDashboardController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.ERROR);
 
         alert.setTitle("Error");
-        alert.setHeaderText("No se pudo registrar el proyecto");
+        alert.setHeaderText("No se pudo modificar el proyecto");
         alert.setContentText(message);
         alert.showAndWait();
     }
