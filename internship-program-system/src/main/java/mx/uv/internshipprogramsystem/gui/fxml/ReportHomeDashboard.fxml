@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ReportHomeDashboardController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#4a90e2;" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin><Insets top="20.0" /></VBox.margin>
+                    <children>
+                        <Label text="ES" textFill="WHITE">
+                            <font><Font name="System Bold" size="12.0" /></font>
+                        </Label>
+                    </children>
+                </StackPane>
+                <Button fx:id="btnHome" text="⌂" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        onAction="#goHome"/>
+                <Button fx:id="btnProjects" text="🛠️" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        onAction="#goProjectsModule"/>
+                <Button fx:id="btnDocuments" text="📑" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        onAction="#goDocumentsModule"/>
+                <Button fx:id="btnReports" text="📋" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        onAction="#goReportsModule"/>
+                <Button fx:id="btnSelfAssessments" text="📝" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        onAction="#goSelfAssessmentsModule"/>
+                <Region VBox.vgrow="ALWAYS" />
+                <Button fx:id="btnExit" text="🚪" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent;"
+                        onAction="#logOut">
+                    <VBox.margin><Insets bottom="20.0" /></VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
+            <content>
+                <VBox spacing="16.0">
+                    <padding><Insets bottom="24.0" left="24.0" right="24.0" top="20.0" /></padding>
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Panel de Estudiantes" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="22.0" /></font>
+                                        </Label>
+                                        <Label fx:id="lblFecha" text="Martes, 5 de mayo de 2026" textFill="#6b7280"/>
+                                    </children>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <StackPane prefHeight="35.0" prefWidth="35.0"
+                                           style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
+                                    <children>
+                                        <Label text="SF" textFill="WHITE">
+                                            <font><Font name="System Bold" size="11.0" /></font>
+                                        </Label>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </HBox>
+
+                        <VBox spacing="10.0"
+                              style="-fx-background-color: white; -fx-background-radius: 13;
+                                     -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;">
+                            <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <children>
+                                        <StackPane prefHeight="32.0" prefWidth="32.0"
+                                                   style="-fx-background-color: #EEEDFE; -fx-background-radius: 9;">
+                                            <children>
+                                                <Label text="R" textFill="#7c3aed" />
+                                            </children>
+                                        </StackPane>
+                                        <Label text="REPORTES" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="14.0" /></font>
+                                        </Label>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                    </children>
+                                </HBox>
+
+                                <HBox spacing="8.0">
+                                    <children>
+                                        <Button fx:id="btnRegisterReport"
+                                                onAction="#openRegisterReport"
+                                                text="Registrar reporte" />
+                                        <Button fx:id="btnGenerateReport"
+                                                onAction="#generateReportPDF"
+                                                text="Generar PDF" />
+                                        <Button fx:id="btnUploadPDF"
+                                                onAction="#uploadReportFile"
+                                                text="Subir PDF" />
+                                        <Button fx:id="btnSendReport"
+                                                onAction="#sendReport"
+                                                text="Enviar reporte" />
+                                    </children>
+                                </HBox>
+
+                                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Buscar por número:" textFill="#1a2744" />
+                                        <TextField fx:id="txtSearchNumber" promptText="Ej. 1" />
+                                        <Button text="Buscar" onAction="#handleSearch" />
+                                        <Button text="Limpiar" onAction="#handleClearSearch" />
+                                    </children>
+                                </HBox>
+
+                                <TableView fx:id="tblReports" prefHeight="200.0" prefWidth="600.0">
+                                    <columns>
+                                        <TableColumn fx:id="colNumber" text="Número" prefWidth="80"/>
+                                        <TableColumn fx:id="colType" text="Tipo" prefWidth="120"/>
+                                        <TableColumn fx:id="colDate" text="Fecha" prefWidth="120"/>
+                                        <TableColumn fx:id="colStatus" text="Estado" prefWidth="120"/>
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

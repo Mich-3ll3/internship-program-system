@@ -65,6 +65,14 @@
                         style="-fx-background-color: transparent;" 
                         text="📋" 
                         textFill="WHITE" />
+                <Button fx:id="btnSelfAssessments" 
+                        mnemonicParsing="false" 
+                        onAction="#goSelfAssessmentsModule" 
+                        prefHeight="40.0" 
+                        prefWidth="40.0" 
+                        style="-fx-background-color: transparent;" 
+                        text="📝" 
+                        textFill="WHITE" />
                 <Region VBox.vgrow="ALWAYS" />
                 <Button fx:id="btnExit" 
                         mnemonicParsing="false" 
@@ -145,7 +153,7 @@
                             </children>
                         </HBox>
 
-                        <HBox spacing="12.0">
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
                             <children>
                                 <HBox alignment="CENTER_LEFT" prefHeight="78.0" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;" HBox.hgrow="ALWAYS">
                                     <padding><Insets left="15.0" right="15.0" /></padding>
@@ -195,9 +203,18 @@
                             </children>
                         </HBox>
 
-                        <HBox spacing="12.0">
+                        <GridPane hgap="16.0" vgap="16.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="50.0" />
+                                <ColumnConstraints percentWidth="50.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints valignment="TOP" />
+                                <RowConstraints valignment="TOP" />
+                            </rowConstraints>
                             <children>
-                                <VBox prefWidth="285.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" HBox.hgrow="ALWAYS">
+                                
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                     <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
                                     <children>
                                         <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -237,19 +254,19 @@
                                                 <Label style="-fx-background-color:#EBF3FF; -fx-background-radius:4; -fx-padding:4 7;" text="• Reporte 3" textFill="#1d4ed8" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                                                 <Label style="-fx-background-color:#FEF3E7; -fx-background-radius:4; -fx-padding:4 7;" text="• Autoevaluación" textFill="#b45309" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                             </children>
-                                 <columnConstraints>
-                                    <ColumnConstraints />
-                                    <ColumnConstraints />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints />
-                                    <RowConstraints />
-                                 </rowConstraints>
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints />
+                                                <RowConstraints />
+                                            </rowConstraints>
                                         </GridPane>
                                     </children>
                                 </VBox>
 
-                                <VBox prefWidth="285.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" HBox.hgrow="ALWAYS">
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                     <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
                                     <children>
                                         <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -277,17 +294,17 @@
                                                 <Label text="Carta de aceptación" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                                                 <Label alignment="CENTER" style="-fx-background-color:#f5f6fa; -fx-background-radius:4; -fx-padding:3 6;" text="Falta" textFill="#6b7280" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                                             </children>
-                                 <columnConstraints>
-                                    <ColumnConstraints />
-                                    <ColumnConstraints />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints />
-                                    <RowConstraints />
-                                    <RowConstraints />
-                                    <RowConstraints />
-                                    <RowConstraints />
-                                 </rowConstraints>
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="ALWAYS" />
+                                                <ColumnConstraints halignment="RIGHT" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints />
+                                                <RowConstraints />
+                                                <RowConstraints />
+                                                <RowConstraints />
+                                                <RowConstraints />
+                                            </rowConstraints>
                                         </GridPane>
                                         <Separator />
                                         <ComboBox fx:id="cmbTipoDocumento" maxWidth="Infinity" promptText="Tipo de documento a subir" />
@@ -300,7 +317,7 @@
                                     </children>
                                 </VBox>
 
-                                <VBox prefWidth="285.0" spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" HBox.hgrow="ALWAYS">
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                     <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
                                     <children>
                                         <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -312,7 +329,7 @@
                                                     <font><Font name="System Bold" size="14.0" /></font>
                                                 </Label>
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <Hyperlink fx:id="lnkVerReportes" onAction="#abrirReportes" style="-fx-font-size: 12;" text="Historial ↗" textFill="#4a90e2" />
+                                                <Hyperlink fx:id="lnkVerReportes" onAction="#goReportsModule" style="-fx-font-size: 12;" text="Entrar ↗" textFill="#4a90e2" />
                                             </children>
                                         </HBox>
                                         <VBox spacing="6.0">
@@ -321,7 +338,7 @@
                                                     <children>
                                                         <VBox HBox.hgrow="ALWAYS">
                                                             <children>
-                                                                <Label text="Reporte 1 - Análisis de requerimientos" textFill="#1a2744" />
+                                                                <Label text="Reporte 1 - Análisis" textFill="#1a2744" />
                                                                 <Label text="Aprobado • 3 mar 2026" textFill="#16a34a" />
                                                             </children>
                                                         </VBox>
@@ -356,8 +373,40 @@
                                         <Button fx:id="btnEnviarReporte" maxWidth="Infinity" mnemonicParsing="false" onAction="#enviarReporte" style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;" text="Enviar reporte" />
                                     </children>
                                 </VBox>
+
+                                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                            <children>
+                                                <StackPane prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #FCE8E6; -fx-background-radius: 9;">
+                                                    <children><Label text="A" textFill="#db2777" /></children>
+                                                </StackPane>
+                                                <Label text="AUTOEVALUACIÓN" textFill="#1a2744">
+                                                    <font><Font name="System Bold" size="14.0" /></font>
+                                                </Label>
+                                                <Region HBox.hgrow="ALWAYS" />
+                                                <Hyperlink fx:id="lnkVerAutoevaluaciones" onAction="#goSelfAssessmentsModule" style="-fx-font-size: 12;" text="Entrar ↗" textFill="#4a90e2" />
+                                            </children>
+                                        </HBox>
+                                        <VBox spacing="6.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-background-color: #FDF2F8; -fx-background-radius: 8; -fx-padding: 8;">
+                                                    <children>
+                                                        <VBox HBox.hgrow="ALWAYS">
+                                                            <children>
+                                                                <Label text="Autoevaluación Parcial 1" textFill="#1a2744" />
+                                                                <Label text="Respondido • Nota: 9.5" textFill="#db2777" />
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
                             </children>
-                        </HBox>
+                        </GridPane>
                     </children>
                 </VBox>
             </content>

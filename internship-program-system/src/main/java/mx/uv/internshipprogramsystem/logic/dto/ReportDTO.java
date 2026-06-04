@@ -3,6 +3,7 @@ package mx.uv.internshipprogramsystem.logic.dto;
 import java.time.LocalDate;
 
 public class ReportDTO {
+
     private int id;
     private int number;
     private LocalDate date;
@@ -18,9 +19,18 @@ public class ReportDTO {
     public ReportDTO() {
     }
 
-    public ReportDTO(int id, int number, LocalDate date, String generalObservations,
-                     String type, String status, String filePath,
-                     int studentId, int professorId, int projectId) {
+    public ReportDTO(
+            int id,
+            int number,
+            LocalDate date,
+            String generalObservations,
+            String type,
+            String status,
+            String filePath,
+            int studentId,
+            int professorId,
+            int projectId
+    ) {
         this.id = id;
         this.number = number;
         this.date = date;
@@ -33,9 +43,17 @@ public class ReportDTO {
         this.projectId = projectId;
     }
 
-    public ReportDTO(int number, LocalDate date, String generalObservations,
-                     String type, String status, String filePath,
-                     int studentId, int professorId, int projectId) {
+    public ReportDTO(
+            int number,
+            LocalDate date,
+            String generalObservations,
+            String type,
+            String status,
+            String filePath,
+            int studentId,
+            int professorId,
+            int projectId
+    ) {
         this.number = number;
         this.date = date;
         this.generalObservations = generalObservations;

@@ -59,11 +59,10 @@ public class InternHomeDashboardController
         );
     }
 
+    
     @FXML
     private void goReportsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
-        );
+        WindowManagerController.changeView("ReportHomeDashboard.fxml");
     }
 
     @FXML
@@ -105,6 +104,19 @@ public class InternHomeDashboardController
             "Carga de documento iniciada."
         );
     }
+    
+    @FXML
+    private void goSelfAssessmentsModule(ActionEvent event) {
+        WindowManagerController.changeView("SelfAssessmentHomeDashboard.fxml");
+    }
+
+    @FXML
+    private void registrarAutoevaluacion(ActionEvent event) {
+
+        WindowManagerController.changeView("RegisterSelfAssessment.fxml");
+    }
+
+
 
     @FXML
     private void verComentariosDocumento(

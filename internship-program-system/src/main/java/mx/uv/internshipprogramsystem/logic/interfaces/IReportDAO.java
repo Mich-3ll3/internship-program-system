@@ -1,5 +1,6 @@
 package mx.uv.internshipprogramsystem.logic.interfaces;
 
+import java.util.List;
 import java.util.Optional;
 
 import mx.uv.internshipprogramsystem.logic.dto.ReportDTO;
@@ -10,6 +11,11 @@ public interface IReportDAO {
     boolean registerReport(ReportDTO report) throws BusinessException;
 
     boolean evaluateReport(int reportId, String newStatus, String newObservations)
+            throws BusinessException;
+    
+    List<ReportDTO> getAllReports() throws BusinessException;
+    
+    boolean updateReportFilePath(int reportId, String filePath) 
             throws BusinessException;
 
     Optional<ReportDTO> getReportByStudent(int studentId) throws BusinessException;
