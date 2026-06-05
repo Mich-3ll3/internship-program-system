@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
             style="-fx-background-color: #f5f6fa; -fx-background: #f5f6fa;"
             xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -36,7 +36,7 @@
     </fx:define>
 
     <content>
-        <VBox spacing="16.0" style="-fx-background-color: #f5f6fa;">
+        <VBox spacing="16.0" style="-fx-background-color: #f5f6fa;" prefWidth="850.0" minWidth="600.0">
             <padding>
                 <Insets bottom="24.0" left="24.0" right="24.0" top="20.0" />
             </padding>
@@ -88,13 +88,13 @@
                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Estudiante" textFill="#374151" />
-                                        <ComboBox fx:id="cmbEstudiante" maxWidth="Infinity" promptText="Seleccionar estudiante" />
+                                        <ComboBox fx:id="cmbEstudiante" maxWidth="Infinity" minWidth="150.0" promptText="Seleccionar estudiante" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Proyecto" textFill="#374151" />
-                                        <ComboBox fx:id="cmbProyecto" maxWidth="Infinity" promptText="Seleccionar proyecto" />
+                                        <ComboBox fx:id="cmbProyecto" maxWidth="Infinity" minWidth="150.0" promptText="Seleccionar proyecto" />
                                     </children>
                                 </VBox>
                             </children>
@@ -105,13 +105,13 @@
                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Organización" textFill="#374151" />
-                                        <ComboBox fx:id="cmbOrganizacion" maxWidth="Infinity" promptText="Seleccionar organización" />
+                                        <ComboBox fx:id="cmbOrganizacion" maxWidth="Infinity" minWidth="150.0" promptText="Seleccionar organización" />
                                     </children>
                                 </VBox>
                                 <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label text="Responsable del Proyecto" textFill="#374151" />
-                                        <ComboBox fx:id="cmbResponsable" maxWidth="Infinity" promptText="Seleccionar responsable" />
+                                        <ComboBox fx:id="cmbResponsable" maxWidth="Infinity" minWidth="150.0" promptText="Seleccionar responsable" />
                                     </children>
                                 </VBox>
                             </children>

@@ -32,28 +32,30 @@
                 </StackPane>
                 <Button fx:id="btnHome" text="⌂" textFill="WHITE"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
                         onAction="#goHome"/>
                 <Button fx:id="btnProjects" text="🛠️" textFill="WHITE"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
                         onAction="#goProjectsModule"/>
                 <Button fx:id="btnDocuments" text="📑" textFill="WHITE"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
                         onAction="#goDocumentsModule"/>
+                
                 <Button fx:id="btnReports" text="📋" textFill="WHITE"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-background-radius: 10; -fx-cursor: hand;"
                         onAction="#goReportsModule"/>
+                        
                 <Button fx:id="btnSelfAssessments" text="📝" textFill="WHITE"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
                         onAction="#goSelfAssessmentsModule"/>
                 <Region VBox.vgrow="ALWAYS" />
                 <Button fx:id="btnExit" text="🚪" textFill="WHITE"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
                         onAction="#logOut">
                     <VBox.margin><Insets bottom="20.0" /></VBox.margin>
                 </Button>
@@ -65,8 +67,8 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
                     style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
             <content>
-                <VBox spacing="16.0">
-                    <padding><Insets bottom="24.0" left="24.0" right="24.0" top="20.0" /></padding>
+                <VBox spacing="20.0">
+                    <padding><Insets bottom="24.0" left="30.0" right="30.0" top="30.0" /></padding>
                     <children>
 
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -74,77 +76,89 @@
                                 <VBox>
                                     <children>
                                         <Label text="Panel de Estudiantes" textFill="#1a2744">
-                                            <font><Font name="System Bold" size="22.0" /></font>
+                                            <font><Font name="System Bold" size="24.0" /></font>
                                         </Label>
-                                        <Label fx:id="lblFecha" text="Martes, 5 de mayo de 2026" textFill="#6b7280"/>
+                                        <Label fx:id="lblFecha" text="Dashboard de Reportes" textFill="#6b7280">
+                                            <font><Font size="13.0" /></font>
+                                        </Label>
                                     </children>
                                 </VBox>
                                 <Region HBox.hgrow="ALWAYS" />
-                                <StackPane prefHeight="35.0" prefWidth="35.0"
+                                <StackPane prefHeight="40.0" prefWidth="40.0"
                                            style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
                                     <children>
                                         <Label text="SF" textFill="WHITE">
-                                            <font><Font name="System Bold" size="11.0" /></font>
+                                            <font><Font name="System Bold" size="13.0" /></font>
                                         </Label>
                                     </children>
                                 </StackPane>
                             </children>
                         </HBox>
 
-                        <VBox spacing="10.0"
-                              style="-fx-background-color: white; -fx-background-radius: 13;
-                                     -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;">
-                            <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                        <VBox spacing="20.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; 
+                                     -fx-border-color: #e5e7eb; -fx-border-radius: 12; 
+                                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);">
+                            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
                             <children>
-                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
                                     <children>
-                                        <StackPane prefHeight="32.0" prefWidth="32.0"
-                                                   style="-fx-background-color: #EEEDFE; -fx-background-radius: 9;">
+                                        <StackPane prefHeight="36.0" prefWidth="36.0"
+                                                   style="-fx-background-color: #EEEDFE; -fx-background-radius: 10;">
                                             <children>
-                                                <Label text="R" textFill="#7c3aed" />
+                                                <Label text="R" textFill="#7c3aed">
+                                                    <font><Font name="System Bold" size="16.0" /></font>
+                                                </Label>
                                             </children>
                                         </StackPane>
-                                        <Label text="REPORTES" textFill="#1a2744">
-                                            <font><Font name="System Bold" size="14.0" /></font>
+                                        <Label text="Gestión de Reportes" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="16.0" /></font>
                                         </Label>
-                                        <Region HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
 
-                                <HBox spacing="8.0">
+                                <HBox spacing="12.0">
                                     <children>
-                                        <Button fx:id="btnRegisterReport"
-                                                onAction="#openRegisterReport"
-                                                text="Registrar reporte" />
-                                        <Button fx:id="btnGenerateReport"
-                                                onAction="#generateReportPDF"
-                                                text="Generar PDF" />
-                                        <Button fx:id="btnUploadPDF"
-                                                onAction="#uploadReportFile"
-                                                text="Subir PDF" />
-                                        <Button fx:id="btnSendReport"
-                                                onAction="#sendReport"
-                                                text="Enviar reporte" />
+                                        <Button fx:id="btnRegisterReport" onAction="#openRegisterReport" text="➕ Nuevo Reporte"
+                                                style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+                                                
+                                        <Button fx:id="btnGenerateReport" onAction="#generateReportPDF" text="📄 Generar PDF"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+                                                
+                                        <Button fx:id="btnUploadPDF" onAction="#uploadReportFile" text="⬆️ Subir PDF Firmado"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+                                                
+                                        <Button fx:id="btnSendReport" onAction="#sendReport" text="✉️ Enviar a Revisión"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
                                     </children>
                                 </HBox>
 
-                                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-padding: 10 0 5 0;">
                                     <children>
-                                        <Label text="Buscar por número:" textFill="#1a2744" />
-                                        <TextField fx:id="txtSearchNumber" promptText="Ej. 1" />
-                                        <Button text="Buscar" onAction="#handleSearch" />
-                                        <Button text="Limpiar" onAction="#handleClearSearch" />
+                                        <Label text="🔍 Buscar reporte:" textFill="#4b5563">
+                                            <font><Font name="System Bold" size="13.0" /></font>
+                                        </Label>
+                                        <TextField fx:id="txtSearchNumber" promptText="Número de reporte..." 
+                                                   prefWidth="200.0"
+                                                   style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 10;" />
+                                        <Button text="Buscar" onAction="#handleSearch"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;" />
+                                        <Button text="Limpiar" onAction="#handleClearSearch"
+                                                style="-fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-cursor: hand; -fx-underline: true;" />
                                     </children>
                                 </HBox>
 
-                                <TableView fx:id="tblReports" prefHeight="200.0" prefWidth="600.0">
+                                <TableView fx:id="tblReports" prefHeight="280.0" 
+                                           style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8;">
                                     <columns>
-                                        <TableColumn fx:id="colNumber" text="Número" prefWidth="80"/>
-                                        <TableColumn fx:id="colType" text="Tipo" prefWidth="120"/>
-                                        <TableColumn fx:id="colDate" text="Fecha" prefWidth="120"/>
-                                        <TableColumn fx:id="colStatus" text="Estado" prefWidth="120"/>
+                                        <TableColumn fx:id="colNumber" text="Número" prefWidth="100"/>
+                                        <TableColumn fx:id="colType" text="Tipo de Reporte" prefWidth="200"/>
+                                        <TableColumn fx:id="colDate" text="Fecha de Registro" prefWidth="180"/>
+                                        <TableColumn fx:id="colStatus" text="Estado Actual" prefWidth="180"/>
                                     </columns>
                                 </TableView>
+
                             </children>
                         </VBox>
                     </children>
