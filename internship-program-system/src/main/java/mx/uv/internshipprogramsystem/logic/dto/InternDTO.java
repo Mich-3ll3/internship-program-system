@@ -1,6 +1,9 @@
 package mx.uv.internshipprogramsystem.logic.dto;
 
 public class InternDTO extends UserDTO {
+    
+    private static final String DEFAULT_NRC = "N/A";
+    
     private String enrollmentNumber;
     private String nrc;
 
@@ -66,6 +69,6 @@ public class InternDTO extends UserDTO {
     }
 
     public void setNrc(String nrc) {
-        this.nrc = (nrc != null) ? nrc : "N/A";
+        this.nrc = (nrc != null) ? nrc : DEFAULT_NRC;
     }
 }
