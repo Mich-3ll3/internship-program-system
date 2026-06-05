@@ -1,35 +1,51 @@
 package mx.uv.internshipprogramsystem.logic.managers;
 
 import java.util.Optional;
+
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 
 public final class UserSessionManager {
-    
+
     private static UserDTO currentUser;
 
     private UserSessionManager() {
 
     }
 
-    public static void setCurrentUser(UserDTO user) {
-
-        currentUser = user; 
+    public static void setCurrentUser(
+            UserDTO user
+    ) {
+        currentUser =
+            user;
     }
 
-    public static Optional<UserDTO> getCurrentUser() {
+    public static UserDTO getCurrentUser() {
+        return currentUser;
+    }
 
-        return Optional.ofNullable(currentUser); 
+    public static Optional<UserDTO> getCurrentUserOptional() {
+        return Optional.ofNullable(
+            currentUser
+        );
     }
 
     public static Optional<InternDTO> getCurrentIntern() {
+        Optional<InternDTO> currentIntern =
+            Optional.empty();
+
         if (currentUser instanceof InternDTO) {
-            return Optional.of((InternDTO) currentUser);
+            currentIntern =
+                Optional.of(
+                    (InternDTO) currentUser
+                );
         }
-        return Optional.empty(); 
+
+        return currentIntern;
     }
 
     public static void clearSession() {
-        currentUser = null;
+        currentUser =
+            null;
     }
 }
