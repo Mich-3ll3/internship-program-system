@@ -159,8 +159,9 @@
                                 <TextField
                                     fx:id="txtSearchEnrollment"
                                     onAction="#handleSearchIntern"
+                                    onKeyReleased="#handleSearchIntern"
                                     prefHeight="40.0"
-                                    promptText="Buscar por matrícula: zS12345678"
+                                    promptText="Buscar por matrícula, correo, nombre o NRC"
                                     style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #cbd5e1; -fx-padding: 0 14 0 14;"
                                     HBox.hgrow="ALWAYS" />
 

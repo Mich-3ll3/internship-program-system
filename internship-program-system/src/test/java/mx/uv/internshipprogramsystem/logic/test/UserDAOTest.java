@@ -7,6 +7,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.Optional;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 
 import org.junit.jupiter.api.Test;
@@ -84,7 +86,9 @@ class UserDAOTest {
 
         try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
 
-            UserDTO user = dao.findByInstitutionalEmail("ana@uv.mx");
+            Optional<UserDTO> optionalUser = dao.findByInstitutionalEmail("ana@uv.mx");
+            assertTrue(optionalUser.isPresent());
+            UserDTO user = optionalUser.get();
 
 
             assertEquals(12, user.getId());
@@ -159,6 +163,24 @@ class UserDAOTest {
 
 
         assertThrows(BusinessException.class, () -> dao.create(user, mock(Connection.class)));
+    }
+
+    @Test
+    void activateAccountWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        UserDAO dao = new UserDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasActivated = dao.activateAccount(12, "password-hash");
+
+
+            assertFalse(wasActivated);
+        }
     }
 
     private UserDTO buildUser() {

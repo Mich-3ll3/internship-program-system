@@ -6,7 +6,10 @@ import javafx.fxml.FXML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.managers.AccessControlManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class CoordinatorProfessorHomeDashboardController {
     private static final Logger LOGGER =
@@ -23,68 +26,82 @@ public class CoordinatorProfessorHomeDashboardController {
 
     @FXML
     private void goEducationalExperienceModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "EducationalExperienceRegisterDashboard.fxml"
+        openViewWithPermission(
+            Permission.REGISTER_EDUCATIONAL_EXPERIENCE,
+            "EducationalExperienceRegisterDashboard.fxml",
+            "Acceso denegado al módulo de experiencias educativas"
         );
     }
 
     @FXML
     private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes"
         );
     }
 
     @FXML
     private void goLinkedOrganizationModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "LinkedOrganizationManagementGUI.fxml"
+        openViewWithPermission(
+            Permission.CONSULT_ORGANIZATION,
+            "LinkedOrganizationManagementGUI.fxml",
+            "Acceso denegado al módulo de organizaciones"
         );
     }
 
     @FXML
     private void goProjectsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de proyectos."
-        );
-
-        WindowManagerController.changeView(
-            "ProjectsModuleDashboard.fxml"
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos"
         );
     }
 
     @FXML
     private void goDocumentsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de documentos."
+        openViewWithPermission(
+            Permission.VALIDATE_INITIAL_FORMATS,
+            "DocumentsModuleDashboard.fxml",
+            "Acceso denegado al módulo de documentos"
         );
     }
 
     @FXML
     private void goReportsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
+        openViewWithPermission(
+            Permission.EVALUATE_REPORT,
+            "ReportsModuleDashboard.fxml",
+            "Acceso denegado al módulo de reportes"
         );
     }
 
     @FXML
     private void goResponsibleModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectResponsibleModuleDashboard.fxml"
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT_RESPONSIBLE,
+            "ProjectResponsibleModuleDashboard.fxml",
+            "Acceso denegado al módulo de responsables"
         );
     }
 
     @FXML
     private void goProjectRequestModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de solicitudes."
+        openViewWithPermission(
+            Permission.ASSIGN_PROJECT,
+            "ProjectRequestModuleDashboard.fxml",
+            "Acceso denegado al módulo de solicitudes"
         );
     }
 
     @FXML
     private void goTrackingModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de seguimiento."
+        openViewWithPermission(
+            Permission.EVALUATE_REPORT,
+            "TrackingModuleDashboard.fxml",
+            "Acceso denegado al módulo de seguimiento"
         );
     }
 
@@ -98,6 +115,57 @@ public class CoordinatorProfessorHomeDashboardController {
 
         WindowManagerController.changeView(
             "LoginDashboard.fxml"
+        );
+    }
+
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
+    ) {
+        try {
+            validatePermission(permission);
+
+            LOGGER.info(
+                "Acceso permitido a {}",
+                fxmlName
+            );
+
+            WindowManagerController.changeView(
+                fxmlName
+            );
+        } catch (BusinessException businessException) {
+            handleAccessDenied(
+                logMessage,
+                businessException
+            );
+        }
+    }
+
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
+    }
+
+    private void handleAccessDenied(
+            String logMessage,
+            BusinessException businessException
+    ) {
+        LOGGER.warn(
+            logMessage,
+            businessException
+        );
+
+        FormAlertSupport.showError(
+            "Acceso denegado",
+            "No tienes permisos para realizar esta acción."
         );
     }
 }

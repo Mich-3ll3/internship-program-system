@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -89,6 +90,24 @@ class LinkedOrganizationDAOTest {
 
 
         assertThrows(BusinessException.class, () -> dao.update(null));
+    }
+
+    @Test
+    void updateWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        LinkedOrganizationDAO dao = new LinkedOrganizationDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasUpdated = dao.update(buildOrganization());
+
+
+            assertFalse(wasUpdated);
+        }
     }
 
     private LinkedOrganizationDTO buildOrganization() {

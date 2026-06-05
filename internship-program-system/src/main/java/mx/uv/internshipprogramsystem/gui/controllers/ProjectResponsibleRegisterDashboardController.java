@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
@@ -17,12 +16,14 @@ import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
 import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import mx.uv.internshipprogramsystem.logic.managers
-        .ProjectResponsibleManager;
+import mx.uv.internshipprogramsystem.logic.managers.AccessControlManager;
+import mx.uv.internshipprogramsystem.logic.managers.ProjectResponsibleManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class ProjectResponsibleRegisterDashboardController
         implements Initializable {
+
     private static final Logger LOGGER =
         LoggerFactory.getLogger(
             ProjectResponsibleRegisterDashboardController.class
@@ -53,13 +54,34 @@ public class ProjectResponsibleRegisterDashboardController
             URL url,
             ResourceBundle resourceBundle
     ) {
-        projectResponsibleManager = new ProjectResponsibleManager();
+        try {
+            validatePermission(
+                Permission.REGISTER_PROJECT_RESPONSIBLE
+            );
 
-        loadLinkedOrganizations();
+            projectResponsibleManager =
+                new ProjectResponsibleManager();
 
-        LOGGER.info(
-            "Vista de registro de responsable cargada correctamente."
-        );
+            loadLinkedOrganizations();
+
+            LOGGER.info(
+                "Vista de registro de responsable cargada correctamente."
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado al registro de responsable de proyecto.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+
+            WindowManagerController.changeView(
+                "CoordinatorProfessorHomeDashboard.fxml"
+            );
+        }
     }
 
     @FXML
@@ -67,17 +89,21 @@ public class ProjectResponsibleRegisterDashboardController
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.REGISTER_PROJECT_RESPONSIBLE
+            );
+
             ProjectResponsibleDTO responsible =
                 buildProjectResponsible();
 
             boolean wasRegistered =
-                projectResponsibleManager
-                    .registerProjectResponsible(
-                        responsible
-                    );
+                projectResponsibleManager.registerProjectResponsible(
+                    responsible
+                );
 
             if (wasRegistered) {
-                showInformationAlert(
+                FormAlertSupport.showInformation(
+                    "Registro exitoso",
                     "Responsable registrado correctamente."
                 );
 
@@ -85,11 +111,12 @@ public class ProjectResponsibleRegisterDashboardController
             }
         } catch (BusinessException businessException) {
             LOGGER.warn(
-                "No se pudo registrar el responsable de proyecto",
+                "No se pudo registrar el responsable de proyecto.",
                 businessException
             );
 
-            showErrorAlert(
+            FormAlertSupport.showError(
+                "Error",
                 businessException.getMessage()
             );
         }
@@ -129,32 +156,26 @@ public class ProjectResponsibleRegisterDashboardController
         }
     }
 
-    private void loadLinkedOrganizations() {
-        try {
-            LinkedOrganizationDAO linkedOrganizationDAO =
-                new LinkedOrganizationDAO();
+    private void loadLinkedOrganizations()
+            throws BusinessException {
+        LinkedOrganizationDAO linkedOrganizationDAO =
+            new LinkedOrganizationDAO();
 
-            cmbLinkedOrganization.getItems().setAll(
-                linkedOrganizationDAO.findAll()
-            );
-        } catch (BusinessException businessException) {
-            LOGGER.error(
-                "No se pudieron cargar las organizaciones vinculadas",
-                businessException
-            );
-
-            showErrorAlert(
-                "No se pudieron cargar las organizaciones vinculadas."
-            );
-        }
+        cmbLinkedOrganization.getItems().setAll(
+            linkedOrganizationDAO.findAll()
+        );
     }
 
     @FXML
     private void clearForm() {
         txtFirstName.clear();
+
         txtLastNameFather.clear();
+
         txtLastNameMother.clear();
+
         txtEmail.clear();
+
         txtPosition.clear();
 
         cmbLinkedOrganization
@@ -163,21 +184,29 @@ public class ProjectResponsibleRegisterDashboardController
     }
 
     @FXML
-    private void goHome(ActionEvent event) {
+    private void goHome(
+            ActionEvent event
+    ) {
         WindowManagerController.changeView(
             "CoordinatorProfessorHomeDashboard.fxml"
         );
     }
 
     @FXML
-    private void goResponsibleModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectResponsibleRegisterDashboard.fxml"
+    private void goResponsibleModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT_RESPONSIBLE,
+            "ProjectResponsibleModuleDashboard.fxml",
+            "Acceso denegado al módulo de responsables de proyecto."
         );
     }
 
     @FXML
-    private void logOut(ActionEvent event) {
+    private void logOut(
+            ActionEvent event
+    ) {
         UserSessionManager.clearSession();
 
         LOGGER.info(
@@ -189,45 +218,41 @@ public class ProjectResponsibleRegisterDashboardController
         );
     }
 
-    private void showInformationAlert(
-            String message
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
     ) {
-        Alert informationAlert =
-            new Alert(Alert.AlertType.INFORMATION);
+        try {
+            validatePermission(
+                permission
+            );
 
-        informationAlert.setTitle(
-            "Registro exitoso"
-        );
+            WindowManagerController.changeView(
+                fxmlName
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                logMessage,
+                businessException
+            );
 
-        informationAlert.setHeaderText(
-            null
-        );
-
-        informationAlert.setContentText(
-            message
-        );
-
-        informationAlert.showAndWait();
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+        }
     }
 
-    private void showErrorAlert(
-            String message
-    ) {
-        Alert errorAlert =
-            new Alert(Alert.AlertType.ERROR);
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
 
-        errorAlert.setTitle(
-            "Error"
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
         );
-
-        errorAlert.setHeaderText(
-            null
-        );
-
-        errorAlert.setContentText(
-            message
-        );
-
-        errorAlert.showAndWait();
     }
 }

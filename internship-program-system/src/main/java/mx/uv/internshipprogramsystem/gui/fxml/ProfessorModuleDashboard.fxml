@@ -5,134 +5,205 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="700.0"
-            prefWidth="1000.0"
-            style="-fx-background-color: #f5f6fa;"
-            xmlns="http://javafx.com/javafx/26"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorManagementController">
+<BorderPane
+    prefHeight="700.0"
+    prefWidth="1000.0"
+    style="-fx-background-color: #f3f6fb;"
+    xmlns="http://javafx.com/javafx/25"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorManagementController">
+
     <left>
-        <VBox alignment="TOP_CENTER"
-              prefWidth="70.0"
-              spacing="20.0"
-              style="-fx-background-color:#4a90e2;"
-              BorderPane.alignment="CENTER">
+        <VBox
+            alignment="TOP_CENTER"
+            prefWidth="72.0"
+            spacing="22.0"
+            style="-fx-background-color: #3f8fe5;"
+            BorderPane.alignment="CENTER">
+
             <children>
-                <StackPane prefHeight="40.0"
-                           prefWidth="40.0"
-                           style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
-                    <VBox.margin> 
-                        <Insets top="20.0" />
+                <StackPane
+                    prefHeight="42.0"
+                    prefWidth="42.0"
+                    style="-fx-background-color: #f2a91b; -fx-background-radius: 12;">
+
+                    <VBox.margin>
+                        <Insets top="22.0" />
                     </VBox.margin>
                 </StackPane>
-                <Button fx:id="btnHome" 
-                        mnemonicParsing="false" 
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" 
-                        text="⌂" 
-                        textFill="WHITE"
-                        onAction="#goHome"/>
-                <Button fx:id="btnProfessor"
-                        mnemonicParsing="false"
-                        prefHeight="40.0"
-                        prefWidth="40.0"
-                        style="-fx-background-color: transparent;" 
-                        text="🎓"
-                        textFill="WHITE"
-                        onAction = "#goProfessorModule"/>
-                <Button fx:id="btnIntern"
-                        mnemonicParsing="false"
-                        prefHeight="40.0"
-                        prefWidth="40.0"
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
-                        text="👥"
-                        textFill="WHITE"
-                        onAction = "#goInternModule"/>
-                        <Region VBox.vgrow="ALWAYS" />
-                <Button  fx:id="btnExit"
-                        mnemonicParsing="false"
-                        prefHeight="40.0"
-                        prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
-                        text="🚪"
-                        textFill="WHITE"
-                        onAction="#logOut">
+
+                <Button
+                    fx:id="btnHome"
+                    mnemonicParsing="false"
+                    onAction="#goHome"
+                    prefHeight="42.0"
+                    prefWidth="42.0"
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 12; -fx-cursor: hand;"
+                    text="⌂"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnProfessor"
+                    mnemonicParsing="false"
+                    onAction="#goProfessorModule"
+                    prefHeight="42.0"
+                    prefWidth="42.0"
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 12; -fx-cursor: hand;"
+                    text="🎓"
+                    textFill="WHITE" />
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Button
+                    fx:id="btnExit"
+                    mnemonicParsing="false"
+                    onAction="#logOut"
+                    prefHeight="42.0"
+                    prefWidth="42.0"
+                    style="-fx-background-color: transparent; -fx-cursor: hand;"
+                    text="🚪"
+                    textFill="WHITE">
+
                     <VBox.margin>
-                        <Insets bottom="20.0" />
+                        <Insets bottom="22.0" />
                     </VBox.margin>
                 </Button>
             </children>
         </VBox>
     </left>
-    
+
     <center>
-        <VBox spacing="16.0">
+        <VBox spacing="18.0">
             <padding>
-                <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
+                <Insets bottom="26.0" left="30.0" right="30.0" top="28.0" />
             </padding>
-            <HBox alignment="CENTER_LEFT">
-                <VBox HBox.hgrow="ALWAYS">
-                    <Label text="Gestión de profesores" textFill="#1a2744">
-                        <font>
-                            <Font name="System Bold" size="22.0" />
-                        </font>
-                    </Label>
-                    <Label text="Consulta, registro, modificación y cambio de estado de profesores." textFill="#6b7280" />
+
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Gestión de profesores" textFill="#14213d">
+                                    <font>
+                                        <Font name="System Bold" size="24.0" />
+                                    </font>
+                                </Label>
+
+                                <Label
+                                    text="Consulta, registro, modificación y cambio de estado de profesores."
+                                    textFill="#64748b">
+                                    <font>
+                                        <Font size="13.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                        <Button
+                            fx:id="btnRegisterProfessor"
+                            mnemonicParsing="false"
+                            onAction="#goRegisterProfessor"
+                            prefHeight="38.0"
+                            style="-fx-background-color: #3f8fe5; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                            text="+ Nuevo profesor" />
+                    </children>
+                </HBox>
+
+                <VBox
+                    spacing="16.0"
+                    style="-fx-background-color: white; -fx-background-radius: 18; -fx-border-color: #e2e8f0; -fx-border-radius: 18; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0.16, 0, 4);">
+
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <TextField
+                                    fx:id="txtSearchStaffNumber"
+                                    onAction="#searchProfessor"
+                                    onKeyReleased="#handleLiveSearchProfessor"
+                                    prefHeight="40.0"
+                                    promptText="Buscar por número, correo o nombre"
+                                    style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #cbd5e1; -fx-padding: 0 14 0 14;"
+                                    HBox.hgrow="ALWAYS" />
+
+                                <Button
+                                    fx:id="btnSearchProfessor"
+                                    mnemonicParsing="false"
+                                    onAction="#searchProfessor"
+                                    prefHeight="40.0"
+                                    style="-fx-background-color: #14213d; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                                    text="Buscar" />
+
+                                <Button
+                                    fx:id="btnRefreshProfessors"
+                                    mnemonicParsing="false"
+                                    onAction="#refreshProfessors"
+                                    prefHeight="40.0"
+                                    style="-fx-background-color: #eef2f7; -fx-background-radius: 12; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                                    text="Mostrar todos" />
+                            </children>
+                        </HBox>
+
+                        <TableView
+                            fx:id="tblProfessors"
+                            prefHeight="340.0"
+                            style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: #dbe1ea; -fx-padding: 0; -fx-selection-bar: #dbeafe; -fx-selection-bar-non-focused: #dbeafe; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 12, 0.15, 0, 3);">
+
+                            <columns>
+                                <TableColumn fx:id="colStaffNumber" text="No. personal" />
+                                <TableColumn fx:id="colName" text="Nombre" />
+                                <TableColumn fx:id="colEmail" text="Correo institucional" />
+                                <TableColumn fx:id="colCoordinator" text="Coordinador" />
+                                <TableColumn fx:id="colStatus" text="Estado" />
+                            </columns>
+                        </TableView>
+
+                        <HBox
+                            alignment="CENTER_RIGHT"
+                            spacing="10.0"
+                            style="-fx-background-color: #f8fafc; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14;">
+
+                            <padding>
+                                <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                            </padding>
+
+                            <children>
+                                <Label
+                                    text="Seleccione un profesor para modificarlo o cambiar su estado."
+                                    textFill="#64748b"
+                                    HBox.hgrow="ALWAYS" />
+
+                                <Button
+                                    fx:id="btnUpdateProfessor"
+                                    mnemonicParsing="false"
+                                    onAction="#goUpdateProfessor"
+                                    prefHeight="38.0"
+                                    style="-fx-background-color: #e0ecff; -fx-background-radius: 12; -fx-text-fill: #1d4ed8; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                                    text="Modificar profesor" />
+
+                                <Button
+                                    fx:id="btnChangeProfessorStatus"
+                                    mnemonicParsing="false"
+                                    onAction="#handleChangeProfessorStatus"
+                                    prefHeight="38.0"
+                                    style="-fx-background-color: #fee2e2; -fx-background-radius: 12; -fx-text-fill: #b91c1c; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                                    text="Activar / Inactivar" />
+                            </children>
+                        </HBox>
+                    </children>
                 </VBox>
-                <Button mnemonicParsing="false"
-                        onAction="#goRegisterProfessor"
-                        style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;"
-                        text="+ Nuevo profesor" />
-            </HBox>
-
-            <VBox spacing="12.0"
-                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 12;">
-                <padding>
-                    <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
-                </padding>
-                <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <TextField fx:id="txtSearchStaffNumber"
-                               onAction="#searchProfessor"
-                               promptText="Buscar por número de personal: 123456"
-                               HBox.hgrow="ALWAYS" />
-                    <Button mnemonicParsing="false"
-                            onAction="#searchProfessor"
-                            style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;"
-                            text="Buscar" />
-                </HBox>
-
-                <TableView fx:id="tblProfessors" prefHeight="310.0">
-                    <columns>
-                        <TableColumn fx:id="colStaffNumber" prefWidth="140.0" text="No. personal" />
-                        <TableColumn fx:id="colName" prefWidth="210.0" text="Nombre" />
-                        <TableColumn fx:id="colEmail" prefWidth="230.0" text="Correo institucional" />
-                        <TableColumn fx:id="colCoordinator" prefWidth="120.0" text="Coordinador" />
-                        <TableColumn fx:id="colStatus" prefWidth="100.0" text="Estado" />
-                    </columns>
-                </TableView>
-
-                <HBox alignment="CENTER_RIGHT" spacing="8.0">
-                    <TextArea fx:id="txtProfessorDetails"
-                              prefRowCount="3"
-                              promptText="Detalle del profesor seleccionado..."
-                              wrapText="true"
-                              HBox.hgrow="ALWAYS" />
-                    <VBox spacing="8.0">
-                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goUpdateProfessor" text="Modificar" />
-                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#handleChangeProfessorStatus" text="Cambiar estado" />
-                    </VBox>
-                </HBox>
-            </VBox>
+            </children>
         </VBox>
     </center>
 </BorderPane>

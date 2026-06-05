@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -108,5 +109,70 @@ class EducationalExperienceDAOTest {
 
 
         assertThrows(BusinessException.class, () -> dao.create(experience));
+    }
+
+    @Test
+    void createWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceDTO experience =
+            new EducationalExperienceDTO("12345", "2026-51", "1", 8, true);
+        EducationalExperienceDAO dao = new EducationalExperienceDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasCreated = dao.create(experience);
+
+
+            assertFalse(wasCreated);
+        }
+    }
+
+    @Test
+    void findByNrcWhenBlankThrowsBusinessException() {
+
+        EducationalExperienceDAO dao = new EducationalExperienceDAO();
+
+
+        assertThrows(BusinessException.class, () -> dao.findByNrc(" "));
+    }
+
+    @Test
+    void findByNrcWhenNotExistsReturnsEmpty() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceDAO dao = new EducationalExperienceDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet());
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            Optional<EducationalExperienceDTO> experience = dao.findByNrc("12345");
+
+
+            assertTrue(experience.isEmpty());
+        }
+    }
+
+    @Test
+    void findAllWhenNoRowsReturnsEmptyList() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceDAO dao = new EducationalExperienceDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet());
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            List<EducationalExperienceDTO> experiences = dao.findAll();
+
+
+            assertTrue(experiences.isEmpty());
+        }
     }
 }

@@ -3,18 +3,15 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -29,11 +26,13 @@ import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternStatus;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.managers.AccessControlManager;
 import mx.uv.internshipprogramsystem.logic.managers.EducationalExperienceInternAssignmentManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
-import mx.uv.internshipprogramsystem.logic.validations.InternValidator;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class InternManagementController {
+
     private static final Logger LOGGER =
         LoggerFactory.getLogger(
             InternManagementController.class
@@ -44,30 +43,39 @@ public class InternManagementController {
 
     @FXML
     private TextField txtSearchEnrollment;
-    @FXML
-    private TextArea txtInternDetails;
+
     @FXML
     private ComboBox<EducationalExperienceDTO> cmbEducationalExperience;
+
     @FXML
     private TableView<InternDTO> tblInterns;
+
     @FXML
     private TableColumn<InternDTO, String> colEnrollment;
+
     @FXML
     private TableColumn<InternDTO, String> colName;
+
     @FXML
     private TableColumn<InternDTO, String> colEmail;
+
     @FXML
     private TableColumn<InternDTO, String> colNRC;
+
     @FXML
     private TableColumn<InternDTO, String> colStatus;
+
     @FXML
     private Button btnUpdateIntern;
+
     @FXML
     private Button btnChangeInternStatus;
 
-    private final InternDAO internDAO = new InternDAO();
+    private final InternDAO internDAO =
+        new InternDAO();
 
-    private final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO =
+        new UserDAO();
 
     private final EducationalExperienceDAO educationalExperienceDAO =
         new EducationalExperienceDAO();
@@ -81,15 +89,41 @@ public class InternManagementController {
 
     @FXML
     public void initialize() {
-        configureTable();
-        tblInterns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        loadInternsData();
-        loadEducationalExperiences();
-        disableActionButtons();
+        try {
+            validatePermission(
+                Permission.CONSULT_INTERN
+            );
 
-        LOGGER.info(
-            "Módulo de gestión de estudiantes cargado correctamente."
-        );
+            configureTable();
+
+            tblInterns.setColumnResizePolicy(
+                TableView.CONSTRAINED_RESIZE_POLICY
+            );
+
+            loadInternsData();
+
+            loadEducationalExperiences();
+
+            disableActionButtons();
+
+            LOGGER.info(
+                "Módulo de gestión de estudiantes cargado correctamente."
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado al módulo de gestión de estudiantes.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+
+            WindowManagerController.changeView(
+                "CoordinatorProfessorHomeDashboard.fxml"
+            );
+        }
     }
 
     private void configureTable() {
@@ -126,6 +160,10 @@ public class InternManagementController {
 
     private void loadInternsData() {
         try {
+            validatePermission(
+                Permission.CONSULT_INTERN
+            );
+
             List<InternDTO> interns =
                 internDAO.findAll();
 
@@ -146,8 +184,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de carga",
                 "No se pudo cargar la lista de estudiantes."
             );
@@ -156,6 +193,10 @@ public class InternManagementController {
 
     private void loadEducationalExperiences() {
         try {
+            validatePermission(
+                Permission.ASSIGN_EDUCATIONAL_EXPERIENCE
+            );
+
             List<EducationalExperienceDTO> activeExperiences =
                 getActiveEducationalExperiences();
 
@@ -172,8 +213,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de carga",
                 "No se pudieron cargar las experiencias educativas."
             );
@@ -202,82 +242,107 @@ public class InternManagementController {
     }
 
     @FXML
-    private void handleSearchIntern(
-            ActionEvent event
-    ) {
+    private void handleSearchIntern() {
         try {
-            String enrollmentNumber =
-                txtSearchEnrollment.getText().trim();
-
-            InternValidator validator =
-                new InternValidator();
-
-            validator.validateEnrollmentNumber(
-                enrollmentNumber
+            validatePermission(
+                Permission.CONSULT_INTERN
             );
 
-            Optional<InternDTO> foundIntern =
-                internDAO.findByEnrollmentNumber(
-                    enrollmentNumber
+            String searchValue =
+                txtSearchEnrollment.getText()
+                    .trim()
+                    .toLowerCase();
+
+            if (searchValue.isBlank()) {
+                tblInterns.setItems(
+                    masterData
                 );
 
-            handleSearchResult(
-                foundIntern
-            );
+                disableActionButtons();
+            } else {
+                filterInterns(
+                    searchValue
+                );
+            }
         } catch (BusinessException businessException) {
             LOGGER.warn(
                 "Búsqueda de estudiante inválida.",
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de búsqueda",
                 businessException.getMessage()
             );
         }
     }
 
-    private void handleSearchResult(
-            Optional<InternDTO> foundIntern
+    private void filterInterns(
+            String searchValue
     ) {
-        if (foundIntern.isPresent()) {
-            showFoundIntern(
-                foundIntern.get()
-            );
-        } else {
-            showInternNotFoundMessage();
+        ObservableList<InternDTO> filteredInterns =
+            FXCollections.observableArrayList();
+
+        for (InternDTO intern : masterData) {
+            if (containsSearchValue(
+                    intern,
+                    searchValue
+            )) {
+                filteredInterns.add(
+                    intern
+                );
+            }
         }
-    }
 
-    private void showFoundIntern(
-            InternDTO intern
-    ) {
         tblInterns.setItems(
-            FXCollections.observableArrayList(
-                intern
-            )
+            filteredInterns
         );
 
-        enableActionButtons();
-
-        LOGGER.info(
-            "Estudiante encontrado correctamente."
-        );
+        disableActionButtons();
     }
 
-    private void showInternNotFoundMessage() {
-        disableActionButtons();
+    private boolean containsSearchValue(
+            InternDTO intern,
+            String searchValue
+    ) {
+        String enrollment =
+            getTextValue(
+                intern.getEnrollmentNumber()
+            );
 
-        LOGGER.warn(
-            "No se encontró estudiante con la matrícula proporcionada."
-        );
+        String email =
+            getTextValue(
+                intern.getInstitutionalEmail()
+            );
 
-        showNotification(
-            Alert.AlertType.WARNING,
-            "Sin resultados",
-            "No se encontró ningún estudiante con esa matrícula."
-        );
+        String fullName =
+            getTextValue(
+                intern.getFullName()
+            );
+
+        String nrc =
+            getTextValue(
+                intern.getNrc()
+            );
+
+        return enrollment.contains(searchValue)
+            || email.contains(searchValue)
+            || fullName.contains(searchValue)
+            || nrc.contains(searchValue);
+    }
+
+    private String getTextValue(
+            String text
+    ) {
+        String value =
+            "";
+
+        if (text != null) {
+            value =
+                text.toLowerCase();
+        }
+
+        return value;
     }
 
     @FXML
@@ -287,6 +352,11 @@ public class InternManagementController {
         txtSearchEnrollment.clear();
 
         loadInternsData();
+
+        tblInterns.setItems(
+            masterData
+        );
+
         disableActionButtons();
 
         LOGGER.info(
@@ -303,6 +373,7 @@ public class InternManagementController {
             disableActionButtons();
         } else {
             enableActionButtons();
+
             updateStatusButtonText(
                 selectedIntern
             );
@@ -314,6 +385,10 @@ public class InternManagementController {
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.ASSIGN_EDUCATIONAL_EXPERIENCE
+            );
+
             InternDTO selectedIntern =
                 getSelectedIntern();
 
@@ -331,21 +406,21 @@ public class InternManagementController {
                     assignment
                 );
 
-            showNotification(
-                Alert.AlertType.INFORMATION,
+            FormAlertSupport.showInformation(
                 "Asignación exitosa",
                 "La experiencia educativa fue asignada correctamente."
             );
 
             loadInternsData();
+
+            disableActionButtons();
         } catch (BusinessException businessException) {
             LOGGER.warn(
                 "No se pudo asignar experiencia educativa al estudiante.",
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.WARNING,
+            FormAlertSupport.showWarning(
                 "Asignación no realizada",
                 businessException.getMessage()
             );
@@ -405,6 +480,10 @@ public class InternManagementController {
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.CHANGE_INTERN_STATUS
+            );
+
             InternDTO selectedIntern =
                 getSelectedIntern();
 
@@ -412,7 +491,13 @@ public class InternManagementController {
                 selectedIntern
             );
 
+            FormAlertSupport.showInformation(
+                "Estado actualizado",
+                "El estado del estudiante fue actualizado correctamente."
+            );
+
             loadInternsData();
+
             disableActionButtons();
         } catch (BusinessException businessException) {
             LOGGER.error(
@@ -420,8 +505,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error",
                 businessException.getMessage()
             );
@@ -456,6 +540,10 @@ public class InternManagementController {
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.UPDATE_INTERN
+            );
+
             InternDTO selectedIntern =
                 getSelectedIntern();
 
@@ -473,8 +561,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.WARNING,
+            FormAlertSupport.showWarning(
                 "Selección requerida",
                 businessException.getMessage()
             );
@@ -534,12 +621,10 @@ public class InternManagementController {
     private void handleGoProfessorModule(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "ProfessorModuleDashboard.fxml"
-        );
-
-        LOGGER.info(
-            "Acceso al módulo de profesores."
+        openViewWithPermission(
+            Permission.CONSULT_PROFESSOR,
+            "ProfessorModuleDashboard.fxml",
+            "Acceso denegado al módulo de profesores."
         );
     }
 
@@ -547,12 +632,10 @@ public class InternManagementController {
     private void handleGoInternModule(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
-        );
-
-        LOGGER.info(
-            "Acceso al módulo de estudiantes."
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes."
         );
     }
 
@@ -560,12 +643,10 @@ public class InternManagementController {
     private void handleGoRegisterIntern(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "RegisterInternDashboard.fxml"
-        );
-
-        LOGGER.info(
-            "Acceso al registro de estudiantes."
+        openViewWithPermission(
+            Permission.REGISTER_INTERN,
+            "RegisterInternDashboard.fxml",
+            "Acceso denegado al registro de estudiantes."
         );
     }
 
@@ -584,28 +665,46 @@ public class InternManagementController {
         );
     }
 
-    private void showNotification(
-            Alert.AlertType type,
-            String title,
-            String content
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
     ) {
-        Alert alert =
-            new Alert(
-                type
+        try {
+            validatePermission(
+                permission
             );
 
-        alert.setTitle(
-            title
-        );
+            WindowManagerController.changeView(
+                fxmlName
+            );
 
-        alert.setHeaderText(
-            null
-        );
+            LOGGER.info(
+                "Acceso permitido a la vista {}.",
+                fxmlName
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                logMessage,
+                businessException
+            );
 
-        alert.setContentText(
-            content
-        );
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+        }
+    }
 
-        alert.showAndWait();
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
     }
 }

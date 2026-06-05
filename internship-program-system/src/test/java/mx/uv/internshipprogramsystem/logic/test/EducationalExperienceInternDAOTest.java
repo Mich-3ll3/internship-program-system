@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -123,6 +124,82 @@ class EducationalExperienceInternDAOTest {
 
             assertEquals(2, total);
             verify(statement).setInt(1, 10);
+        }
+    }
+
+    @Test
+    void existsAssignmentWhenCountIsZeroReturnsFalse()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceInternDAO dao = new EducationalExperienceInternDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet(row("total", 0)));
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean exists = dao.existsAssignment(buildAssignment());
+
+
+            assertFalse(exists);
+        }
+    }
+
+    @Test
+    void existsActiveAssignmentByInternIdWhenCountIsZeroReturnsFalse()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceInternDAO dao = new EducationalExperienceInternDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet(row("total", 0)));
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean exists = dao.existsActiveAssignmentByInternId(10);
+
+
+            assertFalse(exists);
+        }
+    }
+
+    @Test
+    void existsActiveEducationalExperienceByNrcWhenCountIsZeroReturnsFalse()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceInternDAO dao = new EducationalExperienceInternDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet(row("total", 0)));
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean exists = dao.existsActiveEducationalExperienceByNrc("12345");
+
+
+            assertFalse(exists);
+        }
+    }
+
+    @Test
+    void countValidOpportunitiesByInternIdWhenNoRowsReturnsZero()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        EducationalExperienceInternDAO dao = new EducationalExperienceInternDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet());
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            int total = dao.countValidOpportunitiesByInternId(10);
+
+
+            assertEquals(0, total);
         }
     }
 

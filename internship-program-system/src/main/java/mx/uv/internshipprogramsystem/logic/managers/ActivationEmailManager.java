@@ -20,6 +20,7 @@ import mx.uv.internshipprogramsystem.logic.dao.ActivationTokenDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ActivationTokenDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.security.SecurityManager;
+import mx.uv.internshipprogramsystem.logic.security.EmailConfiguration;
 import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
 
 public class ActivationEmailManager {
@@ -27,12 +28,6 @@ public class ActivationEmailManager {
         LoggerFactory.getLogger(ActivationEmailManager.class);
 
     private static final int ACTIVATION_TOKEN_EXPIRATION_HOURS = 24;
-    private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final String SMTP_PORT = "587";
-    private static final String SYSTEM_EMAIL =
-        "internship.system.uv@gmail.com";
-    private static final String SYSTEM_EMAIL_PASSWORD =
-        "ugxmnvljsieuxhpu";
 
     private final ActivationTokenDAO activationTokenDAO;
     private final SecurityManager securityManager;
@@ -103,7 +98,11 @@ public class ActivationEmailManager {
         try {
             Message message = new MimeMessage(session);
 
-            message.setFrom(new InternetAddress(SYSTEM_EMAIL));
+            message.setFrom(
+                new InternetAddress(
+                    EmailConfiguration.getEmail()
+                )
+            );
             message.setRecipients(
                 Message.RecipientType.TO,
                 InternetAddress.parse(recipientEmail)
@@ -113,9 +112,9 @@ public class ActivationEmailManager {
 
             transport = session.getTransport("smtp");
             transport.connect(
-                SMTP_HOST,
-                SYSTEM_EMAIL,
-                SYSTEM_EMAIL_PASSWORD
+                EmailConfiguration.getHost(),
+                EmailConfiguration.getEmail(),
+                EmailConfiguration.getPassword()
             );
             transport.sendMessage(
                 message,
@@ -209,8 +208,15 @@ public class ActivationEmailManager {
 
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", SMTP_HOST);
-        properties.put("mail.smtp.port", SMTP_PORT);
+        properties.put(
+            "mail.smtp.host",
+            EmailConfiguration.getHost()
+        );
+
+        properties.put(
+            "mail.smtp.port",
+            EmailConfiguration.getPort()
+        );
 
         return properties;
     }
@@ -226,19 +232,13 @@ public class ActivationEmailManager {
         return activationMessage;
     }
 
-    private void closeTransport(Transport transport)
-            throws BusinessException {
+    private void closeTransport(Transport transport) {
         if (transport != null && transport.isConnected()) {
             try {
                 transport.close();
             } catch (MessagingException messagingException) {
                 LOGGER.error(
                     "Error al cerrar la conexión SMTP",
-                    messagingException
-                );
-
-                throw new BusinessException(
-                    "No se pudo cerrar la conexión de correo.",
                     messagingException
                 );
             }

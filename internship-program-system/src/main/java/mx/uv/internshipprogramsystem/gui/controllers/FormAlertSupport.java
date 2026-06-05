@@ -15,8 +15,17 @@ public final class FormAlertSupport {
         showAlert(Alert.AlertType.WARNING, title, message);
     }
 
-    private static void showAlert(Alert.AlertType alertType, String title, String message) {
+    public static void showError(String title, String message) {
+        showAlert(Alert.AlertType.ERROR, title, message);
+    }
+
+    private static void showAlert(
+            Alert.AlertType alertType,
+            String title,
+            String message
+    ) {
         Alert alert = new Alert(alertType);
+
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

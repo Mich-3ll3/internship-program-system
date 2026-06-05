@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -140,5 +141,42 @@ class LoginDAOTest {
             assertTrue(wasLocked);
             verify(statement).setInt(1, 12);
         }
+    }
+
+    @Test
+    void incrementFailedLoginAttemptsWhenNoRowsAreAffectedReturnsFalse()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        LoginDAO dao = new LoginDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasIncremented = dao.incrementFailedLoginAttempts(12);
+
+
+            assertFalse(wasIncremented);
+        }
+    }
+
+    @Test
+    void loginWhenEmailIsEmptyThrowsBusinessException() {
+
+        LoginDAO dao = new LoginDAO();
+
+
+        assertThrows(BusinessException.class, () -> dao.login("", "Password123"));
+    }
+
+    @Test
+    void loginWhenPasswordIsEmptyThrowsBusinessException() {
+
+        LoginDAO dao = new LoginDAO();
+
+
+        assertThrows(BusinessException.class, () -> dao.login("ana@uv.mx", ""));
     }
 }

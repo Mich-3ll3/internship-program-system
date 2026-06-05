@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -129,6 +130,24 @@ class InternDAOTest {
 
 
         assertThrows(BusinessException.class, () -> dao.create(intern, mock(Connection.class)));
+    }
+
+    @Test
+    void updateWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        InternDAO dao = new InternDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasUpdated = dao.update(buildIntern());
+
+
+            assertFalse(wasUpdated);
+        }
     }
 
     private InternDTO buildIntern() {

@@ -7,6 +7,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -162,6 +163,60 @@ class ProjectDAOTest {
 
 
         assertThrows(BusinessException.class, () -> dao.findById(0));
+    }
+
+    @Test
+    void deactivateWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ProjectDAO dao = new ProjectDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasDeactivated = dao.deactivate(7);
+
+
+            assertFalse(wasDeactivated);
+        }
+    }
+
+    @Test
+    void createWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ProjectDAO dao = new ProjectDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasCreated = dao.create(buildProject());
+
+
+            assertFalse(wasCreated);
+        }
+    }
+
+    @Test
+    void findByIdWhenNoRowsReturnsEmpty() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ProjectDAO dao = new ProjectDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeQuery()).thenReturn(resultSet());
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            Optional<ProjectDTO> project = dao.findById(7);
+
+
+            assertTrue(project.isEmpty());
+        }
     }
 
     private ProjectDTO buildProject() {

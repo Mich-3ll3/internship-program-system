@@ -2,29 +2,19 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
 
-import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.logic.dao.InternDAO;
-import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
-import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
-import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
-import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.managers.AccessControlManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class AdminHomeDashboardController {
     private static final Logger LOGGER =
@@ -36,66 +26,40 @@ public class AdminHomeDashboardController {
     private Label lblDate;
 
     @FXML
-    private Button btnAddProfessor;
-
-    @FXML
-    private TextField txtSearchProfessor;
-
-    @FXML
-    private TableView<ProfessorDTO> tblProfessors;
-
-    @FXML
-    private TableColumn<ProfessorDTO, String> colNameProfessor;
-
-    @FXML
-    private TableColumn<ProfessorDTO, Integer> colGroupsProfessor;
-
-    @FXML
-    private TableColumn<ProfessorDTO, Boolean> colStatusProfessor;
-
-    @FXML
-    private Button btnAddIntern;
-
-    @FXML
-    private TextField txtSearchIntern;
-
-    @FXML
-    private TableView<InternDTO> tblIntern;
-
-    @FXML
-    private TableColumn<InternDTO, String> colNameIntern;
-
-    @FXML
-    private TableColumn<InternDTO, String> colNRCIntern;
-
-    @FXML
-    private TableColumn<InternDTO, Boolean> colStatusIntern;
-
-    @FXML
-    private Label lblTotalProfessors;
-
-    @FXML
-    private Label lblTotalInterns;
-
-    @FXML
-    private Label lblTotalActiveUsers;
+    private Label lblWelcomeUser;
 
     @FXML
     private void initialize() {
         try {
+            validateAdministratorAccess();
             initializeDate();
-            initializeTables();
-            loadStatistics();
+            initializeUserInformation();
 
             LOGGER.info(
                 "Dashboard de administrador cargado correctamente."
             );
         } catch (BusinessException businessException) {
-            LOGGER.error(
-                "Error cargando dashboard de administrador",
+            LOGGER.warn(
+                "Acceso denegado al dashboard de administrador",
                 businessException
             );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                "No tienes permisos para acceder a esta vista."
+            );
+
+            WindowManagerController.changeView(
+                "LoginDashboard.fxml"
+            );
         }
+    }
+
+    private void validateAdministratorAccess()
+            throws BusinessException {
+        validatePermission(
+            Permission.CONSULT_PROFESSOR
+        );
     }
 
     private void initializeDate() {
@@ -106,62 +70,30 @@ public class AdminHomeDashboardController {
             );
 
         String formattedDate =
-            LocalDate.now().format(formatter);
+            LocalDate.now().format(
+                formatter
+            );
 
-        lblDate.setText(formattedDate);
-    }
-
-    private void initializeTables() {
-        colNameProfessor.setCellValueFactory(
-            new PropertyValueFactory<>("name")
-        );
-
-        colGroupsProfessor.setCellValueFactory(
-            new PropertyValueFactory<>("groups")
-        );
-
-        colStatusProfessor.setCellValueFactory(
-            new PropertyValueFactory<>("isActive")
-        );
-
-        colNameIntern.setCellValueFactory(
-            new PropertyValueFactory<>("name")
-        );
-
-        colNRCIntern.setCellValueFactory(
-            new PropertyValueFactory<>("nrc")
-        );
-
-        colStatusIntern.setCellValueFactory(
-            new PropertyValueFactory<>("isActive")
+        lblDate.setText(
+            formattedDate
         );
     }
 
-    private void loadStatistics()
-            throws BusinessException {
-        InternDAO internDAO = new InternDAO();
-        ProfessorDAO professorDAO = new ProfessorDAO();
-        UserDAO userDAO = new UserDAO();
+    private void initializeUserInformation() {
+        String userName =
+            UserSessionManager
+                .getCurrentUser()
+                .getName();
 
-        int totalProfessors =
-            professorDAO.countAll();
-
-        int totalInterns =
-            internDAO.countAll();
-
-        int totalActiveUsers =
-            userDAO.countActiveUsers();
-
-        lblTotalProfessors.setText(
-            String.valueOf(totalProfessors)
+        lblWelcomeUser.setText(
+            "Bienvenido, " + userName
         );
+    }
 
-        lblTotalInterns.setText(
-            String.valueOf(totalInterns)
-        );
-
-        lblTotalActiveUsers.setText(
-            String.valueOf(totalActiveUsers)
+    @FXML
+    private void goProfile(ActionEvent event) {
+        WindowManagerController.changeView(
+            "UserProfileDashboard.fxml"
         );
     }
 
@@ -173,91 +105,50 @@ public class AdminHomeDashboardController {
     }
 
     @FXML
-    private void goFormAddProfessor(ActionEvent event) {
-        WindowManagerController.changeView(
-            "RegisterProfessorDashboard.fxml"
-        );
-    }
-
-    @FXML
-    private void goConsultProfessor(ActionEvent event) {
-        try {
-            ProfessorDAO professorDAO =
-                new ProfessorDAO();
-
-            List<ProfessorDTO> professors =
-                professorDAO.findAll();
-
-            tblProfessors.setItems(
-                FXCollections.observableArrayList(
-                    professors
-                )
-            );
-
-            LOGGER.info(
-                "Consulta de profesores realizada correctamente."
-            );
-        } catch (BusinessException businessException) {
-            LOGGER.error(
-                "Error consultando profesores",
-                businessException
-            );
-        }
-    }
-
-    @FXML
-    private void goFormAddIntern(ActionEvent event) {
-        WindowManagerController.changeView(
-            "RegisterInternDashboard.fxml"
-        );
-    }
-
-    @FXML
-    private void goConsultIntern(ActionEvent event) {
-        try {
-            InternDAO internDAO =
-                new InternDAO();
-
-            List<InternDTO> interns =
-                internDAO.findAll();
-
-            tblIntern.setItems(
-                FXCollections.observableArrayList(
-                    interns
-                )
-            );
-
-            LOGGER.info(
-                "Consulta de estudiantes realizada correctamente."
-            );
-        } catch (BusinessException businessException) {
-            LOGGER.error(
-                "Error consultando estudiantes",
-                businessException
-            );
-        }
-    }
-
-    @FXML
     private void goProfessorModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProfessorModuleDashboard.fxml"
-        );
-    }
+        try {
+            validatePermission(
+                Permission.CONSULT_PROFESSOR
+            );
 
-    @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
-        );
+            WindowManagerController.changeView(
+                "ProfessorModuleDashboard.fxml"
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado al módulo de profesores",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                "No tienes permisos para acceder al módulo de profesores."
+            );
+        }
     }
 
     @FXML
     private void logOut(ActionEvent event) {
         UserSessionManager.clearSession();
-        LOGGER.info("Cierre de sesión realizado correctamente.");
+
+        LOGGER.info(
+            "Cierre de sesión realizado correctamente."
+        );
+
         WindowManagerController.changeView(
             "LoginDashboard.fxml"
+        );
+    }
+
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
         );
     }
 }

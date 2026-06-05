@@ -1,5 +1,7 @@
 package mx.uv.internshipprogramsystem.logic.managers;
 
+import java.util.Optional;
+
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -14,18 +16,20 @@ public class ActivationTokenResendManager {
         activationEmailManager = new ActivationEmailManager();
     }
 
-    public void resendActivationToken(String institutionalEmail)
-            throws BusinessException {
+    public void resendActivationToken(
+            String institutionalEmail
+    ) throws BusinessException {
         InputValidator.validateNotEmpty(
             institutionalEmail,
             "El correo institucional no puede estar vacío."
         );
 
-        UserDTO user = userDAO.findByInstitutionalEmail(
-            institutionalEmail
-        );
+        Optional<UserDTO> optionalUser =
+            userDAO.findByInstitutionalEmail(
+                institutionalEmail
+            );
 
-        validateUserCanRequestToken(user);
+        UserDTO user = getValidUser(optionalUser);
 
         activationEmailManager.resendActivationToken(
             user.getId(),
@@ -33,8 +37,27 @@ public class ActivationTokenResendManager {
         );
     }
 
-    private void validateUserCanRequestToken(UserDTO user)
-            throws BusinessException {
+    private UserDTO getValidUser(
+            Optional<UserDTO> optionalUser
+    ) throws BusinessException {
+        UserDTO user;
+
+        if (optionalUser.isEmpty()) {
+            throw new BusinessException(
+                "No existe una cuenta registrada con ese correo."
+            );
+        }
+
+        user = optionalUser.get();
+
+        validateUserCanRequestToken(user);
+
+        return user;
+    }
+
+    private void validateUserCanRequestToken(
+            UserDTO user
+    ) throws BusinessException {
         if (user.getIsActive()) {
             throw new BusinessException(
                 "La cuenta ya se encuentra activa."

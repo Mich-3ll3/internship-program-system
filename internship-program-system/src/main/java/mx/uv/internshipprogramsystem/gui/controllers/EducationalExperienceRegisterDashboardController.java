@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -18,8 +17,10 @@ import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
 import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-import mx.uv.internshipprogramsystem.logic.managers
-        .EducationalExperienceRegistrationManager;
+import mx.uv.internshipprogramsystem.logic.managers.AccessControlManager;
+import mx.uv.internshipprogramsystem.logic.managers.EducationalExperienceRegistrationManager;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class EducationalExperienceRegisterDashboardController
         implements Initializable {
@@ -31,28 +32,53 @@ public class EducationalExperienceRegisterDashboardController
 
     @FXML
     private TextField txtNrc;
+
     @FXML
     private TextField txtSchoolPeriod;
+
     @FXML
     private TextField txtSection;
+
     @FXML
     private ComboBox<ProfessorDTO> cmbProfessor;
+
     @FXML
     private CheckBox chkActive;
 
-    private EducationalExperienceRegistrationManager educationalExperienceRegistrationManager;
+    private EducationalExperienceRegistrationManager
+            educationalExperienceRegistrationManager;
 
     @Override
     public void initialize(
             URL url,
             ResourceBundle resourceBundle
     ) {
-        educationalExperienceRegistrationManager =
-            new EducationalExperienceRegistrationManager();
+        try {
+            validatePermission(
+                Permission.REGISTER_EDUCATIONAL_EXPERIENCE
+            );
 
-        loadProfessors();
+            educationalExperienceRegistrationManager =
+                new EducationalExperienceRegistrationManager();
 
-        chkActive.setSelected(true);
+            loadProfessors();
+
+            chkActive.setSelected(true);
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado al registro de experiencia educativa",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                "No tienes permisos para acceder a esta vista."
+            );
+
+            WindowManagerController.changeView(
+                "CoordinatorProfessorHomeDashboard.fxml"
+            );
+        }
     }
 
     @FXML
@@ -60,6 +86,10 @@ public class EducationalExperienceRegisterDashboardController
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.REGISTER_EDUCATIONAL_EXPERIENCE
+            );
+
             EducationalExperienceDTO educationalExperience =
                 buildEducationalExperience();
 
@@ -70,7 +100,8 @@ public class EducationalExperienceRegisterDashboardController
                     );
 
             if (wasRegistered) {
-                showInformationAlert(
+                FormAlertSupport.showInformation(
+                    "Registro exitoso",
                     "Experiencia educativa registrada correctamente."
                 );
 
@@ -82,16 +113,15 @@ public class EducationalExperienceRegisterDashboardController
                 businessException
             );
 
-            showErrorAlert(
+            FormAlertSupport.showError(
+                "Error",
                 businessException.getMessage()
             );
         }
     }
 
-    private EducationalExperienceDTO
-            buildEducationalExperience()
+    private EducationalExperienceDTO buildEducationalExperience()
             throws BusinessException {
-
         ProfessorDTO selectedProfessor =
             cmbProfessor
                 .getSelectionModel()
@@ -156,27 +186,35 @@ public class EducationalExperienceRegisterDashboardController
     private void goEducationalExperienceModule(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "EducationalExperienceRegisterDashboard.fxml"
+        openViewWithPermission(
+            Permission.REGISTER_EDUCATIONAL_EXPERIENCE,
+            "EducationalExperienceRegisterDashboard.fxml",
+            "Acceso denegado al módulo de experiencia educativa"
         );
     }
 
     @FXML
     private void goInternModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de alumnos."
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de alumnos"
         );
     }
 
     @FXML
     private void goProjectsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de proyectos."
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos"
         );
     }
 
     @FXML
     private void logOut(ActionEvent event) {
+        UserSessionManager.clearSession();
+
         LOGGER.info(
             "Cierre de sesión realizado correctamente."
         );
@@ -186,61 +224,51 @@ public class EducationalExperienceRegisterDashboardController
         );
     }
 
-    private void loadProfessors() {
-        try {
-            ProfessorDAO professorDAO =
-                new ProfessorDAO();
+    private void loadProfessors()
+            throws BusinessException {
+        ProfessorDAO professorDAO =
+            new ProfessorDAO();
 
-            cmbProfessor.getItems().setAll(
-                professorDAO.findAll()
+        cmbProfessor.getItems().setAll(
+            professorDAO.findAll()
+        );
+    }
+
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
+    ) {
+        try {
+            validatePermission(
+                permission
+            );
+
+            WindowManagerController.changeView(
+                fxmlName
             );
         } catch (BusinessException businessException) {
-            LOGGER.error(
-                "No se pudieron cargar los profesores",
+            LOGGER.warn(
+                logMessage,
                 businessException
             );
 
-            showErrorAlert(
-                "No se pudieron cargar los profesores."
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
             );
         }
     }
 
-    private void showInformationAlert(
-            String message
-    ) {
-        Alert informationAlert =
-            new Alert(Alert.AlertType.INFORMATION);
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
 
-        informationAlert.setTitle(
-            "Registro exitoso"
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
         );
-
-        informationAlert.setHeaderText(null);
-
-        informationAlert.setContentText(
-            message
-        );
-
-        informationAlert.showAndWait();
-    }
-
-    private void showErrorAlert(
-            String message
-    ) {
-        Alert errorAlert =
-            new Alert(Alert.AlertType.ERROR);
-
-        errorAlert.setTitle(
-            "Error"
-        );
-
-        errorAlert.setHeaderText(null);
-
-        errorAlert.setContentText(
-            message
-        );
-
-        errorAlert.showAndWait();
     }
 }
