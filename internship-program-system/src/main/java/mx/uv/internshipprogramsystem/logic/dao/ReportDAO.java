@@ -17,6 +17,7 @@ import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ReportDTO;
 import mx.uv.internshipprogramsystem.logic.dto.MonthlyReportContextDTO;
 import mx.uv.internshipprogramsystem.logic.dto.PlannedActivityDTO;
+import mx.uv.internshipprogramsystem.logic.dto.ActivityPlanDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IReportDAO;
 import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
@@ -50,9 +51,9 @@ public class ReportDAO implements IReportDAO {
         "JOIN USUARIO u ON ap.estudiante_id = u.id " +
         "WHERE ap.proyecto_id = ?";
 
-    // Actualizada para incluir las horas_planeadas
+    // MODIFICADO: Se incluye el ID en la consulta para identificar la actividad
     private static final String SQL_GET_PLANNED_ACTIVITIES = 
-        "SELECT nombre, horas_planeadas FROM ACTIVIDADES_PLAN WHERE proyecto_id = ?";
+        "SELECT id, nombre, horas_planeadas FROM ACTIVIDADES_PLAN WHERE proyecto_id = ?";
 
     @Override
     public boolean registerReport(ReportDTO report) throws BusinessException {
@@ -60,6 +61,9 @@ public class ReportDAO implements IReportDAO {
 
         String insertReportQuery = "INSERT INTO REPORTE (numero, fecha, observaciones_generales, tipo, estado, estudiante_id, profesor_id, proyecto_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String insertAdvancesQuery = "INSERT INTO REPORTE_AVANCES (periodo, mes, horas_reportadas, porcentaje_avance, observaciones_particulares, resultados_obtenidos_momento, reporte_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        
+        // NUEVA CONSULTA: Inserta en la tabla puente
+        String insertActivitiesQuery = "INSERT INTO ACTIVIDADES_REPORTE (reporte_id, actividad_id, horas_reportadas) VALUES (?, ?, ?)";
 
         Connection connection = null;
 
@@ -69,6 +73,7 @@ public class ReportDAO implements IReportDAO {
 
             int generatedReportId;
 
+            // 1. Guardar en REPORTE
             try (PreparedStatement preparedStatementReport = connection.prepareStatement(insertReportQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
                 preparedStatementReport.setInt(1, report.getNumber());
                 preparedStatementReport.setDate(2, Date.valueOf(report.getDate()));
@@ -90,6 +95,7 @@ public class ReportDAO implements IReportDAO {
                 }
             }
 
+            // 2. Guardar en REPORTE_AVANCES
             try (PreparedStatement preparedStatementAdvances = connection.prepareStatement(insertAdvancesQuery)) {
                 preparedStatementAdvances.setString(1, report.getPeriod());
                 preparedStatementAdvances.setInt(2, report.getMonth());
@@ -102,8 +108,33 @@ public class ReportDAO implements IReportDAO {
                 preparedStatementAdvances.executeUpdate();
             }
 
+            // 3. NUEVO: Guardar desglose en ACTIVIDADES_REPORTE
+            if (report.getActivities() != null && !report.getActivities().isEmpty()) {
+                try (PreparedStatement preparedStatementActivities = connection.prepareStatement(insertActivitiesQuery)) {
+                    for (ActivityPlanDTO activity : report.getActivities()) {
+                        
+                        int activityMonthlyHours = 0;
+                        try {
+                            activityMonthlyHours += Integer.parseInt(activity.getWeek1Hours());
+                            activityMonthlyHours += Integer.parseInt(activity.getWeek2Hours());
+                            activityMonthlyHours += Integer.parseInt(activity.getWeek3Hours());
+                            activityMonthlyHours += Integer.parseInt(activity.getWeek4Hours());
+                        } catch (NumberFormatException e) {
+                            LOGGER.warn("Formato de horas inválido en actividad ID: {}. Se guardará como 0.", activity.getId());
+                        }
+
+                        preparedStatementActivities.setInt(1, generatedReportId);
+                        preparedStatementActivities.setInt(2, activity.getId());
+                        preparedStatementActivities.setInt(3, activityMonthlyHours);
+                        
+                        preparedStatementActivities.addBatch();
+                    }
+                    preparedStatementActivities.executeBatch();
+                }
+            }
+
             connection.commit();
-            LOGGER.info("Reporte y avances registrados exitosamente con ID: {}", generatedReportId);
+            LOGGER.info("Reporte, avances y desglose de actividades registrados exitosamente con ID: {}", generatedReportId);
             return true;
 
         } catch (SQLException sqlException) {
@@ -301,6 +332,8 @@ public class ReportDAO implements IReportDAO {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     PlannedActivityDTO activity = new PlannedActivityDTO();
+                    // MODIFICADO: Ahora extrae el ID de la base de datos
+                    activity.setId(resultSet.getInt("id"));
                     activity.setName(resultSet.getString("nombre"));
                     activity.setPlannedHours(resultSet.getInt("horas_planeadas"));
                     activities.add(activity);
@@ -419,7 +452,6 @@ public class ReportDAO implements IReportDAO {
     }
     
     
-    
     @Override
     public int getAccumulatedHours(int internId) {
         int accumulatedHours = 0;
@@ -447,5 +479,35 @@ public class ReportDAO implements IReportDAO {
         }
         
         return accumulatedHours;
+    }
+
+    // NUEVO MÉTODO: Suma el historial de horas para una actividad específica
+    @Override
+    public int getSumOfHoursForActivity(int studentId, int activityId) {
+        int totalHours = 0;
+        
+        String query = "SELECT SUM(ar.horas_reportadas) AS total_horas " +
+                       "FROM ACTIVIDADES_REPORTE ar " +
+                       "JOIN REPORTE r ON ar.reporte_id = r.id " +
+                       "WHERE r.estudiante_id = ? AND ar.actividad_id = ? " +
+                       "AND r.tipo = 'MENSUAL'";
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setInt(1, studentId);
+            preparedStatement.setInt(2, activityId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    totalHours = resultSet.getInt("total_horas");
+                }
+            }
+
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error calculando suma de horas para la actividad ID: {}", activityId, sqlException);
+        }
+
+        return totalHours;
     }
 }

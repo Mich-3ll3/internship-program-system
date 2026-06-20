@@ -5,6 +5,7 @@ import javafx.beans.property.StringProperty;
 
 public class ActivityPlanDTO {
 
+    private int id;
     private final StringProperty activityName = new SimpleStringProperty("");
     private final StringProperty type = new SimpleStringProperty("Real");
     private final StringProperty totalHours = new SimpleStringProperty("0");
@@ -12,6 +13,10 @@ public class ActivityPlanDTO {
     private final StringProperty week2Hours = new SimpleStringProperty("0");
     private final StringProperty week3Hours = new SimpleStringProperty("0");
     private final StringProperty week4Hours = new SimpleStringProperty("0");
+
+    public int getId() {
+        return id;
+    }
 
     public String getActivityName() {
         return activityName.get();
@@ -39,6 +44,10 @@ public class ActivityPlanDTO {
 
     public String getWeek4Hours() {
         return week4Hours.get();
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setActivityName(String name) {

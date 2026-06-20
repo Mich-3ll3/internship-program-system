@@ -1,6 +1,7 @@
 package mx.uv.internshipprogramsystem.logic.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 public class ReportDTO {
@@ -24,6 +25,8 @@ public class ReportDTO {
     private String particularObservations;
     private String currentResults;
 
+    private List<ActivityPlanDTO> activities; 
+
     public ReportDTO() {
     }
 
@@ -40,6 +43,14 @@ public class ReportDTO {
         this.studentId = studentId;
         this.professorId = professorId;
         this.projectId = projectId;
+    }
+
+    public List<ActivityPlanDTO> getActivities() {
+        return activities;
+    }
+
+    public void setActivities(List<ActivityPlanDTO> activities) {
+        this.activities = activities;
     }
 
     public int getId() {

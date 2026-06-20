@@ -90,8 +90,11 @@ public class ReportManager {
             String formattedName = activity.getName() + " (Plan: " + activity.getPlannedHours() + " hrs)";
             
             ActivityPlanDTO realRow = new ActivityPlanDTO();
+            // LÍNEA AGREGADA A CONTINUACIÓN: Configurar el ID en el DTO
+            realRow.setId(activity.getId());
             realRow.setActivityName(formattedName);
-            realRow.setTotalHours("0"); 
+            int totalActivityHours = reportDAO.getSumOfHoursForActivity(internId, activity.getId());
+            realRow.setTotalHours(String.valueOf(totalActivityHours));
             
             tableRows.add(realRow);
         }

@@ -269,7 +269,6 @@ public class RegisterReportController implements Initializable {
         try {
             int studentId = currentInternOptional.get().getId();
 
-            // Validamos que no exceda el límite de reportes mensuales
             reportManager.validateReportLimit(studentId, REPORT_TYPE);
 
             Optional<MonthlyReportContextDTO> contextOptional = reportManager.generateMonthlyContext(studentId);
@@ -302,13 +301,20 @@ public class RegisterReportController implements Initializable {
             
             int totalReportedHours = 0;
             for (ActivityPlanDTO activity : tblActivities.getItems()) {
-                totalReportedHours += Integer.parseInt(activity.getWeek1Hours());
-                totalReportedHours += Integer.parseInt(activity.getWeek2Hours());
-                totalReportedHours += Integer.parseInt(activity.getWeek3Hours());
-                totalReportedHours += Integer.parseInt(activity.getWeek4Hours());
+                try {
+                    totalReportedHours += Integer.parseInt(activity.getWeek1Hours());
+                    totalReportedHours += Integer.parseInt(activity.getWeek2Hours());
+                    totalReportedHours += Integer.parseInt(activity.getWeek3Hours());
+                    totalReportedHours += Integer.parseInt(activity.getWeek4Hours());
+                } catch (NumberFormatException e) {
+                    LOGGER.warn("Una de las celdas tiene formato inválido. Ignorando cálculo parcial de esa celda.");
+                }
             }
             newReport.setReportedHours(totalReportedHours); 
             newReport.setAdvancePercentage("0%");
+            
+            // --> LÍNEA AGREGADA: Empaquetar la lista de actividades en el DTO
+            newReport.setActivities(new java.util.ArrayList<>(tblActivities.getItems()));
 
             boolean isRegistered = reportManager.registerReport(newReport);
 
