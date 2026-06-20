@@ -34,34 +34,34 @@
                 <Button fx:id="btnHome" text="⌂" textFill="WHITE"
                         onAction="#goHome"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"/>
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
 
                 <Button fx:id="btnProjects" text="🛠️" textFill="WHITE"
                         onAction="#goProjectsModule"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"/>
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
 
                 <Button fx:id="btnDocuments" text="📑" textFill="WHITE"
                         onAction="#goDocumentsModule"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"/>
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
 
                 <Button fx:id="btnReports" text="📋" textFill="WHITE"
                         onAction="#goReportsModule"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"/>
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
 
                 <Button fx:id="btnSelfAssessments" text="📝" textFill="WHITE"
                         onAction="#goSelfAssessmentsModule"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;"/>
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-background-radius: 10; -fx-cursor: hand;"/>
 
                 <Region VBox.vgrow="ALWAYS" />
 
                 <Button fx:id="btnExit" text="🚪" textFill="WHITE"
                         onAction="#logOut"
                         prefHeight="40.0" prefWidth="40.0"
-                        style="-fx-background-color: transparent;">
+                        style="-fx-background-color: transparent; -fx-cursor: hand;">
                     <VBox.margin><Insets bottom="20.0" /></VBox.margin>
                 </Button>
             </children>
@@ -72,8 +72,8 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
                     style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
             <content>
-                <VBox spacing="16.0">
-                    <padding><Insets bottom="24.0" left="24.0" right="24.0" top="20.0" /></padding>
+                <VBox spacing="20.0">
+                    <padding><Insets bottom="24.0" left="30.0" right="30.0" top="30.0" /></padding>
                     <children>
 
                         <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -81,64 +81,78 @@
                                 <VBox>
                                     <children>
                                         <Label text="Panel de Estudiantes" textFill="#1a2744">
-                                            <font><Font name="System Bold" size="22.0" /></font>
+                                            <font><Font name="System Bold" size="24.0" /></font>
                                         </Label>
-                                        <Label fx:id="lblDate" text="Jueves, 21 de mayo de 2026" textFill="#6b7280" />
+                                        <Label fx:id="lblDate" text="Dashboard de Autoevaluaciones" textFill="#6b7280">
+                                            <font><Font size="13.0" /></font>
+                                        </Label>
                                     </children>
                                 </VBox>
                                 <Region HBox.hgrow="ALWAYS" />
-                                <StackPane prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
+                                <StackPane prefHeight="40.0" prefWidth="40.0"
+                                           style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
                                     <children>
                                         <Label text="SF" textFill="WHITE">
-                                            <font><Font name="System Bold" size="11.0" /></font>
+                                            <font><Font name="System Bold" size="13.0" /></font>
                                         </Label>
                                     </children>
                                 </StackPane>
                             </children>
                         </HBox>
 
-                        <VBox spacing="10.0"
-                              style="-fx-background-color: white; -fx-background-radius: 13;
-                                     -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;">
-                            <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                        <VBox spacing="20.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; 
+                                     -fx-border-color: #e5e7eb; -fx-border-radius: 12; 
+                                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);">
+                            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
                             <children>
 
-                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
                                     <children>
-                                        <StackPane prefHeight="32.0" prefWidth="32.0"
-                                                   style="-fx-background-color: #FEF3E7; -fx-background-radius: 9;">
+                                        <StackPane prefHeight="36.0" prefWidth="36.0"
+                                                   style="-fx-background-color: #FEF3E7; -fx-background-radius: 10;">
                                             <children>
-                                                <Label text="A" textFill="#e8a020" />
+                                                <Label text="A" textFill="#e8a020">
+                                                    <font><Font name="System Bold" size="16.0" /></font>
+                                                </Label>
                                             </children>
                                         </StackPane>
-                                        <Label text="AUTOEVALUACIONES" textFill="#1a2744">
-                                            <font><Font name="System Bold" size="14.0" /></font>
+                                        <Label text="Gestión de Autoevaluaciones" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="16.0" /></font>
                                         </Label>
-                                        <Region HBox.hgrow="ALWAYS" />
                                     </children>
                                 </HBox>
 
-                                <HBox spacing="8.0">
+                                <HBox spacing="12.0">
                                     <children>
-                                        <Button fx:id="btnRegisterSelfAssessment"
-                                                onAction="#openRegisterSelfAssessment"
-                                                text="Registrar autoevaluación" />
-                                        <Button fx:id="btnPrintSelfAssessment"
-                                                onAction="#printSelfAssessment"
-                                                text="Imprimir autoevaluación" />
+                                        <Button fx:id="btnRegisterSelfAssessment" onAction="#openRegisterSelfAssessment" text="➕ Nueva Autoevaluación"
+                                                style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+                                                
+                                        <Button fx:id="btnPrintSelfAssessment" onAction="#printSelfAssessment" text="📄 Imprimir PDF"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+
+                                        <Button fx:id="btnConsultSelfAssessment" onAction="#consultSelfAssessment" text="👁️ Consultar detalles"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
                                     </children>
                                 </HBox>
 
-                                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-padding: 10 0 5 0;">
                                     <children>
-                                        <Label text="Buscar por nombre:" textFill="#1a2744" />
-                                        <TextField fx:id="txtSearchName" promptText="Ej. Proyecto A" />
-                                        <Button text="Buscar" onAction="#handleSearchByName" />
-                                        <Button text="Limpiar" onAction="#handleClearSearchByName" />
+                                        <Label text="🔍 Buscar por nombre:" textFill="#4b5563">
+                                            <font><Font name="System Bold" size="13.0" /></font>
+                                        </Label>
+                                        <TextField fx:id="txtSearchName" promptText="Ej. Proyecto A" 
+                                                   prefWidth="200.0"
+                                                   style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 10;" />
+                                        <Button text="Buscar" onAction="#handleSearchByName"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;" />
+                                        <Button text="Limpiar" onAction="#handleClearSearchByName"
+                                                style="-fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-cursor: hand; -fx-underline: true;" />
                                     </children>
                                 </HBox>
 
-                                <TableView fx:id="tblSelfAssessments" prefHeight="200.0" prefWidth="600.0">
+                                <TableView fx:id="tblSelfAssessments" prefHeight="280.0" 
+                                           style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8;">
                                     <columns>
                                         <TableColumn fx:id="colStudent" text="Estudiante" prefWidth="150"/>
                                         <TableColumn fx:id="colProject" text="Proyecto" prefWidth="150"/>
@@ -150,9 +164,6 @@
                                     </columns>
                                 </TableView>
 
-                                <Button fx:id="btnConsultSelfAssessment"
-                                        onAction="#consultSelfAssessment"
-                                        text="Consultar autoevaluación" />
                             </children>
                         </VBox>
                     </children>

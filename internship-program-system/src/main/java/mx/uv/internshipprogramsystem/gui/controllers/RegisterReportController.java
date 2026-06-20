@@ -1,12 +1,14 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -33,6 +35,7 @@ public class RegisterReportController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RegisterReportController.class);
     private static final String NOT_AVAILABLE = "N/A";
+    private static final String REPORT_TYPE = "MENSUAL";
 
     @FXML private Button btnHome;
     @FXML private Button btnProjects;
@@ -174,7 +177,6 @@ public class RegisterReportController implements Initializable {
         }
     }
     
-    // --- CLASE INTERNA PARA EL MANEJO DE EDICIÓN DE CELDAS ---
     private class WeekCellEditEventHandler implements EventHandler<CellEditEvent<ActivityPlanDTO, String>> {
         
         private int targetWeek;
@@ -204,9 +206,8 @@ public class RegisterReportController implements Initializable {
                 tblActivities.refresh(); 
             }
         }
-    } // FIN DE LA CLASE INTERNA
+    }
 
-    // --- MÉTODOS DE NAVEGACIÓN FXML ---
     @FXML
     private void goHome(ActionEvent event) {
         WindowManagerController.changeView("InternHomeDashboard.fxml");
@@ -214,12 +215,12 @@ public class RegisterReportController implements Initializable {
 
     @FXML
     private void goProjectsModule(ActionEvent event) {
-        LOGGER.info("Redirección a módulo de proyectos.");
+        WindowManagerController.changeView("ProjectsDashboard.fxml");
     }
 
     @FXML
     private void goDocumentsModule(ActionEvent event) {
-        LOGGER.info("Redirección a módulo de documentos.");
+        WindowManagerController.changeView("DocumentsDashboard.fxml");
     }
     
     @FXML
@@ -239,61 +240,66 @@ public class RegisterReportController implements Initializable {
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 
-    // --- MÉTODOS DE ACCIÓN DEL FORMULARIO ---
     @FXML
     private void handleBtnCancelClick(ActionEvent event) {
-        LOGGER.info("Creación de reporte mensual cancelada por el usuario.");
+        LOGGER.info("Creación de reporte cancelada por el usuario.");
         WindowManagerController.changeView("ReportHomeDashboard.fxml");
     }
 
     @FXML
     private void handleBtnSubmitClick(ActionEvent event) {
-        LOGGER.info(" INICIANDO PROCESO DE REGISTRO (BOTÓN PRESIONADO) ");
+        LOGGER.info("INICIANDO PROCESO DE REGISTRO (BOTÓN PRESIONADO)");
 
         String resultsText = txtResults.getText();
         String observationsText = txtObservations.getText();
 
         if (resultsText == null || resultsText.trim().isEmpty()) {
-            LOGGER.warn("BLOQUEO DE VISTA: El campo de resultados está vacío.");
-            return;
-        }
-
-        if (observationsText == null || observationsText.trim().isEmpty()) {
-            LOGGER.warn("BLOQUEO DE VISTA: El campo de observaciones está vacío.");
+            showWarning("El campo de resultados obtenidos no puede estar vacío.");
             return;
         }
 
         Optional<InternDTO> currentInternOptional = UserSessionManager.getCurrentIntern();
         if (currentInternOptional.isEmpty()) {
-            LOGGER.error("BLOQUEO DE SESIÓN: No se encontró un practicante activo.");
+            showError("No se pudo identificar la sesión activa del estudiante.");
             return;
         }
 
+        btnSubmit.setDisable(true);
+
         try {
-            Optional<MonthlyReportContextDTO> contextOptional = reportManager.generateMonthlyContext(currentInternOptional.get().getId());
-            
+            int studentId = currentInternOptional.get().getId();
+
+            // Validamos que no exceda el límite de reportes mensuales
+            reportManager.validateReportLimit(studentId, REPORT_TYPE);
+
+            Optional<MonthlyReportContextDTO> contextOptional = reportManager.generateMonthlyContext(studentId);
             if (contextOptional.isEmpty()) {
-                LOGGER.error("BLOQUEO DE CONTEXTO: Faltan datos del proyecto en la BD.");
+                showError("Faltan datos del proyecto en la base de datos para generar el reporte.");
                 return;
             }
-
+            
             MonthlyReportContextDTO context = contextOptional.get();
 
             ReportDTO newReport = new ReportDTO();
-            newReport.setStudentId(currentInternOptional.get().getId());
+            newReport.setStudentId(studentId);
             newReport.setProjectId(context.getProjectId());
             newReport.setProfessorId(context.getProfessorId());
-            newReport.setType(ReportManager.TYPE_MONTHLY);
-            newReport.setStatus("pendiente");
-            newReport.setDate(java.time.LocalDate.now());
+            newReport.setType(REPORT_TYPE);
+            newReport.setStatus("PENDIENTE");
+            newReport.setDate(LocalDate.now());
             newReport.setNumber(context.getReportNumber());
             
-            newReport.setCurrentResults(resultsText);
-            newReport.setParticularObservations(observationsText);
-            newReport.setMonth(java.time.LocalDate.now().getMonthValue());
+            newReport.setCurrentResults(resultsText.trim());
+            
+            if (observationsText != null && !observationsText.trim().isEmpty()) {
+                newReport.setParticularObservations(observationsText.trim());
+            } else {
+                newReport.setParticularObservations("Sin observaciones particulares.");
+            }
+            
+            newReport.setMonth(LocalDate.now().getMonthValue());
             newReport.setPeriod(context.getSchoolPeriod());
             
-            // Lógica de suma de horas de la tabla
             int totalReportedHours = 0;
             for (ActivityPlanDTO activity : tblActivities.getItems()) {
                 totalReportedHours += Integer.parseInt(activity.getWeek1Hours());
@@ -301,25 +307,51 @@ public class RegisterReportController implements Initializable {
                 totalReportedHours += Integer.parseInt(activity.getWeek3Hours());
                 totalReportedHours += Integer.parseInt(activity.getWeek4Hours());
             }
-            
             newReport.setReportedHours(totalReportedHours); 
             newReport.setAdvancePercentage("0%");
 
             boolean isRegistered = reportManager.registerReport(newReport);
 
             if (isRegistered) {
-                LOGGER.info("====== ÉXITO: REPORTE MENSUAL GUARDADO EN MYSQL ======");
+                showSuccess("El reporte mensual se registró correctamente.");
                 WindowManagerController.changeView("ReportHomeDashboard.fxml");
             } else {
-                LOGGER.error("====== FALLO SILENCIOSO: El Manager devolvió false ======");
+                showError("Ocurrió un problema interno al intentar guardar el reporte.");
             }
 
-        } catch (ValidationException validationException) {
-            LOGGER.error("ERROR DE VALIDACIÓN: {}", validationException.getMessage());
-        } catch (BusinessException businessException) {
-            LOGGER.error("ERROR DE BASE DE DATOS: {}", businessException.getMessage());
-        } catch (Exception unexpectedException) {
-            LOGGER.error("ERROR INESPERADO: {}", unexpectedException.getMessage(), unexpectedException);
+        } catch (Exception exception) {
+            if (exception instanceof BusinessException) {
+                showWarning(exception.getMessage());
+            } else {
+                showError("Ocurrió un error inesperado al procesar el reporte: " + exception.getMessage());
+                LOGGER.error("ERROR INESPERADO: {}", exception.getMessage(), exception);
+            }
+        } finally {
+            btnSubmit.setDisable(false);
         }
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle("Advertencia");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showSuccess(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Éxito");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }

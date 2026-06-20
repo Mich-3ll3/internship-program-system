@@ -4,6 +4,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -18,9 +19,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.SelfAssessmentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.managers.SelfAssessmentManager;
+import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -62,11 +65,17 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
     }
 
     private void loadAssessments() {
-        try {
-            List<SelfAssessmentDTO> assessments = selfAssessmentManager.getAllSelfAssessments();
-            tblSelfAssessments.setItems(FXCollections.observableArrayList(assessments));
-        } catch (BusinessException exception) {
-            showError("Error cargando autoevaluaciones: " + exception.getMessage());
+        Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
+        if (currentIntern.isPresent()) {
+            try {
+                int studentId = currentIntern.get().getId();
+                List<SelfAssessmentDTO> assessments = selfAssessmentManager.getSelfAssessmentsByStudentId(studentId);
+                tblSelfAssessments.setItems(FXCollections.observableArrayList(assessments));
+            } catch (BusinessException exception) {
+                showError("Error cargando autoevaluaciones: " + exception.getMessage());
+            }
+        } else {
+            showError("No hay una sesión de estudiante activa.");
         }
     }
 
@@ -145,20 +154,24 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
             return;
         }
 
-        try {
-            List<SelfAssessmentDTO> assessments = selfAssessmentManager.getAllSelfAssessments();
-            List<SelfAssessmentDTO> filtered = new ArrayList<>();
+        Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
+        if (currentIntern.isPresent()) {
+            try {
+                int studentId = currentIntern.get().getId();
+                List<SelfAssessmentDTO> assessments = selfAssessmentManager.getSelfAssessmentsByStudentId(studentId);
+                List<SelfAssessmentDTO> filtered = new ArrayList<>();
 
-            for (SelfAssessmentDTO assessment : assessments) {
-                if (assessment.getProjectName() != null &&
-                    assessment.getProjectName().toLowerCase().contains(searchName)) {
-                    filtered.add(assessment);
+                for (SelfAssessmentDTO assessment : assessments) {
+                    if (assessment.getProjectName() != null &&
+                        assessment.getProjectName().toLowerCase().contains(searchName)) {
+                        filtered.add(assessment);
+                    }
                 }
-            }
 
-            tblSelfAssessments.setItems(FXCollections.observableArrayList(filtered));
-        } catch (BusinessException exception) {
-            showError("Error al buscar autoevaluaciones: " + exception.getMessage());
+                tblSelfAssessments.setItems(FXCollections.observableArrayList(filtered));
+            } catch (BusinessException exception) {
+                showError("Error al buscar autoevaluaciones: " + exception.getMessage());
+            }
         }
     }
 

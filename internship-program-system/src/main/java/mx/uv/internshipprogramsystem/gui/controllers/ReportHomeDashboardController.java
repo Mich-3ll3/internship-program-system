@@ -33,7 +33,10 @@ import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
 public class ReportHomeDashboardController implements Initializable {
 
-    @FXML private Button btnRegisterReport;
+    // Se actualizaron los botones para coincidir con el nuevo FXML
+    @FXML private Button btnRegisterMonthlyReport;
+    @FXML private Button btnRegisterPartialReport;
+    
     @FXML private Button btnGenerateReport;
     @FXML private Button btnUploadPDF;
     @FXML private Button btnSendReport;
@@ -70,6 +73,12 @@ public class ReportHomeDashboardController implements Initializable {
         WindowManagerController.changeView("RegisterReport.fxml");
     }
 
+    // Nuevo método para abrir la ventana del reporte parcial
+    @FXML
+    private void openRegisterPartialReport(ActionEvent event) {
+        WindowManagerController.changeView("RegisterPartialReport.fxml");
+    }
+
     @FXML
     private void generateReportPDF(ActionEvent event) {
         ReportDTO selectedReport = tblReports.getSelectionModel().getSelectedItem();
@@ -83,7 +92,7 @@ public class ReportHomeDashboardController implements Initializable {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Guardar reporte PDF como...");
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
-            fileChooser.setInitialFileName("Reporte_Mensual_No_" + selectedReport.getNumber() + ".pdf");
+            fileChooser.setInitialFileName("Reporte_" + selectedReport.getType() + "_No_" + selectedReport.getNumber() + ".pdf");
 
             Stage stage = (Stage) tblReports.getScene().getWindow();
             File selectedFile = fileChooser.showSaveDialog(stage);
