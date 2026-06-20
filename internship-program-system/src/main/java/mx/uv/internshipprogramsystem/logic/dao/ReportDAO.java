@@ -312,6 +312,27 @@ public class ReportDAO implements IReportDAO {
         
         return activities;
     }
+    
+    public int countReportsByType(int studentId, String reportType) throws BusinessException {
+        int count = 0;
+        String query = "SELECT COUNT(*) FROM REPORTE WHERE estudiante_id = ? AND tipo = ?";
+        
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+             
+            preparedStatement.setInt(1, studentId);
+            preparedStatement.setString(2, reportType.toLowerCase());
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    count = resultSet.getInt(1);
+                }
+            }
+        } catch (SQLException sqlException) {
+            throw new BusinessException("Error al contar los reportes en la base de datos.", sqlException);
+        }
+        return count;
+    }
 
     public Optional<MonthlyReportContextDTO> getProjectContextForIntern(int internId) {
         if (internId <= 0) {
@@ -406,7 +427,6 @@ public class ReportDAO implements IReportDAO {
         final int PARAM_INTERN_ID = 1;
         final int COLUMN_INDEX_SUM = 1;
 
-        // Hacemos JOIN porque las horas están en AVANCES, pero el ID del intern está en REPORTE
         String query = "SELECT SUM(ra.horas_reportadas) " +
                        "FROM REPORTE_AVANCES ra " +
                        "JOIN REPORTE r ON ra.reporte_id = r.id " +
@@ -418,7 +438,6 @@ public class ReportDAO implements IReportDAO {
             preparedStatement.setInt(PARAM_INTERN_ID, internId);
             
             try (java.sql.ResultSet resultSet = preparedStatement.executeQuery()) {
-                // getInt() devuelve 0 automáticamente si la suma es NULL (cuando no hay reportes aún)
                 if (resultSet.next()) {
                     accumulatedHours = resultSet.getInt(COLUMN_INDEX_SUM); 
                 }

@@ -27,7 +27,7 @@ import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 class InternDAOTest {
     @Test
     void createWithConnectionWhenInternIsValidReturnsTrue() throws Exception {
-
+ 
         Connection connection = mock(Connection.class);
         PreparedStatement statement = mock(PreparedStatement.class);
         InternDTO intern = buildIntern();
