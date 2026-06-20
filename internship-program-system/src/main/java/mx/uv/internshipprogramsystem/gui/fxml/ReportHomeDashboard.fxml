@@ -122,17 +122,18 @@
                                     <children>
                                         <Button fx:id="btnRegisterMonthlyReport" onAction="#openRegisterReport" text="➕ Nuevo Mensual"
                                                 style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
-                                        
+
                                         <Button fx:id="btnRegisterPartialReport" onAction="#openRegisterPartialReport" text="➕ Nuevo Parcial"
+                                                disable="true"
                                                 style="-fx-background-color: #e8a020; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
-                                                
+
                                         <Button fx:id="btnGenerateReport" onAction="#generateReportPDF" text="📄 Generar PDF"
                                                 style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
-                                                
-                                        <Button fx:id="btnUploadPDF" onAction="#uploadReportFile" text="⬆️ Subir PDF Firmado"
-                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
-                                                
+
                                         <Button fx:id="btnSendReport" onAction="#sendReport" text="✉️ Enviar a Revisión"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+
+                                        <Button fx:id="btnUploadPDF" onAction="#uploadReportFile" text="⬆️ Subir PDF Firmado"
                                                 style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
                                     </children>
                                 </HBox>

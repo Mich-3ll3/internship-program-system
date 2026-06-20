@@ -31,11 +31,12 @@ import mx.uv.internshipprogramsystem.logic.managers.ReportManager;
 import mx.uv.internshipprogramsystem.logic.managers.ReportExporterManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
+
 public class ReportHomeDashboardController implements Initializable {
 
-    // Se actualizaron los botones para coincidir con el nuevo FXML
     @FXML private Button btnRegisterMonthlyReport;
-    @FXML private Button btnRegisterPartialReport;
+    
+    @FXML private Button btnRegisterPartialReport; 
     
     @FXML private Button btnGenerateReport;
     @FXML private Button btnUploadPDF;
@@ -66,6 +67,9 @@ public class ReportHomeDashboardController implements Initializable {
         } catch (BusinessException e) {
             showError("Error cargando reportes: " + e.getMessage());
         }
+        
+        validatePartialReportButton();
+
     }
 
     @FXML
@@ -73,7 +77,6 @@ public class ReportHomeDashboardController implements Initializable {
         WindowManagerController.changeView("RegisterReport.fxml");
     }
 
-    // Nuevo método para abrir la ventana del reporte parcial
     @FXML
     private void openRegisterPartialReport(ActionEvent event) {
         WindowManagerController.changeView("RegisterPartialReport.fxml");
@@ -83,46 +86,45 @@ public class ReportHomeDashboardController implements Initializable {
     private void generateReportPDF(ActionEvent event) {
         ReportDTO selectedReport = tblReports.getSelectionModel().getSelectedItem();
 
+        // Aplicada la regla de un solo retorno (sin return prematuros)
         if (selectedReport == null) {
             showWarning("Debes seleccionar un reporte de la lista antes de generar el PDF.");
-            return;
-        }
+        } else {
+            try {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Guardar reporte PDF como...");
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
+                fileChooser.setInitialFileName("Reporte_" + selectedReport.getType() + "_No_" + selectedReport.getNumber() + ".pdf");
 
-        try {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Guardar reporte PDF como...");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos PDF (*.pdf)", "*.pdf"));
-            fileChooser.setInitialFileName("Reporte_" + selectedReport.getType() + "_No_" + selectedReport.getNumber() + ".pdf");
+                Stage stage = (Stage) tblReports.getScene().getWindow();
+                File selectedFile = fileChooser.showSaveDialog(stage);
 
-            Stage stage = (Stage) tblReports.getScene().getWindow();
-            File selectedFile = fileChooser.showSaveDialog(stage);
+                if (selectedFile != null) {
+                    Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
+                    
+                    if (currentIntern.isPresent()) {
+                        Optional<MonthlyReportContextDTO> contextOpt = reportManager.generateMonthlyContext(currentIntern.get().getId());
 
-            if (selectedFile != null) {
-                
-                Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
-                
-                if (currentIntern.isPresent()) {
-                    Optional<MonthlyReportContextDTO> contextOpt = reportManager.generateMonthlyContext(currentIntern.get().getId());
-
-                    if (contextOpt.isPresent()) {
-                        boolean success = exporterManager.generatePlainPdfReport(selectedReport, contextOpt.get(), selectedFile.getAbsolutePath());
-                        
-                        if (success) {
-                            showSuccess("El reporte PDF se generó y guardó correctamente en:\n" + selectedFile.getAbsolutePath());
+                        if (contextOpt.isPresent()) {
+                            boolean success = exporterManager.generatePlainPdfReport(selectedReport, contextOpt.get(), selectedFile.getAbsolutePath());
+                            
+                            if (success) {
+                                showSuccess("El reporte PDF se generó y guardó correctamente en:\n" + selectedFile.getAbsolutePath());
+                            } else {
+                                showError("Ocurrió un problema interno al escribir el archivo PDF.");
+                            }
                         } else {
-                            showError("Ocurrió un problema interno al escribir el archivo PDF.");
+                            showError("No se pudo obtener el contexto de la base de datos para llenar el PDF.");
                         }
                     } else {
-                        showError("No se pudo obtener el contexto de la base de datos para llenar el PDF.");
+                        showError("No hay un Intern activo en la sesión.");
                     }
-                } else {
-                    showError("No hay un Intern activo en la sesión.");
                 }
+            } catch (ValidationException e) {
+                showError("Error de validación al generar el PDF: " + e.getMessage());
+            } catch (Exception e) {
+                showError("Ocurrió un problema inesperado: " + e.getMessage());
             }
-        } catch (ValidationException e) {
-            showError("Error de validación al generar el PDF: " + e.getMessage());
-        } catch (Exception e) {
-            showError("Ocurrió un problema inesperado: " + e.getMessage());
         }
     }
 
@@ -158,6 +160,22 @@ public class ReportHomeDashboardController implements Initializable {
     @FXML
     private void sendReport(ActionEvent event) {
         showInfo("Funcionalidad de envío pendiente de implementación.");
+    }
+
+    private void validatePartialReportButton() {
+        Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
+        if (currentIntern.isPresent()) {
+            InternDTO intern = currentIntern.get();
+            int studentId = intern.getId();
+            
+            boolean isEligible = reportManager.canSubmitPartialReport(studentId);
+            
+            if (isEligible) {
+                btnRegisterPartialReport.setDisable(false);
+            } else {
+                btnRegisterPartialReport.setDisable(true);
+            }
+        }
     }
 
     @FXML
@@ -218,6 +236,7 @@ public class ReportHomeDashboardController implements Initializable {
 
     @FXML
     private void logOut(ActionEvent event) {
+        UserSessionManager.clearSession();
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 

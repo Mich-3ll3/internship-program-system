@@ -90,7 +90,6 @@ public class ReportManager {
             String formattedName = activity.getName() + " (Plan: " + activity.getPlannedHours() + " hrs)";
             
             ActivityPlanDTO realRow = new ActivityPlanDTO();
-            // LÍNEA AGREGADA A CONTINUACIÓN: Configurar el ID en el DTO
             realRow.setId(activity.getId());
             realRow.setActivityName(formattedName);
             int totalActivityHours = reportDAO.getSumOfHoursForActivity(internId, activity.getId());
@@ -125,5 +124,22 @@ public class ReportManager {
         InputValidator.validatePositive(reportId, MSG_INVALID_ID);
         InputValidator.validateNotEmpty(newStatus, MSG_EMPTY_STATUS);
         return reportDAO.evaluateReport(reportId, newStatus, newObservations);
+    }
+    
+    public boolean canSubmitPartialReport(int studentId) {
+        boolean isEligible = false;
+        try {
+            int monthlyCount = reportDAO.countReportsByType(studentId, TYPE_MONTHLY);
+            int partialCount = reportDAO.countReportsByType(studentId, TYPE_PARTIAL);
+            
+            if (monthlyCount >= 3) {
+                if (partialCount < MAX_PARTIAL_REPORTS) {
+                    isEligible = true;
+                }
+            }
+        } catch (BusinessException e) {
+            LOGGER.error("Error al verificar elegibilidad: {}", e.getMessage());
+        }
+        return isEligible;
     }
 }

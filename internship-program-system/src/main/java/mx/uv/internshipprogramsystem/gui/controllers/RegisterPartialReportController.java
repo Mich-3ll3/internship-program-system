@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import mx.uv.internshipprogramsystem.gui.utils.LengthFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import mx.uv.internshipprogramsystem.logic.dto.*;
@@ -35,7 +36,16 @@ public class RegisterPartialReportController implements Initializable {
         colActivity.setCellValueFactory(new PropertyValueFactory<>("activityName"));
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalHours"));
+        
         loadReportContextData();
+        
+        LengthFilter resultsLengthFilter = new LengthFilter(240);
+        TextFormatter<String> resultsFormatter = new TextFormatter<>(resultsLengthFilter);
+        txtResults.setTextFormatter(resultsFormatter);
+
+        LengthFilter observationsLengthFilter = new LengthFilter(240);
+        TextFormatter<String> observationsFormatter = new TextFormatter<>(observationsLengthFilter);
+        txtObservations.setTextFormatter(observationsFormatter);
     }
 
     private void loadReportContextData() {

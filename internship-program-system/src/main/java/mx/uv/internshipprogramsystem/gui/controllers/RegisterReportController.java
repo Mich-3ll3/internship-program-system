@@ -18,8 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javafx.event.EventHandler;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn.CellEditEvent;
-import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import mx.uv.internshipprogramsystem.logic.dto.ActivityPlanDTO;
@@ -30,6 +32,8 @@ import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.managers.ReportManager;
 import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
+
+import mx.uv.internshipprogramsystem.gui.utils.LengthFilter;
 
 public class RegisterReportController implements Initializable {
 
@@ -78,7 +82,7 @@ public class RegisterReportController implements Initializable {
     private static final int WEEK_THREE = 3;
     private static final int WEEK_FOUR = 4;
     
-    @Override
+@Override
     public void initialize(URL location, ResourceBundle resources) {
         LOGGER.info("Inicializando ventana de Registro de Reporte Mensual.");
         this.reportManager = new ReportManager();
@@ -88,27 +92,37 @@ public class RegisterReportController implements Initializable {
         colActivity.setCellValueFactory(new PropertyValueFactory<>("activityName"));
         colType.setCellValueFactory(new PropertyValueFactory<>("type"));
 
+        IntegerCellFactory cellFactory = new IntegerCellFactory();
+
         colWeek1.setCellValueFactory(new PropertyValueFactory<>("week1Hours"));
-        colWeek1.setCellFactory(TextFieldTableCell.forTableColumn());
+        colWeek1.setCellFactory(cellFactory);
         WeekCellEditEventHandler handlerWeekOne = new WeekCellEditEventHandler(WEEK_ONE);
         colWeek1.setOnEditCommit(handlerWeekOne);
 
         colWeek2.setCellValueFactory(new PropertyValueFactory<>("week2Hours"));
-        colWeek2.setCellFactory(TextFieldTableCell.forTableColumn());
+        colWeek2.setCellFactory(cellFactory);
         WeekCellEditEventHandler handlerWeekTwo = new WeekCellEditEventHandler(WEEK_TWO);
         colWeek2.setOnEditCommit(handlerWeekTwo);
 
         colWeek3.setCellValueFactory(new PropertyValueFactory<>("week3Hours"));
-        colWeek3.setCellFactory(TextFieldTableCell.forTableColumn());
+        colWeek3.setCellFactory(cellFactory);
         WeekCellEditEventHandler handlerWeekThree = new WeekCellEditEventHandler(WEEK_THREE);
         colWeek3.setOnEditCommit(handlerWeekThree);
 
         colWeek4.setCellValueFactory(new PropertyValueFactory<>("week4Hours"));
-        colWeek4.setCellFactory(TextFieldTableCell.forTableColumn());
+        colWeek4.setCellFactory(cellFactory);
         WeekCellEditEventHandler handlerWeekFour = new WeekCellEditEventHandler(WEEK_FOUR);
         colWeek4.setOnEditCommit(handlerWeekFour);
 
         loadReportContextData();
+        
+        LengthFilter resultsLengthFilter = new LengthFilter(240);
+        TextFormatter<String> resultsFormatter = new TextFormatter<>(resultsLengthFilter);
+        txtResults.setTextFormatter(resultsFormatter);
+
+        LengthFilter observationsLengthFilter = new LengthFilter(240);
+        TextFormatter<String> observationsFormatter = new TextFormatter<>(observationsLengthFilter);
+        txtObservations.setTextFormatter(observationsFormatter);
     }
 
     private void bindContextToInterface(MonthlyReportContextDTO context) {
@@ -313,7 +327,6 @@ public class RegisterReportController implements Initializable {
             newReport.setReportedHours(totalReportedHours); 
             newReport.setAdvancePercentage("0%");
             
-            // --> LÍNEA AGREGADA: Empaquetar la lista de actividades en el DTO
             newReport.setActivities(new java.util.ArrayList<>(tblActivities.getItems()));
 
             boolean isRegistered = reportManager.registerReport(newReport);
@@ -334,6 +347,45 @@ public class RegisterReportController implements Initializable {
             }
         } finally {
             btnSubmit.setDisable(false);
+        }
+    }
+    
+    public class IntegerFilter implements java.util.function.UnaryOperator<TextFormatter.Change> {
+        @Override
+        public TextFormatter.Change apply(TextFormatter.Change change) {
+            TextFormatter.Change validChange = null;
+            String newText = change.getControlNewText();
+            
+            if (newText.matches("\\d*")) {
+                validChange = change;
+            }
+            
+            return validChange;
+        }
+    }
+
+    public class IntegerEditingCell extends javafx.scene.control.cell.TextFieldTableCell<ActivityPlanDTO, String> {
+        public IntegerEditingCell() {
+            super(new javafx.util.converter.DefaultStringConverter());
+        }
+
+        @Override
+        public void startEdit() {
+            super.startEdit();
+            
+            if (getGraphic() instanceof TextField) {
+                TextField textField = (TextField) getGraphic();
+                IntegerFilter filter = new IntegerFilter();
+                TextFormatter<String> formatter = new TextFormatter<>(filter);
+                textField.setTextFormatter(formatter);
+            }
+        }
+    }
+
+    public class IntegerCellFactory implements javafx.util.Callback<TableColumn<ActivityPlanDTO, String>, TableCell<ActivityPlanDTO, String>> {
+        @Override
+        public TableCell<ActivityPlanDTO, String> call(TableColumn<ActivityPlanDTO, String> param) {
+            return new IntegerEditingCell();
         }
     }
 
