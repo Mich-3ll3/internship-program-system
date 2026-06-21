@@ -102,4 +102,12 @@ public class ProjectManager {
 
         return totalProjects;
     }
+
+    public List<ProjectDTO> getAvailableProjectsForUI()
+            throws BusinessException {
+        List<ProjectDTO> projects =
+            projectDAO.getAvailableProjectsForUI();
+
+        return projects;
+    }
 }

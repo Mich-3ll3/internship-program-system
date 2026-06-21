@@ -117,18 +117,18 @@
                                     <children>
                                         <VBox spacing="4.0" HBox.hgrow="ALWAYS">
                                             <children>
-                                                <Label text="Buscar por palabra clave:" textFill="#4b5563">
+                                                <Label text="Escribe tu búsqueda:" textFill="#4b5563">
                                                     <font><Font size="11.0" /></font>
                                                 </Label>
-                                                <TextField fx:id="txtSearchProject" prefHeight="35.0" promptText="Ej. Base de datos, Desarrollo, nombre de empresa..." />
+                                                <TextField fx:id="txtSearchProject" prefHeight="35.0" promptText="Ej. Sistema web, CFE, 3..." />
                                             </children>
                                         </VBox>
                                         <VBox spacing="4.0" prefWidth="200.0">
                                             <children>
-                                                <Label text="Filtrar por Área:" textFill="#4b5563">
+                                                <Label text="Buscar en:" textFill="#4b5563">
                                                     <font><Font size="11.0" /></font>
                                                 </Label>
-                                                <ComboBox fx:id="cmbAreaFilter" prefHeight="35.0" prefWidth="200.0" promptText="Todas las áreas" />
+                                                <ComboBox fx:id="cmbSearchCriteria" prefHeight="35.0" prefWidth="200.0" promptText="Selecciona un criterio" />
                                             </children>
                                         </VBox>
                                         <VBox alignment="BOTTOM_CENTER">

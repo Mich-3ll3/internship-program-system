@@ -33,8 +33,12 @@ public interface IProjectDAO {
 
     int countAll()
             throws BusinessException;
+            
     int createAndReturnId(
             ProjectDTO project,
             Connection connection
     ) throws BusinessException;
+    
+    List<ProjectDTO> getAvailableProjectsForUI()
+            throws BusinessException;
 }

@@ -1,10 +1,13 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,13 +22,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
-// Importa aquí tus DTOs correspondientes
+import mx.uv.internshipprogramsystem.logic.managers.ProjectManager;
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ApplicationDTO;
 
 public class ProjectHomeDashboardController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectHomeDashboardController.class);
+
+    private final ProjectManager projectManager = new ProjectManager();
 
     @FXML private Button btnHome;
     @FXML private Button btnProjects;
@@ -42,9 +48,11 @@ public class ProjectHomeDashboardController implements Initializable {
     @FXML private TableColumn<ApplicationDTO, String> colAppStatus;
 
     @FXML private TextField txtSearchProject;
-    @FXML private ComboBox<String> cmbAreaFilter;
+    @FXML private ComboBox<String> cmbSearchCriteria; 
     @FXML private Button btnSearch;
     @FXML private Button btnClearFilters;
+    
+    private List<ProjectDTO> allAvailableProjects;
     
     @FXML private TableView<ProjectDTO> tblAvailableProjects;
     @FXML private TableColumn<ProjectDTO, String> colProjName;
@@ -69,7 +77,8 @@ public class ProjectHomeDashboardController implements Initializable {
         colProjArea.setCellValueFactory(new PropertyValueFactory<>("area"));
         colProjSpots.setCellValueFactory(new PropertyValueFactory<>("availableSpots"));
 
-        cmbAreaFilter.getItems().addAll("Todas las áreas", "Desarrollo Web", "Bases de Datos", "Redes", "Soporte Técnico");
+        cmbSearchCriteria.getItems().addAll("Nombre del Proyecto", "Organización", "Cupos Disponibles");
+        cmbSearchCriteria.getSelectionModel().selectFirst();
 
         ApplicationSelectionListener appListener = new ApplicationSelectionListener();
         tblApplications.getSelectionModel().selectedItemProperty().addListener(appListener);
@@ -77,15 +86,25 @@ public class ProjectHomeDashboardController implements Initializable {
         ProjectSelectionListener projListener = new ProjectSelectionListener();
         tblAvailableProjects.getSelectionModel().selectedItemProperty().addListener(projListener);
 
+        loadAvailableProjects();
     }
 
+    private void loadAvailableProjects() {
+        try {
+            allAvailableProjects = projectManager.getAvailableProjectsForUI();
+            tblAvailableProjects.setItems(FXCollections.observableArrayList(allAvailableProjects));
+            LOGGER.info("Se cargaron {} proyectos disponibles en la tabla.", allAvailableProjects.size());
+        } catch (BusinessException ex) {
+            LOGGER.error("Error al cargar los proyectos: {}", ex.getMessage());
+            showError("No se pudieron cargar los proyectos disponibles. Por favor, intenta de nuevo más tarde.");
+        }
+    }
 
     @FXML
     private void cancelApplication(ActionEvent event) {
         ApplicationDTO selectedApp = tblApplications.getSelectionModel().getSelectedItem();
         
         if (selectedApp != null) {
-            // Aquí iría tu lógica de ReportManager/ProjectManager para cancelar
             LOGGER.info("Cancelando postulación para el proyecto: {}", selectedApp.getProjectName());
             showSuccess("La postulación ha sido cancelada correctamente.");
             btnCancelApplication.setDisable(true);
@@ -97,19 +116,71 @@ public class ProjectHomeDashboardController implements Initializable {
 
     @FXML
     private void handleSearch(ActionEvent event) {
-        String keyword = txtSearchProject.getText();
-        String selectedArea = cmbAreaFilter.getValue();
+        String keyword = txtSearchProject.getText().trim().toLowerCase();
+        String criteria = cmbSearchCriteria.getValue();
 
-        LOGGER.info("Buscando proyectos con palabra clave: '{}' y área: '{}'", keyword, selectedArea);
+        if (keyword.isEmpty() || criteria == null) {
+            restaurarTablaCompleta();
+            LOGGER.info("Búsqueda vacía, mostrando todos los proyectos.");
+        } else {
+            List<ProjectDTO> filteredList = filtrarProyectos(keyword, criteria);
+            
+            if (filteredList.isEmpty()) {
+                LOGGER.info("Búsqueda sin resultados para '{}'. La tabla se queda como estaba.", keyword);
+                showInfo("No se encontraron proyectos que coincidan con tu búsqueda.");
+            } else {
+                tblAvailableProjects.setItems(FXCollections.observableArrayList(filteredList));
+                LOGGER.info("Búsqueda aplicada. Resultados encontrados: {}", filteredList.size());
+            }
+        }
+    }
 
+    private void restaurarTablaCompleta() {
+        if (allAvailableProjects != null) {
+            tblAvailableProjects.setItems(FXCollections.observableArrayList(allAvailableProjects));
+        }
+    }
+
+    private List<ProjectDTO> filtrarProyectos(String keyword, String criteria) {
+        List<ProjectDTO> filteredList = new ArrayList<>();
+        if (allAvailableProjects != null) {
+            for (ProjectDTO project : allAvailableProjects) {
+                if (cumpleCriterio(project, criteria, keyword)) {
+                    filteredList.add(project);
+                }
+            }
+        }
+        return filteredList;
+    }
+
+    private boolean cumpleCriterio(ProjectDTO project, String criteria, String keyword) {
+        boolean matches = false;
+        switch (criteria) {
+            case "Nombre del Proyecto" -> {
+                if (project.getName() != null) {
+                    matches = project.getName().toLowerCase().contains(keyword);
+                }
+            }
+            case "Organización" -> {
+                if (project.getOrganizationName() != null) {
+                    matches = project.getOrganizationName().toLowerCase().contains(keyword);
+                }
+            }
+            case "Cupos Disponibles" -> {
+                matches = String.valueOf(project.getAvailableSpots()).contains(keyword);
+            }
+            default -> {
+            }
+        }
+        return matches;
     }
 
     @FXML
     private void clearFilters(ActionEvent event) {
         txtSearchProject.clear();
-        cmbAreaFilter.getSelectionModel().clearSelection();
+        cmbSearchCriteria.getSelectionModel().selectFirst();
+        restaurarTablaCompleta();
         LOGGER.info("Filtros de búsqueda limpiados.");
-        
     }
 
     @FXML
@@ -189,6 +260,13 @@ public class ProjectHomeDashboardController implements Initializable {
         }
     }
 
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
     private void showSuccess(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
