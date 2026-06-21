@@ -19,6 +19,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.SelfAssessmentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -31,6 +34,8 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 public class SelfAssessmentHomeDashboardController implements Initializable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SelfAssessmentHomeDashboardController.class);
 
     @FXML private Button btnRegisterSelfAssessment;
     @FXML private Button btnPrintSelfAssessment;
@@ -52,6 +57,7 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        LOGGER.info("Inicializando ventana de Autoevaluaciones.");
 
         colStudent.setCellValueFactory(new PropertyValueFactory<>("studentName"));
         colProject.setCellValueFactory(new PropertyValueFactory<>("projectName"));
@@ -87,26 +93,26 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
     @FXML
     private void printSelfAssessment(javafx.event.ActionEvent actionEvent) {
         SelfAssessmentDTO selected = tblSelfAssessments.getSelectionModel().getSelectedItem();
+        
         if (selected == null) {
             showWarning("Debes seleccionar una autoevaluación para imprimir.");
-            return;
-        }
+        } else {
+            try {
+                FileChooser fileChooser = new FileChooser();
+                fileChooser.setTitle("Guardar autoevaluación como PDF");
+                fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
 
-        try {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setTitle("Guardar autoevaluación como PDF");
-            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Archivos PDF", "*.pdf"));
+                Stage stage = (Stage) tblSelfAssessments.getScene().getWindow();
+                java.io.File file = fileChooser.showSaveDialog(stage);
 
-            Stage stage = (Stage) tblSelfAssessments.getScene().getWindow();
-            java.io.File file = fileChooser.showSaveDialog(stage);
-
-            if (file != null) {
-                createPDF(selected, file);
-                showSuccess("La autoevaluación del proyecto " + selected.getProjectName() +
-                            " se guardó correctamente en:\n" + file.getAbsolutePath());
+                if (file != null) {
+                    createPDF(selected, file);
+                    showSuccess("La autoevaluación del proyecto " + selected.getProjectName() +
+                                " se guardó correctamente en:\n" + file.getAbsolutePath());
+                }
+            } catch (Exception exception) {
+                showError("Ocurrió un problema al generar el PDF: " + exception.getMessage());
             }
-        } catch (Exception exception) {
-            showError("Ocurrió un problema al generar el PDF: " + exception.getMessage());
         }
     }
 
@@ -139,38 +145,39 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
     @FXML
     private void consultSelfAssessment(javafx.event.ActionEvent actionEvent) {
         SelfAssessmentDTO selected = tblSelfAssessments.getSelectionModel().getSelectedItem();
+        
         if (selected == null) {
             showWarning("Debes seleccionar una autoevaluación para consultar.");
-            return;
+        } else {
+            showInfo("Consulta de autoevaluación del proyecto: " + selected.getProjectName());
         }
-        showInfo("Consulta de autoevaluación del proyecto: " + selected.getProjectName());
     }
 
     @FXML
     private void handleSearchByName(javafx.event.ActionEvent actionEvent) {
         String searchName = txtSearchName.getText().trim().toLowerCase();
+        
         if (searchName.isEmpty()) {
             showWarning("Ingresa un nombre de proyecto para buscar.");
-            return;
-        }
+        } else {
+            Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
+            if (currentIntern.isPresent()) {
+                try {
+                    int studentId = currentIntern.get().getId();
+                    List<SelfAssessmentDTO> assessments = selfAssessmentManager.getSelfAssessmentsByStudentId(studentId);
+                    List<SelfAssessmentDTO> filtered = new ArrayList<>();
 
-        Optional<InternDTO> currentIntern = UserSessionManager.getCurrentIntern();
-        if (currentIntern.isPresent()) {
-            try {
-                int studentId = currentIntern.get().getId();
-                List<SelfAssessmentDTO> assessments = selfAssessmentManager.getSelfAssessmentsByStudentId(studentId);
-                List<SelfAssessmentDTO> filtered = new ArrayList<>();
-
-                for (SelfAssessmentDTO assessment : assessments) {
-                    if (assessment.getProjectName() != null &&
-                        assessment.getProjectName().toLowerCase().contains(searchName)) {
-                        filtered.add(assessment);
+                    for (SelfAssessmentDTO assessment : assessments) {
+                        if (assessment.getProjectName() != null &&
+                            assessment.getProjectName().toLowerCase().contains(searchName)) {
+                            filtered.add(assessment);
+                        }
                     }
-                }
 
-                tblSelfAssessments.setItems(FXCollections.observableArrayList(filtered));
-            } catch (BusinessException exception) {
-                showError("Error al buscar autoevaluaciones: " + exception.getMessage());
+                    tblSelfAssessments.setItems(FXCollections.observableArrayList(filtered));
+                } catch (BusinessException exception) {
+                    showError("Error al buscar autoevaluaciones: " + exception.getMessage());
+                }
             }
         }
     }
@@ -188,7 +195,8 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
 
     @FXML
     private void goProjectsModule(javafx.event.ActionEvent actionEvent) {
-        WindowManagerController.changeView("ProjectsDashboard.fxml");
+        LOGGER.info("Acceso al módulo de proyectos.");
+        WindowManagerController.changeView("ProjectHomeDashboard.fxml");
     }
 
     @FXML
@@ -198,16 +206,20 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
 
     @FXML
     private void goReportsModule(javafx.event.ActionEvent actionEvent) {
+        LOGGER.info("Acceso al módulo de Reportes.");
         WindowManagerController.changeView("ReportHomeDashboard.fxml");
     }
 
     @FXML
     private void goSelfAssessmentsModule(javafx.event.ActionEvent actionEvent) {
+        LOGGER.info("Acceso al módulo de Autoevaluaciones.");
         WindowManagerController.changeView("SelfAssessmentHomeDashboard.fxml");
     }
 
     @FXML
     private void logOut(javafx.event.ActionEvent actionEvent) {
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado.");
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 

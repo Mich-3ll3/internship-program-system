@@ -6,12 +6,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +114,7 @@ public class InternHomeDashboardController implements Initializable {
     @FXML
     private void goProjectsModule(ActionEvent event) {
         LOGGER.info("Acceso al módulo de proyectos.");
+        WindowManagerController.changeView("ProjectHomeDashboard.fxml");
     }
 
     @FXML
@@ -123,13 +124,14 @@ public class InternHomeDashboardController implements Initializable {
     
     @FXML
     private void goReportsModule(ActionEvent event) {
+        LOGGER.info("Acceso al módulo de reportes.");
         WindowManagerController.changeView("ReportHomeDashboard.fxml");
     }
 
     @FXML
     private void logOut(ActionEvent event) {
         UserSessionManager.clearSession();
-        LOGGER.info("Cierre de sesión realizado correctamente.");
+        LOGGER.info("Cierre de sesión realizado.");
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 

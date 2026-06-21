@@ -131,12 +131,7 @@
                                         <Label fx:id="lblStudentDetails" style="-fx-text-fill: #E5E7EB; -fx-font-size: 12;" text="Cargando detalles..." />
                                     </children>
                                 </VBox>
-                                <VBox alignment="CENTER" maxHeight="45.0" prefWidth="120.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 8;">
-                                    <children>
-                                        <Label fx:id="lblPromedio" style="-fx-font-size: 25; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="-" />
-                                        <Label style="-fx-font-size: 12; -fx-text-fill: #6b7280;" text="Promedio" />
-                                    </children>
-                                </VBox>
+                                
                                 <VBox alignment="CENTER" maxHeight="45.0" prefWidth="120.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 8;">
                                     <children>
                                         <Label fx:id="lblDiasEntrega" style="-fx-font-size: 25; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="-" />
@@ -222,11 +217,11 @@
                                                 <StackPane prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #FEF3E7; -fx-background-radius: 9;">
                                                     <children><Label text="P" textFill="#e8a020" /></children>
                                                 </StackPane>
-                                                <Label text="PROYECTO" textFill="#1a2744">
+                                                <Label text="PROYECTOS" textFill="#1a2744">
                                                     <font><Font name="System Bold" size="14.0" /></font>
                                                 </Label>
                                                 <Region HBox.hgrow="ALWAYS" />
-                                                <Hyperlink fx:id="lnkVerProyecto" onAction="#abrirProyecto" style="-fx-font-size: 12;" text="Ver detalle ↗" textFill="#4a90e2" />
+                                                <Hyperlink fx:id="lnkVerProyecto" onAction="#goProjectsModule" style="-fx-font-size: 12;" text="Entrar ↗" textFill="#4a90e2" />
                                             </children>
                                         </HBox>
                                         <VBox spacing="4.0" style="-fx-background-color: #f5f6fa; -fx-background-radius: 9; -fx-padding: 10;">

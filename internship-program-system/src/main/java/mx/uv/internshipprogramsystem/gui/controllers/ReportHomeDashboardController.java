@@ -21,6 +21,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mx.uv.internshipprogramsystem.logic.dao.ReportDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ReportDTO;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
@@ -31,8 +34,9 @@ import mx.uv.internshipprogramsystem.logic.managers.ReportManager;
 import mx.uv.internshipprogramsystem.logic.managers.ReportExporterManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
-
 public class ReportHomeDashboardController implements Initializable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportHomeDashboardController.class);
 
     @FXML private Button btnRegisterMonthlyReport;
     
@@ -69,7 +73,6 @@ public class ReportHomeDashboardController implements Initializable {
         }
         
         validatePartialReportButton();
-
     }
 
     @FXML
@@ -86,7 +89,6 @@ public class ReportHomeDashboardController implements Initializable {
     private void generateReportPDF(ActionEvent event) {
         ReportDTO selectedReport = tblReports.getSelectionModel().getSelectedItem();
 
-        // Aplicada la regla de un solo retorno (sin return prematuros)
         if (selectedReport == null) {
             showWarning("Debes seleccionar un reporte de la lista antes de generar el PDF.");
         } else {
@@ -216,7 +218,8 @@ public class ReportHomeDashboardController implements Initializable {
 
     @FXML
     private void goProjectsModule(ActionEvent event) {
-        WindowManagerController.changeView("ProjectsDashboard.fxml");
+        LOGGER.info("Acceso al módulo de proyectos.");
+        WindowManagerController.changeView("ProjectHomeDashboard.fxml");
     }
 
     @FXML
@@ -226,17 +229,20 @@ public class ReportHomeDashboardController implements Initializable {
 
     @FXML
     private void goReportsModule(ActionEvent event) {
+        LOGGER.info("Acceso al módulo de reportes.");
         WindowManagerController.changeView("ReportHomeDashboard.fxml");
     }
 
     @FXML
     private void goSelfAssessmentsModule(ActionEvent event) {
+        LOGGER.info("Acceso al módulo de Autoevaluaciones.");
         WindowManagerController.changeView("SelfAssessmentHomeDashboard.fxml");
     }
 
     @FXML
     private void logOut(ActionEvent event) {
         UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado.");
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 

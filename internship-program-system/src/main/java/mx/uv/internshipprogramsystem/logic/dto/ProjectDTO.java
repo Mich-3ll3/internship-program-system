@@ -14,6 +14,10 @@ public class ProjectDTO {
     private Integer linkedOrganizationId;
     private Integer projectResponsibleId;
     private Boolean isActive;
+    
+    private String organizationName;
+    private String area;
+    private Integer availableSpots;
 
     public ProjectDTO() {
     }
@@ -179,6 +183,28 @@ public class ProjectDTO {
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
-    
-    
+
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public Integer getAvailableSpots() {
+        return availableSpots;
+    }
+
+    public void setAvailableSpots(Integer availableSpots) {
+        this.availableSpots = availableSpots;
+    }
 }
