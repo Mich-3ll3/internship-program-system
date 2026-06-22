@@ -99,6 +99,9 @@ public class ProjectUpdateDashboardController implements Initializable {
     @FXML
     private ListView<String> lstSchedules;
 
+    @FXML
+    private TextField txtActivityPlannedHours;
+
     private ProjectUpdateManager projectUpdateManager;
 
     private LinkedOrganizationDAO linkedOrganizationDAO;
@@ -620,8 +623,7 @@ public class ProjectUpdateDashboardController implements Initializable {
         return project;
     }
 
-    private ProjectActivityDTO buildActivityFromForm()
-            throws BusinessException {
+    private ProjectActivityDTO buildActivityFromForm() throws BusinessException {
         validateSelectedProject();
 
         validateRequiredTextField(
@@ -634,22 +636,14 @@ public class ProjectUpdateDashboardController implements Initializable {
             "El mes de la actividad es obligatorio."
         );
 
-        ProjectActivityDTO activity =
-            new ProjectActivityDTO(
-                getTrimmedText(
-                    txtActivityName
-                ),
-                getTrimmedText(
-                    txtActivityMonth
-                ),
-                Integer.valueOf(
-                    txtActivityStartWeek.getText().trim()
-                ),
-                Integer.valueOf(
-                    txtActivityEndWeek.getText().trim()
-                ),
-                selectedProject.getId()
-            );
+        ProjectActivityDTO activity = new ProjectActivityDTO(
+            getTrimmedText(txtActivityName),
+            getTrimmedText(txtActivityMonth),
+            Integer.valueOf(txtActivityStartWeek.getText().trim()),
+            Integer.valueOf(txtActivityEndWeek.getText().trim()),
+            Integer.valueOf(txtActivityPlannedHours.getText().trim()),
+            selectedProject.getId()
+        );
 
         return activity;
     }
@@ -739,9 +733,7 @@ public class ProjectUpdateDashboardController implements Initializable {
         return id;
     }
 
-    private String buildActivityDisplayText(
-            ProjectActivityDTO activity
-    ) {
+    private String buildActivityDisplayText(ProjectActivityDTO activity) {
         String displayText =
             activity.getName()
                 + " | "
@@ -749,7 +741,10 @@ public class ProjectUpdateDashboardController implements Initializable {
                 + " | Semana "
                 + activity.getStartWeek()
                 + " a "
-                + activity.getEndWeek();
+                + activity.getEndWeek()
+                + " | " 
+                + activity.getPlannedHours() 
+                + " hrs";
 
         return displayText;
     }
@@ -769,12 +764,11 @@ public class ProjectUpdateDashboardController implements Initializable {
 
     private void clearActivityFields() {
         txtActivityName.clear();
-
         txtActivityMonth.clear();
-
         txtActivityStartWeek.clear();
-
         txtActivityEndWeek.clear();
+        
+        txtActivityPlannedHours.clear(); 
     }
 
     private void clearScheduleFields() {

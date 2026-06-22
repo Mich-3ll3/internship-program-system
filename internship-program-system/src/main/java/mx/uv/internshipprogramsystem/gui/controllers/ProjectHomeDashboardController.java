@@ -23,15 +23,28 @@ import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.managers.ProjectManager;
+import mx.uv.internshipprogramsystem.logic.managers.ProjectApplicationManager;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
-import mx.uv.internshipprogramsystem.logic.dto.ApplicationDTO;
+import mx.uv.internshipprogramsystem.logic.dto.ProjectApplicationDTO;
 
 public class ProjectHomeDashboardController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectHomeDashboardController.class);
 
+    private static final int MAX_ACTIVE_APPLICATIONS = 3;
+    private static final int PRIORITY_ONE = 1;
+    private static final int PRIORITY_TWO = 2;
+    private static final int PRIORITY_THREE = 3;
+    private static final int TEST_INTERN_ID = 3;
+    private static final int FIRST_INDEX = 0;
+
+    private static final String CRITERIA_NAME = "Nombre del Proyecto";
+    private static final String CRITERIA_ORG = "Organización";
+    private static final String CRITERIA_SPOTS = "Cupos Disponibles";
+
     private final ProjectManager projectManager = new ProjectManager();
+    private final ProjectApplicationManager applicationManager = new ProjectApplicationManager();
 
     @FXML private Button btnHome;
     @FXML private Button btnProjects;
@@ -41,11 +54,11 @@ public class ProjectHomeDashboardController implements Initializable {
     @FXML private Button btnExit;
 
     @FXML private Button btnCancelApplication;
-    @FXML private TableView<ApplicationDTO> tblApplications;
-    @FXML private TableColumn<ApplicationDTO, String> colAppProject;
-    @FXML private TableColumn<ApplicationDTO, String> colAppOrganization;
-    @FXML private TableColumn<ApplicationDTO, String> colAppDate;
-    @FXML private TableColumn<ApplicationDTO, String> colAppStatus;
+    @FXML private TableView<ProjectApplicationDTO> tblApplications;
+    @FXML private TableColumn<ProjectApplicationDTO, String> colAppProject;
+    @FXML private TableColumn<ProjectApplicationDTO, String> colAppOrganization;
+    @FXML private TableColumn<ProjectApplicationDTO, String> colAppDate;
+    @FXML private TableColumn<ProjectApplicationDTO, String> colAppStatus;
 
     @FXML private TextField txtSearchProject;
     @FXML private ComboBox<String> cmbSearchCriteria; 
@@ -77,7 +90,7 @@ public class ProjectHomeDashboardController implements Initializable {
         colProjArea.setCellValueFactory(new PropertyValueFactory<>("area"));
         colProjSpots.setCellValueFactory(new PropertyValueFactory<>("availableSpots"));
 
-        cmbSearchCriteria.getItems().addAll("Nombre del Proyecto", "Organización", "Cupos Disponibles");
+        cmbSearchCriteria.getItems().addAll(CRITERIA_NAME, CRITERIA_ORG, CRITERIA_SPOTS);
         cmbSearchCriteria.getSelectionModel().selectFirst();
 
         ApplicationSelectionListener appListener = new ApplicationSelectionListener();
@@ -87,6 +100,7 @@ public class ProjectHomeDashboardController implements Initializable {
         tblAvailableProjects.getSelectionModel().selectedItemProperty().addListener(projListener);
 
         loadAvailableProjects();
+        loadActiveApplications(); 
     }
 
     private void loadAvailableProjects() {
@@ -100,15 +114,38 @@ public class ProjectHomeDashboardController implements Initializable {
         }
     }
 
+    private void loadActiveApplications() {
+        try {
+            List<ProjectApplicationDTO> activeApps = applicationManager.getActiveApplications(TEST_INTERN_ID);
+            tblApplications.setItems(FXCollections.observableArrayList(activeApps));
+            LOGGER.info("Se cargaron {} postulaciones activas en la tabla superior.", activeApps.size());
+        } catch (BusinessException ex) {
+            LOGGER.error("Error al cargar postulaciones activas: {}", ex.getMessage());
+            showError("No se pudieron cargar tus postulaciones activas.");
+        }
+    }
+
     @FXML
     private void cancelApplication(ActionEvent event) {
-        ApplicationDTO selectedApp = tblApplications.getSelectionModel().getSelectedItem();
+        ProjectApplicationDTO selectedApp = tblApplications.getSelectionModel().getSelectedItem();
         
         if (selectedApp != null) {
-            LOGGER.info("Cancelando postulación para el proyecto: {}", selectedApp.getProjectName());
-            showSuccess("La postulación ha sido cancelada correctamente.");
-            btnCancelApplication.setDisable(true);
-            tblApplications.getSelectionModel().clearSelection();
+            try {
+                LOGGER.info("Cancelando postulación para el proyecto ID: {}", selectedApp.getProjectId());
+                
+                boolean success = applicationManager.cancelApplication(TEST_INTERN_ID, selectedApp.getProjectId());
+                
+                if (success) {
+                    showSuccess("La postulación ha sido cancelada correctamente.");
+                    btnCancelApplication.setDisable(true);
+                    tblApplications.getSelectionModel().clearSelection();
+                    
+                    loadActiveApplications();
+                }
+            } catch (BusinessException ex) {
+                LOGGER.error("No se pudo cancelar la postulación: {}", ex.getMessage());
+                showError("Ocurrió un error al intentar cancelar la postulación. Intenta más tarde.");
+            }
         } else {
             showWarning("Debes seleccionar una postulación de la tabla para cancelarla.");
         }
@@ -156,21 +193,21 @@ public class ProjectHomeDashboardController implements Initializable {
     private boolean cumpleCriterio(ProjectDTO project, String criteria, String keyword) {
         boolean matches = false;
         switch (criteria) {
-            case "Nombre del Proyecto" -> {
+            case CRITERIA_NAME:
                 if (project.getName() != null) {
                     matches = project.getName().toLowerCase().contains(keyword);
                 }
-            }
-            case "Organización" -> {
+                break;
+            case CRITERIA_ORG:
                 if (project.getOrganizationName() != null) {
                     matches = project.getOrganizationName().toLowerCase().contains(keyword);
                 }
-            }
-            case "Cupos Disponibles" -> {
+                break;
+            case CRITERIA_SPOTS:
                 matches = String.valueOf(project.getAvailableSpots()).contains(keyword);
-            }
-            default -> {
-            }
+                break;
+            default:
+                break;
         }
         return matches;
     }
@@ -187,11 +224,44 @@ public class ProjectHomeDashboardController implements Initializable {
     private void viewProjectDetails(ActionEvent event) {
         ProjectDTO selectedProject = tblAvailableProjects.getSelectionModel().getSelectedItem();
         
-        if (selectedProject != null) {
-            LOGGER.info("Viendo detalles del proyecto: {}", selectedProject.getName());
-            showInfo("Abriendo detalles del proyecto...\n\n(Aquí puedes abrir una ventana modal o cambiar de vista con WindowManagerController)");
-        } else {
+        if (selectedProject == null) {
             showWarning("Debes seleccionar un proyecto para ver sus detalles.");
+            return;
+        }
+
+        try {
+            LOGGER.info("Abriendo detalles del proyecto: {}", selectedProject.getName());
+            
+            mx.uv.internshipprogramsystem.logic.interfaces.IProjectActivityDAO activityDAO = 
+                new mx.uv.internshipprogramsystem.logic.dao.ProjectActivityDAO();
+            
+            java.util.List<mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO> activities = 
+                activityDAO.findByProjectId(selectedProject.getId());
+            
+            selectedProject.setPlannedActivities(activities);
+            
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                getClass().getResource("/mx/uv/internshipprogramsystem/gui/fxml/ProjectDetailsIntern.fxml")
+            );
+            javafx.scene.Parent root = loader.load();
+
+            ProjectDetailsInternController controller = loader.getController();
+            
+            controller.initData(selectedProject);
+
+            javafx.stage.Stage detailsStage = new javafx.stage.Stage();
+            detailsStage.setTitle("Detalles del Proyecto");
+            detailsStage.setResizable(false);
+            detailsStage.setScene(new javafx.scene.Scene(root));
+            
+            detailsStage.show(); 
+
+        } catch (mx.uv.internshipprogramsystem.logic.exceptions.BusinessException ex) {
+            LOGGER.error("Error de base de datos al consultar las actividades.", ex);
+            showError("No se pudieron cargar las actividades de este proyecto. Verifique su conexión.");
+        } catch (java.io.IOException ex) {
+            LOGGER.error("Error al cargar la ventana de detalles del proyecto.", ex);
+            showError("Ocurrió un error al intentar abrir los detalles del proyecto.");
         }
     }
 
@@ -199,14 +269,87 @@ public class ProjectHomeDashboardController implements Initializable {
     private void applyForProject(ActionEvent event) {
         ProjectDTO selectedProject = tblAvailableProjects.getSelectionModel().getSelectedItem();
         
-        if (selectedProject != null) {
-            LOGGER.info("Iniciando solicitud para el proyecto: {}", selectedProject.getName());
-            showSuccess("Has solicitado el proyecto exitosamente. El académico revisará tu postulación.");
-            btnViewProjectDetails.setDisable(true);
-            btnApplyForProject.setDisable(true);
-            tblAvailableProjects.getSelectionModel().clearSelection();
-        } else {
+        if (selectedProject == null) {
             showWarning("Debes seleccionar un proyecto de la lista para solicitarlo.");
+            return;
+        }
+
+        List<ProjectApplicationDTO> currentApplications = tblApplications.getItems();
+
+        if (hasAlreadyApplied(currentApplications, selectedProject.getId())) {
+            showWarning("Ya estás postulado a este proyecto.\nSi deseas cambiar tu elección, primero debes cancelarlo en la tabla superior.");
+            return;
+        }
+
+        if (currentApplications.size() >= MAX_ACTIVE_APPLICATIONS) {
+            showWarning("Has alcanzado el límite máximo de " + MAX_ACTIVE_APPLICATIONS + 
+                        " postulaciones activas. Cancela una postulación existente para elegir otro proyecto.");
+            return;
+        }
+
+        List<Integer> availablePriorities = getAvailablePriorities(currentApplications);
+        
+        javafx.scene.control.ChoiceDialog<Integer> priorityDialog = new javafx.scene.control.ChoiceDialog<>(
+            availablePriorities.get(FIRST_INDEX), 
+            availablePriorities
+        );
+        priorityDialog.setTitle("Seleccionar Prioridad");
+        priorityDialog.setHeaderText("Postulación para: " + selectedProject.getName());
+        priorityDialog.setContentText("Asigna el nivel de prioridad para este proyecto:");
+
+        java.util.Optional<Integer> selectedPriorityOpt = priorityDialog.showAndWait();
+
+        if (selectedPriorityOpt.isPresent()) {
+            int chosenPriority = selectedPriorityOpt.get();
+            processApplication(selectedProject, chosenPriority);
+        }
+    }
+
+    private boolean hasAlreadyApplied(List<ProjectApplicationDTO> currentApplications, int projectId) {
+        boolean alreadyApplied = false;
+        for (ProjectApplicationDTO activeApp : currentApplications) {
+            if (activeApp.getProjectId().equals(projectId)) {
+                alreadyApplied = true;
+                break;
+            }
+        }
+        return alreadyApplied;
+    }
+
+    private List<Integer> getAvailablePriorities(List<ProjectApplicationDTO> currentApplications) {
+        List<Integer> availablePriorities = new ArrayList<>();
+        availablePriorities.add(PRIORITY_ONE);
+        availablePriorities.add(PRIORITY_TWO);
+        availablePriorities.add(PRIORITY_THREE);
+        
+        for (ProjectApplicationDTO activeApp : currentApplications) {
+            availablePriorities.remove(activeApp.getPriority());
+        }
+        return availablePriorities;
+    }
+
+    private void processApplication(ProjectDTO selectedProject, int chosenPriority) {
+        try {
+            LOGGER.info("Iniciando solicitud para el proyecto ID: {} con prioridad: {}", 
+                    selectedProject.getId(), chosenPriority);
+            
+            boolean success = applicationManager.registerApplication(
+                TEST_INTERN_ID, 
+                selectedProject.getId(), 
+                chosenPriority
+            );
+            
+            if (success) {
+                showSuccess("Has solicitado el proyecto exitosamente. Tu prioridad asignada es: " + chosenPriority);
+                btnViewProjectDetails.setDisable(true);
+                btnApplyForProject.setDisable(true);
+                tblAvailableProjects.getSelectionModel().clearSelection();
+                
+                loadActiveApplications(); 
+            }
+        } catch (BusinessException ex) {
+            LOGGER.error("No se pudo completar la postulación: {}", ex.getMessage());
+            showWarning(ex.getMessage()); 
         }
     }
 
@@ -236,9 +379,9 @@ public class ProjectHomeDashboardController implements Initializable {
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 
-    public class ApplicationSelectionListener implements ChangeListener<ApplicationDTO> {
+    public class ApplicationSelectionListener implements ChangeListener<ProjectApplicationDTO> {
         @Override
-        public void changed(ObservableValue<? extends ApplicationDTO> observable, ApplicationDTO oldValue, ApplicationDTO newValue) {
+        public void changed(ObservableValue<? extends ProjectApplicationDTO> observable, ProjectApplicationDTO oldValue, ProjectApplicationDTO newValue) {
             if (newValue != null) {
                 btnCancelApplication.setDisable(false);
             } else {
@@ -259,7 +402,7 @@ public class ProjectHomeDashboardController implements Initializable {
             }
         }
     }
-
+    
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");

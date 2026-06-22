@@ -89,6 +89,10 @@ public class ProjectRegisterDashboardController implements Initializable {
     @FXML
     private TextField txtActivityEndWeek;
 
+    // --- NUEVO CAMPO AGREGADO ---
+    @FXML
+    private TextField txtActivityPlannedHours;
+
     @FXML
     private ListView<String> lstActivities;
 
@@ -262,7 +266,7 @@ public class ProjectRegisterDashboardController implements Initializable {
 
             FormAlertSupport.showError(
                 "Error de formato",
-                "Las semanas de la actividad deben ser números válidos."
+                "Las semanas y horas de la actividad deben ser números válidos."
             );
         } catch (BusinessException businessException) {
             LOGGER.warn(
@@ -595,6 +599,11 @@ public class ProjectRegisterDashboardController implements Initializable {
                 txtActivityEndWeek.getText().trim()
             );
 
+        Integer plannedHours =
+            Integer.valueOf(
+                txtActivityPlannedHours.getText().trim()
+            );
+
         ProjectActivityDTO activity =
             new ProjectActivityDTO(
                 getTrimmedText(
@@ -605,6 +614,7 @@ public class ProjectRegisterDashboardController implements Initializable {
                 ),
                 startWeek,
                 endWeek,
+                plannedHours,
                 0
             );
 
@@ -710,7 +720,10 @@ public class ProjectRegisterDashboardController implements Initializable {
                 + " | Semana "
                 + activity.getStartWeek()
                 + " a "
-                + activity.getEndWeek();
+                + activity.getEndWeek()
+                + " | "
+                + activity.getPlannedHours()
+                + " hrs";
 
         return displayText;
     }
@@ -736,6 +749,8 @@ public class ProjectRegisterDashboardController implements Initializable {
         txtActivityStartWeek.clear();
 
         txtActivityEndWeek.clear();
+        
+        txtActivityPlannedHours.clear();
     }
 
     private void clearScheduleFields() {

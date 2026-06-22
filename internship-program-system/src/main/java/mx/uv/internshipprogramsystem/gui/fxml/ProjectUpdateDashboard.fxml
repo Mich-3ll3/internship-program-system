@@ -279,6 +279,10 @@
                                        promptText="Semana fin"
                                        prefWidth="120.0" />
 
+                            <TextField fx:id="txtActivityPlannedHours"
+                                       promptText="Horas planeadas"
+                                       prefWidth="120.0" />
+
                             <Button fx:id="btnAddActivity"
                                     text="+"
                                     onAction="#handleBtnAddActivity"

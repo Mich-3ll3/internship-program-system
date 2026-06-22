@@ -26,12 +26,12 @@ public class ProjectActivityDAO implements IProjectActivityDAO {
 
     private static final String INSERT_ACTIVITY_QUERY =
         "INSERT INTO ACTIVIDADES_PLAN "
-        + "(nombre, mes, semana_inicio, semana_fin, proyecto_id) "
-        + "VALUES (?, ?, ?, ?, ?)";
+        + "(nombre, mes, semana_inicio, semana_fin, horas_planeadas, proyecto_id) "
+        + "VALUES (?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_BY_PROJECT_QUERY =
         "SELECT id, nombre, mes, semana_inicio, "
-        + "semana_fin, proyecto_id "
+        + "semana_fin, horas_planeadas, proyecto_id "
         + "FROM ACTIVIDADES_PLAN "
         + "WHERE proyecto_id = ?";
 
@@ -84,6 +84,11 @@ public class ProjectActivityDAO implements IProjectActivityDAO {
 
             statement.setInt(
                 5,
+                activity.getPlannedHours()
+            );
+
+            statement.setInt(
+                6,
                 activity.getProjectId()
             );
 
@@ -230,6 +235,7 @@ public class ProjectActivityDAO implements IProjectActivityDAO {
                 resultSet.getString("mes"),
                 resultSet.getInt("semana_inicio"),
                 resultSet.getInt("semana_fin"),
+                resultSet.getInt("horas_planeadas"),
                 resultSet.getInt("proyecto_id")
             );
 
