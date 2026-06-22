@@ -162,12 +162,12 @@
                                     </Label>
                                     <TableView fx:id="tblActivities" prefHeight="200.0" style="-fx-background-color: transparent;">
                                         <columns>
-                                            <TableColumn fx:id="colActivity" prefWidth="350.0" text="Actividades" />
-                                            <TableColumn fx:id="colType" prefWidth="100.0" text="Tiempo" />
-                                            <TableColumn fx:id="colWeek1" prefWidth="80.0" text="S1" />
-                                            <TableColumn fx:id="colWeek2" prefWidth="80.0" text="S2" />
-                                            <TableColumn fx:id="colWeek3" prefWidth="80.0" text="S3" />
-                                            <TableColumn fx:id="colWeek4" prefWidth="80.0" text="S4" />
+                                            <TableColumn fx:id="colActivity" prefWidth="450.0" text="Actividades" />
+                                            <TableColumn fx:id="colType" prefWidth="100.0" minWidth="100.0" maxWidth="100.0" text="Tiempo" />
+                                            <TableColumn fx:id="colWeek1" prefWidth="80.0" minWidth="80.0" maxWidth="80.0" text="S1" />
+                                            <TableColumn fx:id="colWeek2" prefWidth="80.0" minWidth="80.0" maxWidth="80.0" text="S2" />
+                                            <TableColumn fx:id="colWeek3" prefWidth="80.0" minWidth="80.0" maxWidth="80.0" text="S3" />
+                                            <TableColumn fx:id="colWeek4" prefWidth="80.0" minWidth="80.0" maxWidth="80.0" text="S4" />
                                         </columns>
                                     </TableView>
                                 </children>

@@ -33,7 +33,8 @@ public class ProjectApplicationDAO implements IProjectApplicationDAO {
         "FROM SOLICITUD_PROYECTO sp " +
         "INNER JOIN PROYECTO p ON sp.proyecto_id = p.id " +
         "INNER JOIN ORGANIZACION_VINCULADA o ON p.organizacion_id = o.id " +
-        "WHERE sp.estudiante_id = ? AND sp.estado != 'CANCELADA'";
+        "WHERE sp.estudiante_id = ? AND sp.estado != 'CANCELADA' " +
+        "ORDER BY sp.prioridad ASC"; // <-- El ordenamiento agregado aquí
 
     private static final String DELETE_APPLICATION_QUERY = 
         "UPDATE SOLICITUD_PROYECTO SET estado = 'CANCELADA' WHERE estudiante_id = ? AND proyecto_id = ?";

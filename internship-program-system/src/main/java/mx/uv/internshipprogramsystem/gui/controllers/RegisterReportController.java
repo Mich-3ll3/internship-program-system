@@ -123,6 +123,8 @@ public class RegisterReportController implements Initializable {
         LengthFilter observationsLengthFilter = new LengthFilter(240);
         TextFormatter<String> observationsFormatter = new TextFormatter<>(observationsLengthFilter);
         txtObservations.setTextFormatter(observationsFormatter);
+        
+        tblActivities.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
 
     private void bindContextToInterface(MonthlyReportContextDTO context) {

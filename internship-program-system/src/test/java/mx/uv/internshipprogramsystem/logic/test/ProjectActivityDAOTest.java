@@ -22,6 +22,7 @@ import org.mockito.MockedStatic;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO;
 
 class ProjectActivityDAOTest {
+
     @Test
     void createWithConnectionWhenActivityIsValidReturnsTrue() throws Exception {
 
@@ -29,17 +30,17 @@ class ProjectActivityDAOTest {
         PreparedStatement statement = mock(PreparedStatement.class);
         ProjectActivityDAO dao = new ProjectActivityDAO();
         ProjectActivityDTO activity =
-            new ProjectActivityDTO(1, "Analisis", "Junio", 1, 2, 7);
+            new ProjectActivityDTO(1, "Analisis", "Junio", 1, 2, 10, 7);
+            
         mockPreparedStatement(connection, statement);
         when(statement.executeUpdate()).thenReturn(1);
 
-
         boolean wasCreated = dao.create(activity, connection);
-
 
         assertTrue(wasCreated);
         verify(statement).setString(1, "Analisis");
-        verify(statement).setInt(5, 7);
+        verify(statement).setInt(5, 10);
+        verify(statement).setInt(6, 7);
     }
 
     @Test
@@ -49,12 +50,14 @@ class ProjectActivityDAOTest {
         PreparedStatement statement = mock(PreparedStatement.class);
         ProjectActivityDAO dao = new ProjectActivityDAO();
         mockPreparedStatement(connection, statement);
+        
         when(statement.executeQuery()).thenReturn(resultSet(row(
             "id", 1,
             "nombre", "Analisis",
             "mes", "Junio",
             "semana_inicio", 1,
             "semana_fin", 2,
+            "horas_planeadas", 10, 
             "proyecto_id", 7
         )));
 
@@ -62,9 +65,9 @@ class ProjectActivityDAOTest {
 
             List<ProjectActivityDTO> activities = dao.findByProjectId(7);
 
-
             assertEquals(1, activities.size());
             assertEquals("Analisis", activities.get(0).getName());
+            assertEquals(10, activities.get(0).getPlannedHours()); // Opcional: validar horas
         }
     }
 
@@ -78,9 +81,7 @@ class ProjectActivityDAOTest {
         mockPreparedStatement(connection, statement);
         when(statement.executeUpdate()).thenReturn(0);
 
-
         boolean wasDeleted = dao.deleteByProjectId(7, connection);
-
 
         assertTrue(wasDeleted);
         verify(statement).setInt(1, 7);
@@ -93,8 +94,10 @@ class ProjectActivityDAOTest {
         Connection connection = mock(Connection.class);
         PreparedStatement statement = mock(PreparedStatement.class);
         ProjectActivityDAO dao = new ProjectActivityDAO();
+        
         ProjectActivityDTO activity =
-            new ProjectActivityDTO(1, "Analisis", "Junio", 1, 2, 7);
+            new ProjectActivityDTO(1, "Analisis", "Junio", 1, 2, 10, 7);
+            
         mockPreparedStatement(connection, statement);
         when(statement.executeUpdate()).thenReturn(0);
 

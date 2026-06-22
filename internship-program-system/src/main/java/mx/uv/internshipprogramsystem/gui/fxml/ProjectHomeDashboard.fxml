@@ -88,6 +88,22 @@
                                     </children>
                                 </HBox>
                                 <Separator />
+                                
+                                <Label text="Nota: Los proyectos están ordenados de arriba hacia abajo dependiendo de la prioridad que les asignaste."
+                                       style="-fx-font-size: 13px; -fx-font-style: italic; -fx-text-fill: #64748b;"
+                                       wrapText="true">
+                                    <VBox.margin>
+                                        <Insets top="-5.0"/>
+                                    </VBox.margin>
+                                </Label>
+                                <Label text="Un Profesor revisará tu postulación y se asignará un Proyecto de los que seleccionaste basándose en tus documentos iniciales."
+                                       style="-fx-font-size: 13px; -fx-font-style: italic; -fx-text-fill: #64748b;"
+                                       wrapText="true">
+                                    <VBox.margin>
+                                        <Insets bottom="5.0"/>
+                                    </VBox.margin>
+                                </Label>
+
                                 <TableView fx:id="tblApplications" prefHeight="120.0" style="-fx-background-color: transparent;">
                                     <columns>
                                         <TableColumn fx:id="colAppProject" prefWidth="350.0" text="Proyecto Solicitado" />
