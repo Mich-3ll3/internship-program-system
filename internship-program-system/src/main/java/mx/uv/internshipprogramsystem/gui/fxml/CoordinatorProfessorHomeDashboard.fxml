@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
 
 <BorderPane
     fx:controller="mx.uv.internshipprogramsystem.gui.controllers.CoordinatorProfessorHomeDashboardController"
@@ -23,123 +24,6 @@
     style="-fx-background-color: #f5f6fa;"
     xmlns="http://javafx.com/javafx/26"
     xmlns:fx="http://javafx.com/fxml/1">
-
-    <left>
-        <VBox
-            alignment="TOP_CENTER"
-            prefWidth="70.0"
-            spacing="20.0"
-            style="-fx-background-color:#4a90e2;"
-            BorderPane.alignment="CENTER">
-
-            <children>
-                <StackPane
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
-
-                    <VBox.margin>
-                        <Insets top="20.0" />
-                    </VBox.margin>
-
-                    <children>
-                        <Label text="PC" textFill="WHITE">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                        </Label>
-                    </children>
-                </StackPane>
-
-                <Button
-                    fx:id="btnHome"
-                    mnemonicParsing="false"
-                    onAction="#goHome"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
-                    text="⌂"
-                    textFill="WHITE" />
-
-                <Button
-                    fx:id="btnEducationalExperience"
-                    mnemonicParsing="false"
-                    onAction="#goEducationalExperienceModule"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="📚"
-                    textFill="WHITE" />
-
-                <Button
-                    fx:id="btnIntern"
-                    mnemonicParsing="false"
-                    onAction="#goInternModule"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="👥"
-                    textFill="WHITE" />
-
-                <Button
-                    fx:id="btnLinkedOrganization"
-                    mnemonicParsing="false"
-                    onAction="#goLinkedOrganizationModule"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="🏢"
-                    textFill="WHITE" />
-
-                <Button
-                    fx:id="btnProjects"
-                    mnemonicParsing="false"
-                    onAction="#goProjectsModule"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="🛠️"
-                    textFill="WHITE" />
-
-                <Button
-                    fx:id="btnDocuments"
-                    mnemonicParsing="false"
-                    onAction="#goDocumentsModule"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="📑"
-                    textFill="WHITE" />
-
-                <Button
-                    fx:id="btnReports"
-                    mnemonicParsing="false"
-                    onAction="#goReportsModule"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="📋"
-                    textFill="WHITE" />
-
-                <Region VBox.vgrow="ALWAYS" />
-
-                <Button
-                    fx:id="btnExit"
-                    mnemonicParsing="false"
-                    onAction="#logOut"
-                    prefHeight="40.0"
-                    prefWidth="40.0"
-                    style="-fx-background-color: transparent;"
-                    text="🚪"
-                    textFill="WHITE">
-
-                    <VBox.margin>
-                        <Insets bottom="20.0" />
-                    </VBox.margin>
-                </Button>
-            </children>
-        </VBox>
-    </left>
 
     <center>
         <ScrollPane
@@ -158,43 +42,6 @@
                     </padding>
 
                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <children>
-                                <VBox>
-                                    <children>
-                                        <Label
-                                            text="Panel de Coordinación"
-                                            textFill="#1a2744">
-
-                                            <font>
-                                                <Font name="System Bold" size="22.0" />
-                                            </font>
-                                        </Label>
-
-                                        <Label
-                                            fx:id="lblCurrentDate"
-                                            text="Gestión general del programa de prácticas profesionales"
-                                            textFill="#6b7280" />
-                                    </children>
-                                </VBox>
-
-                                <Region HBox.hgrow="ALWAYS" />
-
-                                <StackPane
-                                    prefHeight="35.0"
-                                    prefWidth="35.0"
-                                    style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
-
-                                    <children>
-                                        <Label text="PC" textFill="WHITE">
-                                            <font>
-                                                <Font name="System Bold" size="11.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </StackPane>
-                            </children>
-                        </HBox>
 
                         <HBox
                             alignment="CENTER_LEFT"
@@ -491,7 +338,7 @@
                                 </VBox>
 
                                 <VBox
-                                    fx:id="pneTrackingCard"
+                                    fx:id="pneActivityCard"
                                     spacing="10.0"
                                     style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;"
                                     GridPane.columnIndex="2"
@@ -502,21 +349,21 @@
                                     </padding>
 
                                     <children>
-                                        <Label text="📈" style="-fx-font-size: 24;" />
-                                        <Label text="Seguimiento" textFill="#1a2744">
+                                        <Label text="📋" style="-fx-font-size: 24;" />
+                                        <Label text="Actividades" textFill="#1a2744">
                                             <font>
                                                 <Font name="System Bold" size="15.0" />
                                             </font>
                                         </Label>
                                         <Label
-                                            text="Visualice el avance general de alumnos y proyectos."
+                                            text="Registre y administre las actividades del plan de trabajo por proyecto."
                                             textFill="#6b7280"
                                             wrapText="true" />
                                         <Button
-                                            fx:id="btnOpenTracking"
+                                            fx:id="btnOpenActivities"
                                             maxWidth="Infinity"
                                             mnemonicParsing="false"
-                                            onAction="#goTrackingModule"
+                                            onAction="#goActivityModule"
                                             style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;"
                                             text="Abrir módulo" />
                                     </children>

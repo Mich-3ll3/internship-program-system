@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.DocumentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IDocumentDAO;
@@ -25,7 +25,7 @@ public class DocumentDAO implements IDocumentDAO {
         String insertDocumentQuery =
             "INSERT INTO DOCUMENTO (nombre, tipo, ruta) VALUES (?, ?, ?)";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertDocumentStatement = connection.prepareStatement(
                  insertDocumentQuery,
                  Statement.RETURN_GENERATED_KEYS
@@ -61,7 +61,7 @@ public class DocumentDAO implements IDocumentDAO {
         InputValidator.validatePositive(id, "El id del documento debe ser positivo.");
         String selectDocumentById = "SELECT id, nombre, tipo, ruta FROM DOCUMENTO WHERE id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statementSelectDocument =
                  connection.prepareStatement(selectDocumentById)) {
             statementSelectDocument.setInt(1, id);
@@ -89,7 +89,7 @@ public class DocumentDAO implements IDocumentDAO {
         InputValidator.validatePositive(id, "El id del documento debe ser positivo.");
         String deleteDocumentById = "DELETE FROM DOCUMENTO WHERE id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement deleteDocumentStatement =
                  connection.prepareStatement(deleteDocumentById)) {
             deleteDocumentStatement.setInt(1, id);

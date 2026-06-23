@@ -42,8 +42,7 @@ class ProjectDAOTest {
 
             assertTrue(wasCreated);
             verify(statement).setString(1, "Sistema de Practicas");
-            verify(statement).setInt(9, 480);
-            verify(statement).setBoolean(12, true);
+            verify(statement).setBoolean(11, true);
         }
     }
 
@@ -117,7 +116,7 @@ class ProjectDAOTest {
 
 
         assertTrue(wasUpdated);
-        verify(statement).setInt(13, 7);
+        verify(statement).setInt(12, 7);
     }
 
     @Test
@@ -175,7 +174,6 @@ class ProjectDAOTest {
             "Metodologia",
             "Recursos",
             "Responsabilidades",
-            480,
             5,
             3,
             true
@@ -193,7 +191,6 @@ class ProjectDAOTest {
             "metodologia", "Metodologia",
             "recursos", "Recursos",
             "responsabilidades", "Responsabilidades",
-            "duracion", 480,
             "organizacion_id", 5,
             "responsable_id", 3,
             "activo", true

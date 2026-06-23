@@ -156,6 +156,9 @@ class ProfessorDAOTest {
         professor.setId(30);
         professor.setStaffNumber("123456");
         professor.setIsCoordinator(true);
+        professor.setInstitutionalEmail("maria@uv.mx");
+        professor.setName("Maria");
+        professor.setFirstSurname("Perez");
 
         return professor;
     }

@@ -17,6 +17,7 @@ import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
 import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers
         .ProjectResponsibleManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
@@ -92,6 +93,15 @@ public class ProjectResponsibleRegisterDashboardController
             showErrorAlert(
                 businessException.getMessage()
             );
+        } catch (DataAccessException dataAccessException) {
+            LOGGER.error(
+                "Error de conexion al registrar el responsable de proyecto",
+                dataAccessException
+            );
+
+            showErrorAlert(
+                "No se pudo conectar con la base de datos para registrar al responsable. Por favor intente mas tarde."
+            );
         }
     }
 
@@ -145,6 +155,15 @@ public class ProjectResponsibleRegisterDashboardController
 
             showErrorAlert(
                 "No se pudieron cargar las organizaciones vinculadas."
+            );
+        } catch (DataAccessException dataAccessException) {
+            LOGGER.error(
+                "Error de conexion al cargar organizaciones vinculadas",
+                dataAccessException
+            );
+
+            showErrorAlert(
+                "No se pudo conectar con la base de datos para cargar las organizaciones. Por favor intente mas tarde."
             );
         }
     }

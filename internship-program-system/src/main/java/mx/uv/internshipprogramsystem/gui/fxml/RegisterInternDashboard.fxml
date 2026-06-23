@@ -106,10 +106,10 @@
                     <Label text="Apellido materno" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="4" />
                     <TextField fx:id="txtSecondSurname" promptText="Apellido materno" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                     <Label text="Matrícula" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                    <TextField fx:id="txtEnrollment" promptText="zS12345678" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                    <TextField fx:id="txtEnrollment" promptText="S12345678" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                 </GridPane>
 
-                <Label text="Validaciones: correo institucional, contraseña segura, campos obligatorios y matrícula con formato zS + 8 dígitos."
+                <Label text="Validaciones: campos obligatorios, matricula con formato S + 8 digitos y correo generado automaticamente con z."
                        textFill="#6b7280"
                        wrapText="true" />
 

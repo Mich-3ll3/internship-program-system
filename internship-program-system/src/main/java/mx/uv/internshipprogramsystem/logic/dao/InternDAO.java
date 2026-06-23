@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +14,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
+import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternStatus;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IInternDAO;
@@ -33,28 +35,56 @@ public class InternDAO implements IInternDAO {
         + "WHERE matricula = ?";
 
     private static final String SELECT_INTERN_BY_ENROLLMENT_QUERY =
-        "SELECT e.matricula, ee.NRC, u.id, u.correo_institucional, "
+        "SELECT e.matricula, "
+        + "(SELECT ee.NRC FROM EXPERIENCIA_ESTUDIANTES ee "
+        + "WHERE ee.estudiante_id = u.id AND ee.estado = 'ACTIVA' "
+        + "ORDER BY ee.fecha_asignacion DESC LIMIT 1) AS NRC, "
+        + "(SELECT ee.estado FROM EXPERIENCIA_ESTUDIANTES ee "
+        + "WHERE ee.estudiante_id = u.id AND ee.estado = 'ACTIVA' "
+        + "ORDER BY ee.fecha_asignacion DESC LIMIT 1) AS estado_experiencia, "
+        + "(SELECT GROUP_CONCAT("
+        + "CONCAT(eeh.NRC, ' - ', "
+        + "COALESCE(exp.periodo_escolar, 'Sin periodo'), "
+        + "' - Seccion ', COALESCE(exp.seccion, 'Sin seccion'), "
+        + "' - ', eeh.estado) "
+        + "ORDER BY exp.periodo_escolar DESC SEPARATOR '\n') "
+        + "FROM EXPERIENCIA_ESTUDIANTES eeh "
+        + "LEFT JOIN EXPERIENCIA_EDUCATIVA exp ON eeh.NRC = exp.NRC "
+        + "WHERE eeh.estudiante_id = u.id) AS historial_experiencias, "
+        + "u.id, u.correo_institucional, "
         + "u.nombre, u.apellido_paterno, u.apellido_materno, u.activo "
         + "FROM ESTUDIANTE e "
         + "JOIN USUARIO u ON e.usuario_id = u.id "
-        + "LEFT JOIN EXPERIENCIA_ESTUDIANTES ee "
-        + "ON e.usuario_id = ee.estudiante_id "
         + "WHERE e.matricula = ?";
 
     private static final String SELECT_ALL_INTERNS_QUERY =
-        "SELECT e.matricula, ee.NRC, u.id, u.correo_institucional, "
+        "SELECT e.matricula, "
+        + "(SELECT ee.NRC FROM EXPERIENCIA_ESTUDIANTES ee "
+        + "WHERE ee.estudiante_id = u.id AND ee.estado = 'ACTIVA' "
+        + "ORDER BY ee.fecha_asignacion DESC LIMIT 1) AS NRC, "
+        + "(SELECT ee.estado FROM EXPERIENCIA_ESTUDIANTES ee "
+        + "WHERE ee.estudiante_id = u.id AND ee.estado = 'ACTIVA' "
+        + "ORDER BY ee.fecha_asignacion DESC LIMIT 1) AS estado_experiencia, "
+        + "(SELECT GROUP_CONCAT("
+        + "CONCAT(eeh.NRC, ' - ', "
+        + "COALESCE(exp.periodo_escolar, 'Sin periodo'), "
+        + "' - Seccion ', COALESCE(exp.seccion, 'Sin seccion'), "
+        + "' - ', eeh.estado) "
+        + "ORDER BY exp.periodo_escolar DESC SEPARATOR '\n') "
+        + "FROM EXPERIENCIA_ESTUDIANTES eeh "
+        + "LEFT JOIN EXPERIENCIA_EDUCATIVA exp ON eeh.NRC = exp.NRC "
+        + "WHERE eeh.estudiante_id = u.id) AS historial_experiencias, "
+        + "u.id, u.correo_institucional, "
         + "u.nombre, u.apellido_paterno, u.apellido_materno, u.activo "
         + "FROM ESTUDIANTE e "
-        + "JOIN USUARIO u ON e.usuario_id = u.id "
-        + "LEFT JOIN EXPERIENCIA_ESTUDIANTES ee "
-        + "ON e.usuario_id = ee.estudiante_id";
+        + "JOIN USUARIO u ON e.usuario_id = u.id";
 
     private static final String SELECT_COUNT_INTERNS_QUERY =
         "SELECT COUNT(*) AS total FROM ESTUDIANTE";
 
     @Override
 
-    public boolean create(InternDTO intern, Connection connection) throws BusinessException {
+    public boolean create(InternDTO intern, Connection connection) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(connection,"La conexión no puede ser nula.");
         InternValidator internValidator = new InternValidator();
         internValidator.validateInternForCreation(intern);
@@ -82,7 +112,7 @@ public class InternDAO implements IInternDAO {
     }
 
     @Override
-    public boolean update(InternDTO intern) throws BusinessException {
+    public boolean update(InternDTO intern) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             intern,
             "InternDTO no puede ser nulo."
@@ -91,7 +121,7 @@ public class InternDAO implements IInternDAO {
 
         boolean wasUpdated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement updateInternStatement =
                  connection.prepareStatement(UPDATE_INTERN_QUERY)) {
             updateInternStatement.setInt(1, intern.getId());
@@ -141,7 +171,7 @@ public class InternDAO implements IInternDAO {
     @Override
     public Optional<InternDTO> findByEnrollmentNumber(
             String enrollmentNumber
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             enrollmentNumber,
             "La matrícula no puede estar vacía."
@@ -149,7 +179,7 @@ public class InternDAO implements IInternDAO {
 
         Optional<InternDTO> intern;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectInternStatement =
                  connection.prepareStatement(
                      SELECT_INTERN_BY_ENROLLMENT_QUERY
@@ -187,10 +217,10 @@ public class InternDAO implements IInternDAO {
     }
 
     @Override
-    public List<InternDTO> findAll() throws BusinessException {
+    public List<InternDTO> findAll() throws BusinessException, DataAccessException {
         List<InternDTO> interns = new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectAllInternsStatement =
                  connection.prepareStatement(SELECT_ALL_INTERNS_QUERY);
              ResultSet resultSet =
@@ -224,10 +254,10 @@ public class InternDAO implements IInternDAO {
     }
 
     @Override
-    public int countAll() throws BusinessException {
+    public int countAll() throws BusinessException, DataAccessException {
         int totalInterns = 0;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectCountInternsStatement =
                  connection.prepareStatement(SELECT_COUNT_INTERNS_QUERY);
              ResultSet resultSet =
@@ -260,7 +290,7 @@ public class InternDAO implements IInternDAO {
         return totalInterns;
     }
 
-    private void validateIntern(InternDTO intern) throws BusinessException {
+    private void validateIntern(InternDTO intern) throws BusinessException, DataAccessException {
         InternValidator validator = new InternValidator();
 
         validator.validateEnrollmentNumber(
@@ -294,7 +324,32 @@ public class InternDAO implements IInternDAO {
         intern.setSecondSurname(resultSet.getString("apellido_materno"));
         intern.setIsActive(resultSet.getBoolean("activo"));
         intern.setNrc(resultSet.getString("NRC"));
+        intern.setEducationalExperienceStatus(
+            buildEducationalExperienceStatus(
+                resultSet.getString("estado_experiencia")
+            )
+        );
+        intern.setEducationalExperienceHistory(
+            resultSet.getString("historial_experiencias")
+        );
 
         return intern;
+    }
+
+    private EducationalExperienceInternStatus
+            buildEducationalExperienceStatus(
+                    String status
+    ) {
+        EducationalExperienceInternStatus educationalExperienceStatus =
+            null;
+
+        if (status != null) {
+            educationalExperienceStatus =
+                EducationalExperienceInternStatus.valueOf(
+                    status
+                );
+        }
+
+        return educationalExperienceStatus;
     }
 }

@@ -128,7 +128,7 @@
                     <Label text="Registrar proyecto"
                            style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
 
-                    <Label text="Captura la información del proyecto, actividades del plan y horario estimado."
+                    <Label text="Captura la información del proyecto."
                            style="-fx-font-size: 14px; -fx-text-fill: #64748b;" />
                 </VBox>
 
@@ -167,25 +167,14 @@
                                        style="-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-padding: 10;" />
                         </VBox>
 
-                        <HBox spacing="16.0">
-                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                                <Label text="Metodología"
-                                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;" />
+                        <VBox spacing="8.0">
+                            <Label text="Metodología"
+                                   style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;" />
 
-                                <TextField fx:id="txtMethodology"
-                                           promptText="Ej. Scrum"
-                                           style="-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-padding: 10;" />
-                            </VBox>
-
-                            <VBox spacing="8.0" HBox.hgrow="ALWAYS">
-                                <Label text="Duración en horas"
-                                       style="-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #334155;" />
-
-                                <TextField fx:id="txtDuration"
-                                           promptText="Ej. 420"
-                                           style="-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-padding: 10;" />
-                            </VBox>
-                        </HBox>
+                            <TextField fx:id="txtMethodology"
+                                       promptText="Ej. Scrum"
+                                       style="-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-padding: 10;" />
+                        </VBox>
 
                         <Label text="Asociación del proyecto"
                                style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
@@ -257,75 +246,9 @@
                                    promptText="Responsabilidades"
                                    style="-fx-background-color: #f8fafc; -fx-background-radius: 10; -fx-border-color: #cbd5e1; -fx-border-radius: 10; -fx-padding: 10;" />
 
-                        <Label text="Actividades del plan de trabajo"
-                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
 
-                        <Separator />
 
-                        <HBox spacing="12.0">
-                            <TextField fx:id="txtActivityName"
-                                       promptText="Actividad"
-                                       HBox.hgrow="ALWAYS" />
 
-                            <TextField fx:id="txtActivityMonth"
-                                       promptText="Mes"
-                                       HBox.hgrow="ALWAYS" />
-
-                            <TextField fx:id="txtActivityStartWeek"
-                                       promptText="Semana inicio"
-                                       prefWidth="120.0" />
-
-                            <TextField fx:id="txtActivityEndWeek"
-                                       promptText="Semana fin"
-                                       prefWidth="120.0" />
-
-                            <Button fx:id="btnAddActivity"
-                                    text="+"
-                                    onAction="#handleBtnAddActivity"
-                                    style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;" />
-                        </HBox>
-
-                        <ListView fx:id="lstActivities"
-                                  prefHeight="120.0"
-                                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1;" />
-
-                        <Button fx:id="btnRemoveActivity"
-                                text="Eliminar actividad seleccionada"
-                                onAction="#handleBtnRemoveActivity"
-                                style="-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-font-weight: bold;" />
-
-                        <Label text="Horario del proyecto"
-                               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1e293b;" />
-
-                        <Separator />
-
-                        <HBox spacing="12.0">
-                            <ComboBox fx:id="cmbScheduleDay"
-                                      promptText="Día"
-                                      prefWidth="180.0" />
-
-                            <TextField fx:id="txtEntryTime"
-                                       promptText="Entrada HH:mm"
-                                       HBox.hgrow="ALWAYS" />
-
-                            <TextField fx:id="txtExitTime"
-                                       promptText="Salida HH:mm"
-                                       HBox.hgrow="ALWAYS" />
-
-                            <Button fx:id="btnAddSchedule"
-                                    text="+"
-                                    onAction="#handleBtnAddSchedule"
-                                    style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold;" />
-                        </HBox>
-
-                        <ListView fx:id="lstSchedules"
-                                  prefHeight="120.0"
-                                  style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1;" />
-
-                        <Button fx:id="btnRemoveSchedule"
-                                text="Eliminar horario seleccionado"
-                                onAction="#handleBtnRemoveSchedule"
-                                style="-fx-background-color: #fee2e2; -fx-text-fill: #991b1b; -fx-font-weight: bold;" />
 
                     </VBox>
                 </content>

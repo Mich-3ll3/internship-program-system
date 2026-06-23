@@ -10,7 +10,6 @@ public class ProjectDTO {
     private String methodology;
     private String resources;
     private String responsibilities;
-    private Integer duration;
     private Integer linkedOrganizationId;
     private Integer projectResponsibleId;
     private Boolean isActive;
@@ -27,7 +26,6 @@ public class ProjectDTO {
             String methodology,
             String resources,
             String responsibilities,
-            Integer duration,
             Integer linkedOrganizationId,
             Integer projectResponsibleId,
             Boolean isActive
@@ -40,7 +38,6 @@ public class ProjectDTO {
         this.methodology = methodology;
         this.resources = resources;
         this.responsibilities = responsibilities;
-        this.duration = duration;
         this.linkedOrganizationId = linkedOrganizationId;
         this.projectResponsibleId = projectResponsibleId;
         this.isActive = isActive;
@@ -56,7 +53,6 @@ public class ProjectDTO {
             String methodology,
             String resources,
             String responsibilities,
-            Integer duration,
             Integer linkedOrganizationId,
             Integer projectResponsibleId,
             Boolean isActive
@@ -70,7 +66,6 @@ public class ProjectDTO {
         this.methodology = methodology;
         this.resources = resources;
         this.responsibilities = responsibilities;
-        this.duration = duration;
         this.linkedOrganizationId = linkedOrganizationId;
         this.projectResponsibleId = projectResponsibleId;
         this.isActive = isActive;
@@ -148,14 +143,6 @@ public class ProjectDTO {
         this.responsibilities = responsibilities;
     }
 
-    public Integer getDuration() {
-        return duration;
-    }
-
-    public void setDuration(Integer duration) {
-        this.duration = duration;
-    }
-
     public Integer getLinkedOrganizationId() {
         return linkedOrganizationId;
     }
@@ -179,6 +166,4 @@ public class ProjectDTO {
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
-    
-    
 }

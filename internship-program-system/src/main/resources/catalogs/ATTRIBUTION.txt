@@ -1,0 +1,4 @@
+Location catalog data by Countries States Cities Database.
+Source: https://github.com/dr5hn/countries-states-cities-database
+License: Open Database License (ODbL) v1.0.
+Downloaded from the project CSV exports/release assets.

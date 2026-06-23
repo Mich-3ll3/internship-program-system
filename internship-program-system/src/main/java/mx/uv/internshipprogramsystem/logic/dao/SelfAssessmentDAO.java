@@ -1,6 +1,7 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.SelfAssessmentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 
@@ -40,10 +41,10 @@ public class SelfAssessmentDAO {
         "observaciones) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public List<SelfAssessmentDTO> getAllSelfAssessments() throws BusinessException {
+    public List<SelfAssessmentDTO> getAllSelfAssessments() throws BusinessException, DataAccessException {
     List<SelfAssessmentDTO> assessments = new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -88,8 +89,8 @@ public class SelfAssessmentDAO {
     }
 
 
-    public void insert(SelfAssessmentDTO dto) throws BusinessException {
-        try (Connection connection = DataBaseManager.getConnection();
+    public void insert(SelfAssessmentDTO dto) throws BusinessException, DataAccessException {
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT)) {
 
             preparedStatement.setInt(1, dto.getStudentId());

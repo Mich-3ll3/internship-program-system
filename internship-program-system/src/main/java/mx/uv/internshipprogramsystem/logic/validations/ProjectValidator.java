@@ -8,31 +8,105 @@ public final class ProjectValidator {
     private static final int MAX_METHODOLOGY_LENGTH = 100;
     private static final int MAX_RESPONSIBILITIES_LENGTH = 255;
     private static final int MAX_TEXT_LENGTH = 5000;
-    private static final int MIN_DURATION_HOURS = 120;
-    private static final int MAX_DURATION_HOURS = 960;
-
     private ProjectValidator() {
     }
 
     public static void validateForCreate(ProjectDTO project)
             throws ValidationException {
         validateProjectNotNull(project);
-        validateProjectRequiredData(project);
-        validateProjectLengths(project);
-        validateProjectNumbers(project);
-        validateProjectTextSecurity(project);
-        validateProjectStatus(project);
+        
+        java.util.List<String> errors = new java.util.ArrayList<>();
+        
+        // Required checks
+        addErrorIfFailed(() -> validateRequiredText(project.getName(), "El nombre del proyecto es obligatorio."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getGeneralDescription(), "La descripción general es obligatoria."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getGeneralObjective(), "El objetivo general es obligatorio."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getImmediateObjectives(), "Los objetivos inmediatos son obligatorios."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getMediateObjective(), "Los objetivos mediatos son obligatorios."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getMethodology(), "La metodología es obligatoria."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getResources(), "Los recursos son obligatorios."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getResponsibilities(), "Las responsabilidades son obligatorias."), errors);
+        
+        // Length checks
+        addErrorIfFailed(() -> validateMaximumLength(project.getName(), MAX_NAME_LENGTH, "El nombre del proyecto no debe superar 255 caracteres."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getGeneralDescription(), MAX_TEXT_LENGTH, "La descripción general es demasiado extensa."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getGeneralObjective(), MAX_TEXT_LENGTH, "El objetivo general es demasiado extenso."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getImmediateObjectives(), MAX_TEXT_LENGTH, "Los objetivos inmediatos son demasiado extensos."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getMediateObjective(), MAX_TEXT_LENGTH, "Los objetivos mediatos son demasiado extensos."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getMethodology(), MAX_METHODOLOGY_LENGTH, "La metodología no debe superar 100 caracteres."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getResources(), MAX_TEXT_LENGTH, "Los recursos son demasiado extensos."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getResponsibilities(), MAX_RESPONSIBILITIES_LENGTH, "Las responsabilidades no deben superar 255 caracteres."), errors);
+        
+        // Number checks
+        addErrorIfFailed(() -> validatePositiveInteger(project.getLinkedOrganizationId(), "La organización vinculada es obligatoria."), errors);
+        addErrorIfFailed(() -> validatePositiveInteger(project.getProjectResponsibleId(), "El responsable del proyecto es obligatorio."), errors);
+        
+        // Security checks
+        addErrorIfFailed(() -> validateSafeText(project.getName(), "nombre"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getGeneralDescription(), "descripción"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getGeneralObjective(), "objetivo general"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getImmediateObjectives(), "objetivos inmediatos"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getMediateObjective(), "objetivos mediatos"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getMethodology(), "metodología"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getResources(), "recursos"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getResponsibilities(), "responsabilidades"), errors);
+        
+        // Status check
+        addErrorIfFailed(() -> validateProjectStatus(project), errors);
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
 
     public static void validateForUpdate(ProjectDTO project)
             throws ValidationException {
         validateProjectNotNull(project);
-        validateProjectId(project.getId());
-        validateProjectRequiredData(project);
-        validateProjectLengths(project);
-        validateProjectNumbers(project);
-        validateProjectTextSecurity(project);
-        validateProjectStatus(project);
+        
+        java.util.List<String> errors = new java.util.ArrayList<>();
+        
+        addErrorIfFailed(() -> validateProjectId(project.getId()), errors);
+        
+        // Required checks
+        addErrorIfFailed(() -> validateRequiredText(project.getName(), "El nombre del proyecto es obligatorio."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getGeneralDescription(), "La descripción general es obligatoria."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getGeneralObjective(), "El objetivo general es obligatorio."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getImmediateObjectives(), "Los objetivos inmediatos son obligatorios."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getMediateObjective(), "Los objetivos mediatos son obligatorios."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getMethodology(), "La metodología es obligatoria."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getResources(), "Los recursos son obligatorios."), errors);
+        addErrorIfFailed(() -> validateRequiredText(project.getResponsibilities(), "Las responsabilidades son obligatorias."), errors);
+        
+        // Length checks
+        addErrorIfFailed(() -> validateMaximumLength(project.getName(), MAX_NAME_LENGTH, "El nombre del proyecto no debe superar 255 caracteres."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getGeneralDescription(), MAX_TEXT_LENGTH, "La descripción general es demasiado extensa."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getGeneralObjective(), MAX_TEXT_LENGTH, "El objetivo general es demasiado extenso."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getImmediateObjectives(), MAX_TEXT_LENGTH, "Los objetivos inmediatos son demasiado extensos."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getMediateObjective(), MAX_TEXT_LENGTH, "Los objetivos mediatos son demasiado extensos."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getMethodology(), MAX_METHODOLOGY_LENGTH, "La metodología no debe superar 100 caracteres."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getResources(), MAX_TEXT_LENGTH, "Los recursos son demasiado extensos."), errors);
+        addErrorIfFailed(() -> validateMaximumLength(project.getResponsibilities(), MAX_RESPONSIBILITIES_LENGTH, "Las responsabilidades no deben superar 255 caracteres."), errors);
+        
+        // Number checks
+        addErrorIfFailed(() -> validatePositiveInteger(project.getLinkedOrganizationId(), "La organización vinculada es obligatoria."), errors);
+        addErrorIfFailed(() -> validatePositiveInteger(project.getProjectResponsibleId(), "El responsable del proyecto es obligatorio."), errors);
+        
+        // Security checks
+        addErrorIfFailed(() -> validateSafeText(project.getName(), "nombre"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getGeneralDescription(), "descripción"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getGeneralObjective(), "objetivo general"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getImmediateObjectives(), "objetivos inmediatos"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getMediateObjective(), "objetivos mediatos"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getMethodology(), "metodología"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getResources(), "recursos"), errors);
+        addErrorIfFailed(() -> validateSafeText(project.getResponsibilities(), "responsabilidades"), errors);
+        
+        // Status check
+        addErrorIfFailed(() -> validateProjectStatus(project), errors);
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
 
     public static void validateProjectId(Integer id)
@@ -155,8 +229,6 @@ public final class ProjectValidator {
 
     private static void validateProjectNumbers(ProjectDTO project)
             throws ValidationException {
-        validateDuration(project.getDuration());
-
         validatePositiveInteger(
             project.getLinkedOrganizationId(),
             "La organización vinculada es obligatoria."
@@ -168,25 +240,6 @@ public final class ProjectValidator {
         );
     }
 
-    private static void validateDuration(Integer duration)
-            throws ValidationException {
-        if (duration == null) {
-            throw new ValidationException(
-                "La duración del proyecto es obligatoria."
-            );
-        }
-
-        if (duration < MIN_DURATION_HOURS
-                || duration > MAX_DURATION_HOURS) {
-            throw new ValidationException(
-                "La duración debe estar entre "
-                    + MIN_DURATION_HOURS
-                    + " y "
-                    + MAX_DURATION_HOURS
-                    + " horas."
-            );
-        }
-    }
 
     private static void validateProjectStatus(ProjectDTO project)
             throws ValidationException {
@@ -264,5 +317,18 @@ public final class ProjectValidator {
         }
 
         return containsControlCharacters;
+    }
+
+    @FunctionalInterface
+    private interface ValidationStep {
+        void execute() throws ValidationException;
+    }
+
+    private static void addErrorIfFailed(ValidationStep step, java.util.List<String> errors) {
+        try {
+            step.execute();
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
     }
 }

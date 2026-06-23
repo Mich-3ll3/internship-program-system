@@ -1,18 +1,25 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers.AccountActivationManager;
-import mx.uv.internshipprogramsystem.logic.managers.ActivationTokenResendManager;
+import mx.uv.internshipprogramsystem.gui.util.FormAlertSupport;
 
-public class ActivateAccountDashboardController {
+public class ActivateAccountDashboardController
+        implements ChangeListener<String> {
+
     private static final Logger LOGGER =
         LoggerFactory.getLogger(
             ActivateAccountDashboardController.class
@@ -20,22 +27,54 @@ public class ActivateAccountDashboardController {
 
     @FXML
     private TextField txtActivationToken;
+
     @FXML
     private PasswordField pwdNewPassword;
+
     @FXML
     private PasswordField pwdConfirmPassword;
+
     @FXML
-    private TextField txtInstitutionalEmail;
+    private Pane pneStrengthBarPart1;
+
+    @FXML
+    private Pane pneStrengthBarPart2;
+
+    @FXML
+    private Pane pneStrengthBarPart3;
+
+    @FXML
+    private Pane pneStrengthBarPart4;
+
+    @FXML
+    private Label lblMinLengthRequirement;
+
+    @FXML
+    private Label lblUppercaseRequirement;
+
+    @FXML
+    private Label lblNumberRequirement;
+
+    @FXML
+    private Label lblSymbolRequirement;
+
+    @FXML
+    private Label lblPasswordMatch;
+
+    @FXML
+    private void initialize() {
+        pwdNewPassword.textProperty().addListener(this);
+        pwdConfirmPassword.textProperty().addListener(this);
+
+        updatePasswordStrength("");
+        updatePasswordMatch();
+    }
 
     @FXML
     private void handleActivateAccount() {
         String activationToken = txtActivationToken.getText();
-
-        String newPassword =
-            pwdNewPassword.getText();
-
-        String confirmPassword =
-            pwdConfirmPassword.getText();
+        String newPassword = pwdNewPassword.getText();
+        String confirmPassword = pwdConfirmPassword.getText();
 
         try {
             AccountActivationManager accountActivationManager =
@@ -51,36 +90,39 @@ public class ActivateAccountDashboardController {
                 "Cuenta activada correctamente."
             );
 
-            showNotification(
-                Alert.AlertType.INFORMATION,
+            FormAlertSupport.showInformation(
                 "Cuenta activada",
-                "Tu cuenta fue activada correctamente. "
-                    + "Ya puedes iniciar sesión."
+                "Tu cuenta fue activada correctamente. Ya puedes iniciar sesión."
             );
 
             WindowManagerController.changeView(
                 "LoginDashboard.fxml"
             );
+        } catch (DataAccessException exception) {
+            LOGGER.warn("No se pudo procesar la activación de cuenta debido a un problema con los servicios del entorno.");
+            
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+            alert.setTitle("Error de Conexión");
+            alert.setHeaderText("Servicio No Disponible");
+            alert.setContentText("No se pudo establecer comunicación con el sistema central. Por favor, verifique su conexión a internet o intente más tarde.");
+            alert.showAndWait();
         } catch (BusinessException businessException) {
             LOGGER.warn(
                 "No se pudo activar la cuenta",
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de activación",
                 businessException.getMessage()
             );
         } catch (Exception exception) {
             LOGGER.error(
-                "Error inesperado durante "
-                    + "la activación de cuenta",
+                "Error inesperado durante la activación de cuenta",
                 exception
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de sistema",
                 "No se pudo activar la cuenta."
             );
@@ -88,40 +130,10 @@ public class ActivateAccountDashboardController {
     }
 
     @FXML
-    private void handleResendActivationToken() {
-        String institutionalEmail =
-            txtInstitutionalEmail.getText();
-
-        try {
-            ActivationTokenResendManager activationTokenResendManager =
-                new ActivationTokenResendManager();
-
-            activationTokenResendManager.resendActivationToken(
-                institutionalEmail
-            );
-
-            LOGGER.info(
-                "Solicitud de reenvío de token procesada."
-            );
-
-            showNotification(
-                Alert.AlertType.INFORMATION,
-                "Token enviado",
-                "Si la cuenta existe y no está activa, "
-                + "se enviará un nuevo token de activación."
-            );
-        } catch (BusinessException businessException) {
-            LOGGER.warn(
-                "No se pudo reenviar el token de activación",
-                businessException
-            );
-
-            showNotification(
-                Alert.AlertType.ERROR,
-                "Error de reenvío",
-                businessException.getMessage()
-            );
-        }
+    private void handleOpenResendTokenView() {
+        WindowManagerController.changeView(
+            "ResendActivationTokenDashboard.fxml"
+        );
     }
 
     @FXML
@@ -131,16 +143,184 @@ public class ActivateAccountDashboardController {
         );
     }
 
-    private void showNotification(
-            Alert.AlertType type,
-            String title,
-            String content
+    @Override
+    public void changed(
+            ObservableValue<? extends String> observable,
+            String oldPassword,
+            String newPassword
     ) {
-        Alert alert = new Alert(type);
+        updatePasswordStrength(
+            pwdNewPassword.getText()
+        );
 
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+        updatePasswordMatch();
+    }
+
+    private void updatePasswordStrength(
+            String password
+    ) {
+        boolean hasMinLength =
+            password.length() >= 8;
+
+        boolean hasUppercase =
+            password.matches(".*[A-Z].*");
+
+        boolean hasNumber =
+            password.matches(".*[0-9].*");
+
+        boolean hasSymbol =
+            password.matches(".*[@#$%^&+=!].*");
+
+        updateRequirementLabel(
+            lblMinLengthRequirement,
+            hasMinLength
+        );
+
+        updateRequirementLabel(
+            lblUppercaseRequirement,
+            hasUppercase
+        );
+
+        updateRequirementLabel(
+            lblNumberRequirement,
+            hasNumber
+        );
+
+        updateRequirementLabel(
+            lblSymbolRequirement,
+            hasSymbol
+        );
+
+        updateStrengthBars(
+            hasMinLength,
+            hasUppercase,
+            hasNumber,
+            hasSymbol
+        );
+    }
+
+    private void updatePasswordMatch() {
+        String password =
+            pwdNewPassword.getText();
+
+        String confirmPassword =
+            pwdConfirmPassword.getText();
+
+        if (confirmPassword.isEmpty()) {
+            lblPasswordMatch.setVisible(false);
+            lblPasswordMatch.setManaged(false);
+        } else {
+            lblPasswordMatch.setVisible(true);
+            lblPasswordMatch.setManaged(true);
+
+            updatePasswordMatchLabel(
+                password,
+                confirmPassword
+            );
+        }
+    }
+
+    private void updatePasswordMatchLabel(
+            String password,
+            String confirmPassword
+    ) {
+        if (password.equals(confirmPassword)) {
+            lblPasswordMatch.setText(
+                "✓ Las contraseñas coinciden"
+            );
+
+            lblPasswordMatch.setTextFill(
+                Color.web("#16A34A")
+            );
+        } else {
+            lblPasswordMatch.setText(
+                "✗ Las contraseñas no coinciden"
+            );
+
+            lblPasswordMatch.setTextFill(
+                Color.web("#EF4444")
+            );
+        }
+    }
+
+    private void updateRequirementLabel(
+            Label requirementLabel,
+            boolean isValid
+    ) {
+        if (isValid) {
+            requirementLabel.setTextFill(
+                Color.web("#16A34A")
+            );
+        } else {
+            requirementLabel.setTextFill(
+                Color.GRAY
+            );
+        }
+    }
+
+    private void updateStrengthBars(
+            boolean hasMinLength,
+            boolean hasUppercase,
+            boolean hasNumber,
+            boolean hasSymbol
+    ) {
+        int score = 0;
+
+        if (hasMinLength) {
+            score++;
+        }
+
+        if (hasUppercase) {
+            score++;
+        }
+
+        if (hasNumber) {
+            score++;
+        }
+
+        if (hasSymbol) {
+            score++;
+        }
+
+        resetStrengthBars();
+        updateStrengthBarColor(score);
+    }
+
+    private void updateStrengthBarColor(
+            int score
+    ) {
+        if (score >= 1) {
+            pneStrengthBarPart1.setStyle(
+                "-fx-background-color: #EF4444; -fx-background-radius: 10;"
+            );
+        }
+
+        if (score >= 2) {
+            pneStrengthBarPart2.setStyle(
+                "-fx-background-color: #F59E0B; -fx-background-radius: 10;"
+            );
+        }
+
+        if (score >= 3) {
+            pneStrengthBarPart3.setStyle(
+                "-fx-background-color: #16A34A; -fx-background-radius: 10;"
+            );
+        }
+
+        if (score >= 4) {
+            pneStrengthBarPart4.setStyle(
+                "-fx-background-color: #16A34A; -fx-background-radius: 10;"
+            );
+        }
+    }
+
+    private void resetStrengthBars() {
+        String defaultStyle =
+            "-fx-background-color: #E5E7EB; -fx-background-radius: 10;";
+
+        pneStrengthBarPart1.setStyle(defaultStyle);
+        pneStrengthBarPart2.setStyle(defaultStyle);
+        pneStrengthBarPart3.setStyle(defaultStyle);
+        pneStrengthBarPart4.setStyle(defaultStyle);
     }
 }

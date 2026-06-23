@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -29,7 +30,7 @@ public class AccountActivationManager {
             String token,
             String password,
             String confirmPassword
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty( token,"El token de activación no puede estar vacío.");
 
         passwordValidator.validatePassword(password);
@@ -52,7 +53,7 @@ public class AccountActivationManager {
 
     private ActivationTokenDTO getValidActivationToken(
             Optional<ActivationTokenDTO> optionalActivationToken
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         ActivationTokenDTO activationToken;
 
         if (optionalActivationToken.isEmpty()) {
@@ -70,7 +71,7 @@ public class AccountActivationManager {
     private void validatePasswordConfirmation(
             String password,
             String confirmPassword
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             confirmPassword,
             "La confirmación de contraseña no puede estar vacía."
@@ -83,7 +84,7 @@ public class AccountActivationManager {
 
     private void validateTokenIsNotUsed(
             ActivationTokenDTO activationToken
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         if (activationToken.isUsed()) {
             throw new BusinessException("El token de activación ya fue utilizado.");
         }
@@ -91,7 +92,7 @@ public class AccountActivationManager {
 
     private void validateTokenExpiration(
             ActivationTokenDTO activationToken
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         Timestamp currentTimestamp = Timestamp.from(Instant.now());
 
         if (activationToken.getExpirationDate().before(currentTimestamp)) {
@@ -99,7 +100,7 @@ public class AccountActivationManager {
         }
     }
 
-    private void activateUserAccount(int userId, String passwordHash) throws BusinessException {
+    private void activateUserAccount(int userId, String passwordHash) throws BusinessException, DataAccessException {
         boolean wasActivated = userDAO.activateAccount(userId, passwordHash);
 
         if (!wasActivated) {

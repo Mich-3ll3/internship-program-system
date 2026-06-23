@@ -14,6 +14,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers.SelfAssessmentManager;
 
 public class RegisterSelfAssessmentController implements Initializable {
@@ -77,6 +78,8 @@ public class RegisterSelfAssessmentController implements Initializable {
 
         } catch (BusinessException exception) {
             showError("Error al guardar la autoevaluación: " + exception.getMessage());
+        } catch (DataAccessException exception) {
+            showError("Error de conexion al guardar la autoevaluación. Por favor intente mas tarde.");
         }
     }
 

@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +23,27 @@ public class EducationalExperienceRegistrationManager {
 
     public boolean registerEducationalExperience(
             EducationalExperienceDTO educationalExperience
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         EducationalExperienceValidator validator =
             new EducationalExperienceValidator();
 
         validator.validateForCreation(educationalExperience);
+
+        if (educationalExperience.getStartDate() == null
+                || educationalExperience.getEndDate() == null) {
+            throw new BusinessException(
+                "Debe capturar la fecha de inicio y la fecha de fin."
+            );
+        }
+
+        if (educationalExperienceDAO.existsSectionByPeriod(
+                educationalExperience.getSchoolPeriod(),
+                educationalExperience.getSection()
+        )) {
+            throw new BusinessException(
+                "La seccion ya existe en el periodo seleccionado."
+            );
+        }
 
         boolean wasRegistered =
             educationalExperienceDAO.create(educationalExperience);

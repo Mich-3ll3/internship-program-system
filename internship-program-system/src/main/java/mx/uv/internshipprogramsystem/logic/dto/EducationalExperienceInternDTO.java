@@ -10,6 +10,9 @@ public class EducationalExperienceInternDTO {
     private boolean countsOpportunity;
     private int opportunityNumber;
     private EducationalExperienceInternStatus status;
+    private String enrollmentNumber;
+    private String internName;
+    private String institutionalEmail;
 
     public EducationalExperienceInternDTO(
             String nrc,
@@ -79,5 +82,49 @@ public class EducationalExperienceInternDTO {
 
     public void setStatus(EducationalExperienceInternStatus status) {
         this.status = status;
+    }
+
+    public String getEnrollmentNumber() {
+        return enrollmentNumber;
+    }
+
+    public void setEnrollmentNumber(String enrollmentNumber) {
+        this.enrollmentNumber = enrollmentNumber;
+    }
+
+    public String getInternName() {
+        return internName;
+    }
+
+    public void setInternName(String internName) {
+        this.internName = internName;
+    }
+
+    public String getInstitutionalEmail() {
+        return institutionalEmail;
+    }
+
+    public void setInstitutionalEmail(String institutionalEmail) {
+        this.institutionalEmail = institutionalEmail;
+    }
+
+    public String getAssignmentDateDisplay() {
+        return (assignmentDate != null) ? assignmentDate.toString() : "-";
+    }
+
+    public String getOpportunityNumberDisplay() {
+        return String.valueOf(opportunityNumber);
+    }
+
+    public String getStatusDisplayName() {
+        String displayName =
+            "Sin estado";
+
+        if (status != null) {
+            displayName =
+                status.getDisplayName();
+        }
+
+        return displayName;
     }
 }

@@ -6,10 +6,10 @@ import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
 public class EducationalExperienceValidator {
     
     private static final int NRC_LENGTH = 5;
-    private static final int SCHOOL_PERIOD_LENGTH = 7;
+    private static final int SCHOOL_PERIOD_LENGTH = 6;
     private static final int MAX_SECTION_LENGTH = 2;
 
-    private static final String SCHOOL_PERIOD_PATTERN = "^\\d{4}-(51|01)$";
+    private static final String SCHOOL_PERIOD_PATTERN = "^\\d{4}(51|01)$";
     private static final String SECTION_PATTERN = "^\\d{1,2}$";
 
     public void validateForCreation(
@@ -62,7 +62,7 @@ public class EducationalExperienceValidator {
     private void validateSchoolPeriodFormat(String schoolPeriod) throws ValidationException {
         if (!schoolPeriod.matches(SCHOOL_PERIOD_PATTERN)) {
             throw new ValidationException(
-                "El periodo escolar debe tener el formato YYYY-51 o YYYY-01."
+                "El periodo escolar debe tener el formato YYYY51 o YYYY01."
             );
         }
     }

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane
+    prefHeight="700.0"
+    prefWidth="1000.0"
+    style="-fx-background-color: #f3f6fb;"
+    xmlns="http://javafx.com/javafx/26"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.EducationalExperienceManagementController">
+
+    <left>
+        <VBox
+            alignment="TOP_CENTER"
+            prefWidth="70.0"
+            spacing="20.0"
+            style="-fx-background-color:#4a90e2;"
+            BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" top="20.0" />
+            </padding>
+            <children>
+                <StackPane
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin>
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                    <children>
+                        <Label text="PC" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </StackPane>
+
+                <Button
+                    fx:id="btnHome"
+                    mnemonicParsing="false"
+                    onAction="#goHome"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="⌂"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnEducationalExperience"
+                    mnemonicParsing="false"
+                    onAction="#goEducationalExperienceModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;"
+                    text="📚"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnIntern"
+                    mnemonicParsing="false"
+                    onAction="#goInternModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="👥"
+                    textFill="WHITE" />
+
+                <Button
+                    fx:id="btnProject"
+                    mnemonicParsing="false"
+                    onAction="#goProjectsModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="🛠️"
+                    textFill="WHITE" />
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <Button
+                    fx:id="btnExit"
+                    mnemonicParsing="false"
+                    onAction="#logOut"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="🚪"
+                    textFill="WHITE">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="18.0">
+
+            <padding>
+                <Insets bottom="26.0" left="30.0" right="30.0" top="28.0" />
+            </padding>
+
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Experiencias educativas" textFill="#14213d">
+                                    <font>
+                                        <Font name="System Bold" size="24.0" />
+                                    </font>
+                                </Label>
+
+                                <Label
+                                    text="Consulta los NRC registrados, su periodo, fechas, seccion, maestro asignado y estado."
+                                    textFill="#64748b">
+                                    <font>
+                                        <Font size="13.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+
+                        <Button
+                            fx:id="btnRegisterEducationalExperience"
+                            mnemonicParsing="false"
+                            onAction="#goRegisterEducationalExperience"
+                            prefHeight="38.0"
+                            style="-fx-background-color: #3f8fe5; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                            text="+ Nueva experiencia" />
+                    </children>
+                </HBox>
+
+                <VBox
+                    spacing="16.0"
+                    style="-fx-background-color: white; -fx-background-radius: 18; -fx-border-color: #e2e8f0; -fx-border-radius: 18; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0.16, 0, 4);">
+
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <TextField
+                                    fx:id="txtSearchEducationalExperience"
+                                    onAction="#searchEducationalExperience"
+                                    onKeyReleased="#handleLiveSearchEducationalExperience"
+                                    prefHeight="40.0"
+                                    promptText="Buscar por NRC, maestro, estado, periodo o anio"
+                                    style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #cbd5e1; -fx-padding: 0 14 0 14;"
+                                    HBox.hgrow="ALWAYS" />
+
+                                <Button
+                                    fx:id="btnSearchEducationalExperience"
+                                    mnemonicParsing="false"
+                                    onAction="#searchEducationalExperience"
+                                    prefHeight="40.0"
+                                    style="-fx-background-color: #14213d; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
+                                    text="Buscar" />
+                            </children>
+                        </HBox>
+
+                        <TableView
+                            fx:id="tblEducationalExperiences"
+                            prefHeight="430.0"
+                            style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: #dbe1ea; -fx-padding: 0; -fx-selection-bar: #dbeafe; -fx-selection-bar-non-focused: #dbeafe; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 12, 0.15, 0, 3);">
+
+                            <columns>
+                                <TableColumn fx:id="colNrc" prefWidth="74.0" text="NRC" />
+                                <TableColumn fx:id="colSchoolPeriod" prefWidth="100.0" text="Periodo" />
+                                <TableColumn fx:id="colSection" prefWidth="84.0" text="Seccion" />
+                                <TableColumn fx:id="colProfessor" prefWidth="230.0" text="Maestro" />
+                                <TableColumn fx:id="colStartDate" prefWidth="120.0" text="Fecha inicio" />
+                                <TableColumn fx:id="colEndDate" prefWidth="110.0" text="Fecha fin" />
+                                <TableColumn fx:id="colStatus" prefWidth="96.0" text="Estado" />
+                                <TableColumn fx:id="colActions" prefWidth="86.0" text="" />
+                            </columns>
+                        </TableView>
+
+                        <HBox
+                            alignment="CENTER_LEFT"
+                            style="-fx-background-color: #f8fafc; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14;">
+
+                            <padding>
+                                <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
+                            </padding>
+
+                            <children>
+                                <Label
+                                    text="El listado muestra cada NRC como registro independiente de experiencia educativa."
+                                    textFill="#64748b"
+                                    HBox.hgrow="ALWAYS" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

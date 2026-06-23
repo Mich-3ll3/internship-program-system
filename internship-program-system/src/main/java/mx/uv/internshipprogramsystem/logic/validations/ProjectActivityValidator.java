@@ -26,11 +26,7 @@ public final class ProjectActivityValidator {
             );
         }
 
-        if (activities.isEmpty()) {
-            throw new ValidationException(
-                "Debe registrar al menos una actividad."
-            );
-        }
+
 
         if (activities.size() > MAX_ACTIVITIES) {
             throw new ValidationException(
@@ -51,31 +47,39 @@ public final class ProjectActivityValidator {
             );
         }
 
-        validateRequiredText(
-            activity.getName(),
-            "El nombre de la actividad es obligatorio."
-        );
+        java.util.List<String> errors = new java.util.ArrayList<>();
 
-        validateRequiredText(
-            activity.getMonth(),
-            "El mes de la actividad es obligatorio."
-        );
+        try {
+            validateRequiredText(activity.getName(), "El nombre de la actividad es obligatorio.");
+            validateMaximumLength(activity.getName(), MAX_NAME_LENGTH, "El nombre de la actividad no debe superar 100 caracteres.");
+            validateSafeText(activity.getName(), "nombre de la actividad");
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
 
-        validateMaximumLength(
-            activity.getName(),
-            MAX_NAME_LENGTH,
-            "El nombre de la actividad no debe superar 100 caracteres."
-        );
+        try {
+            validateRequiredText(activity.getMonth(), "El mes de la actividad es obligatorio.");
+            validateMaximumLength(activity.getMonth(), MAX_MONTH_LENGTH, "El mes de la actividad no debe superar 60 caracteres.");
+            validateSafeText(activity.getMonth(), "mes de la actividad");
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
 
-        validateMaximumLength(
-            activity.getMonth(),
-            MAX_MONTH_LENGTH,
-            "El mes de la actividad no debe superar 60 caracteres."
-        );
+        try {
+            validateWeekRange(activity);
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
 
-        validateWeekRange(activity);
-        validateSafeText(activity.getName(), "nombre de la actividad");
-        validateSafeText(activity.getMonth(), "mes de la actividad");
+        if (activity.getPlannedHours() == null) {
+            errors.add("Las horas planeadas son obligatorias.");
+        } else if (activity.getPlannedHours() < 0) {
+            errors.add("Las horas planeadas deben ser mayor o igual a 0.");
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
     }
 
     private static void validateActivities(
@@ -89,36 +93,27 @@ public final class ProjectActivityValidator {
     private static void validateWeekRange(
             ProjectActivityDTO activity
     ) throws ValidationException {
+        java.util.List<String> errors = new java.util.ArrayList<>();
+
         if (activity.getStartWeek() == null) {
-            throw new ValidationException(
-                "La semana de inicio es obligatoria."
-            );
+            errors.add("La semana de inicio es obligatoria.");
+        } else if (activity.getStartWeek() < MIN_WEEK || activity.getStartWeek() > MAX_WEEK) {
+            errors.add("La semana de inicio debe estar entre 1 y 5.");
         }
 
         if (activity.getEndWeek() == null) {
-            throw new ValidationException(
-                "La semana de fin es obligatoria."
-            );
+            errors.add("La semana de fin es obligatoria.");
+        } else if (activity.getEndWeek() < MIN_WEEK || activity.getEndWeek() > MAX_WEEK) {
+            errors.add("La semana de fin debe estar entre 1 y 5.");
         }
 
-        if (activity.getStartWeek() < MIN_WEEK
-                || activity.getStartWeek() > MAX_WEEK) {
-            throw new ValidationException(
-                "La semana de inicio debe estar entre 1 y 5."
-            );
+        if (activity.getStartWeek() != null && activity.getEndWeek() != null
+                && activity.getStartWeek() > activity.getEndWeek()) {
+            errors.add("La semana de inicio no puede ser mayor que la semana de fin.");
         }
 
-        if (activity.getEndWeek() < MIN_WEEK
-                || activity.getEndWeek() > MAX_WEEK) {
-            throw new ValidationException(
-                "La semana de fin debe estar entre 1 y 5."
-            );
-        }
-
-        if (activity.getStartWeek() > activity.getEndWeek()) {
-            throw new ValidationException(
-                "La semana de inicio no puede ser mayor que la semana de fin."
-            );
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
         }
     }
 

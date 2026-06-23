@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,7 +11,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectRequestDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IProjectRequestDAO;
@@ -20,13 +21,13 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectRequestDAO.class);
 
     @Override
-    public boolean insert(ProjectRequestDTO request) throws BusinessException {
+    public boolean insert(ProjectRequestDTO request) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(request, "ProjectRequestDTO no puede ser nulo.");
         String insertRequestQuery =
             "INSERT INTO SOLICITUD_PROYECTO (estudiante_id, proyecto_id, prioridad) "
             + "VALUES (?, ?, ?)";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertRequestStatement =
                  connection.prepareStatement(insertRequestQuery)) {
             insertRequestStatement.setInt(1, request.getStudentId());
@@ -56,14 +57,14 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     }
 
     @Override
-    public List<ProjectRequestDTO> findByStudent(int studentId) throws BusinessException {
+    public List<ProjectRequestDTO> findByStudent(int studentId) throws BusinessException, DataAccessException {
         InputValidator.validatePositive(studentId, "El id del estudiante debe ser positivo.");
         List<ProjectRequestDTO> requests = new ArrayList<>();
         String selectRequestsQuery =
             "SELECT estudiante_id, proyecto_id, prioridad "
             + "FROM SOLICITUD_PROYECTO WHERE estudiante_id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statementSelectRequests =
                  connection.prepareStatement(selectRequestsQuery)) {
             statementSelectRequests.setInt(1, studentId);
@@ -90,12 +91,12 @@ public class ProjectRequestDAO implements IProjectRequestDAO {
     }
 
     @Override
-    public boolean delete(ProjectRequestDTO request) throws BusinessException {
+    public boolean delete(ProjectRequestDTO request) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(request, "ProjectRequestDTO no puede ser nulo.");
         String deleteRequestById =
             "DELETE FROM SOLICITUD_PROYECTO WHERE estudiante_id = ? AND proyecto_id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement deleteRequestStatement =
                  connection.prepareStatement(deleteRequestById)) {
             deleteRequestStatement.setInt(1, request.getStudentId());

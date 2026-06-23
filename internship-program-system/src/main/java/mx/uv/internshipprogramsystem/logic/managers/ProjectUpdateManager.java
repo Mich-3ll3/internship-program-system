@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,7 +9,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectActivityDAO;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectDAO;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectScheduleDAO;
@@ -39,12 +40,12 @@ public class ProjectUpdateManager {
             ProjectDTO project,
             List<ProjectActivityDTO> activities,
             List<ProjectScheduleDTO> schedules
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasUpdated = false;
 
         validateUpdate(project, activities, schedules);
 
-        try (Connection connection = DataBaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             connection.setAutoCommit(false);
 
             try {
@@ -111,7 +112,7 @@ public class ProjectUpdateManager {
             ProjectDTO project,
             List<ProjectActivityDTO> activities,
             List<ProjectScheduleDTO> schedules
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         try {
             ProjectValidator.validateForUpdate(project);
             ProjectActivityValidator.validateActivityList(activities);
@@ -128,7 +129,7 @@ public class ProjectUpdateManager {
             Integer projectId,
             List<ProjectActivityDTO> activities,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         for (ProjectActivityDTO activity : activities) {
             activity.setProjectId(projectId);
             activityDAO.create(activity, connection);
@@ -139,7 +140,7 @@ public class ProjectUpdateManager {
             Integer projectId,
             List<ProjectScheduleDTO> schedules,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         for (ProjectScheduleDTO schedule : schedules) {
             schedule.setProjectId(projectId);
             scheduleDAO.create(schedule, connection);
@@ -147,7 +148,7 @@ public class ProjectUpdateManager {
     }
 
     private void rollback(Connection connection)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         try {
             connection.rollback();
         } catch (SQLException sqlException) {
@@ -156,5 +157,73 @@ public class ProjectUpdateManager {
                 sqlException
             );
         }
+    }
+
+    public boolean updateProjectOnly(
+            ProjectDTO project,
+            List<ProjectScheduleDTO> schedules
+    ) throws BusinessException, DataAccessException {
+        boolean wasUpdated = false;
+
+        try {
+            ProjectValidator.validateForUpdate(project);
+            ProjectScheduleValidator.validateScheduleList(schedules);
+        } catch (ValidationException validationException) {
+            throw new BusinessException(
+                validationException.getMessage(),
+                validationException
+            );
+        }
+
+        try (Connection connection = DatabaseManager.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try {
+                projectDAO.update(project, connection);
+
+                scheduleDAO.deleteByProjectId(
+                    project.getId(),
+                    connection
+                );
+
+                registerSchedules(
+                    project.getId(),
+                    schedules,
+                    connection
+                );
+
+                connection.commit();
+                wasUpdated = true;
+            } catch (BusinessException | SQLException exception) {
+                rollback(connection);
+
+                throw new BusinessException(
+                    "No se pudo actualizar el proyecto.",
+                    exception
+                );
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión al actualizar proyecto",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al actualizar proyecto",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "No se pudo actualizar el proyecto.",
+                sqlException
+            );
+        }
+
+        return wasUpdated;
     }
 }

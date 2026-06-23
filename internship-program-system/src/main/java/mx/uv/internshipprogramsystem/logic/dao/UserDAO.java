@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,11 +8,12 @@ import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -39,6 +41,11 @@ public class UserDAO implements IUserDAO {
         + "activo, rol "
         + "FROM USUARIO "
         + "WHERE correo_institucional = ?";
+    
+    private static final String UPDATE_PASSWORD_QUERY =
+        "UPDATE USUARIO "
+        + "SET contrasena = ? "
+        + "WHERE id = ?";
 
     private static final String CHANGE_USER_STATUS_QUERY =
         "UPDATE USUARIO SET activo = ? WHERE correo_institucional = ?";
@@ -53,7 +60,7 @@ public class UserDAO implements IUserDAO {
         "UPDATE USUARIO SET activo = ? WHERE id = ?";
 
     @Override
-    public int create(UserDTO user, Connection connection) throws BusinessException {
+    public int create(UserDTO user, Connection connection) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(connection, "La conexión no puede ser nula.");
         validateUserForCreation(user);
 
@@ -97,10 +104,10 @@ public class UserDAO implements IUserDAO {
         return generatedUserId;
     }
 
-    public int create(UserDTO user) throws BusinessException {
+    public int create(UserDTO user) throws BusinessException, DataAccessException {
         int generatedUserId;
 
-        try (Connection connection = DataBaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             generatedUserId = create(user, connection);
         } catch (SQLException exception) {
             throw new BusinessException(
@@ -113,13 +120,13 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public boolean update(UserDTO user) throws BusinessException {
+    public boolean update(UserDTO user) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(user, "UserDTO no puede ser nulo.");
         validateUserForUpdate(user);
 
         boolean wasUpdated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
             PreparedStatement updateUserStatement =
             connection.prepareStatement(UPDATE_USER_QUERY)) {
             updateUserStatement.setString(1, user.getName());
@@ -164,56 +171,24 @@ public class UserDAO implements IUserDAO {
         return wasUpdated;
     }
 
-    public UserDTO findByInstitutionalEmail(
+    public Optional<UserDTO> findByInstitutionalEmail(
         String institutionalEmail
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             institutionalEmail,
             "El correo institucional no puede estar vacío."
         );
 
-        UserDTO user;
+        Optional<UserDTO> optionalUser;
 
-        try (Connection connection = DataBaseManager.getConnection();
-            PreparedStatement selectUserStatement =
-                connection.prepareStatement(
-                    SELECT_USER_BY_EMAIL_QUERY
-                )) {
-            selectUserStatement.setString(
-                1,
-                institutionalEmail
-            );
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement selectUserStatement =
+                 connection.prepareStatement(SELECT_USER_BY_EMAIL_QUERY)) {
 
-            try (ResultSet resultSet =
-                    selectUserStatement.executeQuery()) {
+            selectUserStatement.setString(1, institutionalEmail);
 
-                if (!resultSet.next()) {
-                    throw new BusinessException(
-                        "No existe un usuario con el correo proporcionado."
-                    );
-                }
-
-                user = new UserDTO();
-
-                user.setId(resultSet.getInt("id"));
-                user.setInstitutionalEmail(
-                    resultSet.getString("correo_institucional")
-                );
-                user.setName(resultSet.getString("nombre"));
-                user.setFirstSurname(
-                    resultSet.getString("apellido_paterno")
-                );
-                user.setSecondSurname(
-                    resultSet.getString("apellido_materno")
-                );
-                user.setIsActive(
-                    resultSet.getBoolean("activo")
-                );
-                user.setRole(
-                    UserRole.fromDatabaseValue(
-                        resultSet.getString("rol")
-                    )
-                );
+            try (ResultSet resultSet = selectUserStatement.executeQuery()) {
+                optionalUser = buildOptionalUser(resultSet);
             }
         } catch (SQLTransientConnectionException connectionException) {
             LOGGER.error(
@@ -238,14 +213,14 @@ public class UserDAO implements IUserDAO {
             );
         }
 
-        return user;
+        return optionalUser;
     }
     
     @Override
-    public boolean changeStatus(int userId, boolean isActive) throws BusinessException {
+    public boolean changeStatus(int userId, boolean isActive) throws BusinessException, DataAccessException {
         boolean wasChanged;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement changeUserStatusStatement =
                  connection.prepareStatement(CHANGE_USER_STATUS_BY_ID_QUERY)) {
             changeUserStatusStatement.setBoolean(1, isActive);
@@ -274,10 +249,10 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public int countActiveUsers() throws BusinessException {
+    public int countActiveUsers() throws BusinessException, DataAccessException {
         int totalActiveUsers = 0;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
             PreparedStatement selectCountActiveUsersStatement =
             connection.prepareStatement(
             SELECT_COUNT_ACTIVE_USERS_QUERY
@@ -310,10 +285,10 @@ public class UserDAO implements IUserDAO {
     }
 
     @Override
-    public boolean activateAccount(int userId, String passwordHash) throws BusinessException {
+    public boolean activateAccount(int userId, String passwordHash) throws BusinessException, DataAccessException {
         boolean wasActivated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
             PreparedStatement activateUserAccountStatement =
             connection.prepareStatement(
             ACTIVATE_USER_ACCOUNT_QUERY
@@ -344,13 +319,111 @@ public class UserDAO implements IUserDAO {
 
         return wasActivated;
     }
+    
+    public boolean updatePassword(
+        int userId,
+        String passwordHash
+    ) throws BusinessException, DataAccessException {
 
-    private void validateUserForCreation(UserDTO user) throws BusinessException {
+        InputValidator.validatePositive(
+            userId,
+            "El identificador del usuario no es válido."
+        );
+
+        InputValidator.validateNotEmpty(
+            passwordHash,
+            "El hash de la contraseña no puede estar vacío."
+        );
+
+        boolean wasUpdated;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement updatePasswordStatement =
+                 connection.prepareStatement(
+                     UPDATE_PASSWORD_QUERY
+                 )) {
+
+            updatePasswordStatement.setString(
+                1,
+                passwordHash
+            );
+
+            updatePasswordStatement.setInt(
+                2,
+                userId
+            );
+
+            wasUpdated =
+                updatePasswordStatement.executeUpdate() > 0;
+
+        } catch (SQLTransientConnectionException connectionException) {
+
+            LOGGER.error(
+                "Fallo de conexión con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+
+        } catch (SQLException sqlException) {
+
+            LOGGER.error(
+                "Error SQL al actualizar contraseña",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al actualizar la contraseña.",
+                sqlException
+            );
+        }
+
+        return wasUpdated;
+    }
+    
+    private Optional<UserDTO> buildOptionalUser(
+        ResultSet resultSet
+    ) throws SQLException, BusinessException {
+        Optional<UserDTO> optionalUser;
+
+        if (resultSet.next()) {
+            optionalUser = Optional.of(buildUser(resultSet));
+        } else {
+            optionalUser = Optional.empty();
+        }
+
+        return optionalUser;
+    }
+
+    private UserDTO buildUser(
+            ResultSet resultSet
+    ) throws SQLException, BusinessException {
+        UserDTO user = new UserDTO();
+
+        user.setId(resultSet.getInt("id"));
+        user.setInstitutionalEmail(
+            resultSet.getString("correo_institucional")
+        );
+        user.setName(resultSet.getString("nombre"));
+        user.setFirstSurname(resultSet.getString("apellido_paterno"));
+        user.setSecondSurname(resultSet.getString("apellido_materno"));
+        user.setIsActive(resultSet.getBoolean("activo"));
+        user.setRole(
+            UserRole.fromDatabaseValue(resultSet.getString("rol"))
+        );
+
+        return user;
+    }
+
+    private void validateUserForCreation(UserDTO user) throws BusinessException, DataAccessException {
         UserValidator validator = new UserValidator();
         validator.validateUserForCreation(user);
     }
 
-    private void validateUserForUpdate(UserDTO user) throws BusinessException {
+    private void validateUserForUpdate(UserDTO user) throws BusinessException, DataAccessException {
         UserValidator validator = new UserValidator();
         validator.validateUserForUpdate(user);
     }

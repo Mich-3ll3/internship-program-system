@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -8,17 +9,14 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectActivityDAO;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectDAO;
-import mx.uv.internshipprogramsystem.logic.dao.ProjectScheduleDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
-import mx.uv.internshipprogramsystem.logic.dto.ProjectScheduleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
 import mx.uv.internshipprogramsystem.logic.validations.ProjectActivityValidator;
-import mx.uv.internshipprogramsystem.logic.validations.ProjectScheduleValidator;
 import mx.uv.internshipprogramsystem.logic.validations.ProjectValidator;
 
 public class ProjectRegisterManager {
@@ -27,33 +25,28 @@ public class ProjectRegisterManager {
 
     private final ProjectDAO projectDAO;
     private final ProjectActivityDAO activityDAO;
-    private final ProjectScheduleDAO scheduleDAO;
 
     public ProjectRegisterManager() {
         projectDAO = new ProjectDAO();
         activityDAO = new ProjectActivityDAO();
-        scheduleDAO = new ProjectScheduleDAO();
     }
 
     public boolean registerProject(
             ProjectDTO project,
-            List<ProjectActivityDTO> activities,
-            List<ProjectScheduleDTO> schedules
-    ) throws BusinessException {
+            List<ProjectActivityDTO> activities
+    ) throws BusinessException, DataAccessException {
         boolean wasRegistered = false;
 
         validateProjectRegistration(
             project,
-            activities,
-            schedules
+            activities
         );
 
-        try (Connection connection = DataBaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             wasRegistered =
                 executeProjectRegistration(
                     project,
                     activities,
-                    schedules,
                     connection
                 );
         } catch (SQLTransientConnectionException connectionException) {
@@ -83,13 +76,11 @@ public class ProjectRegisterManager {
 
     private void validateProjectRegistration(
             ProjectDTO project,
-            List<ProjectActivityDTO> activities,
-            List<ProjectScheduleDTO> schedules
-    ) throws BusinessException {
+            List<ProjectActivityDTO> activities
+    ) throws BusinessException, DataAccessException {
         try {
             ProjectValidator.validateForCreate(project);
             ProjectActivityValidator.validateActivityList(activities);
-            ProjectScheduleValidator.validateScheduleList(schedules);
         } catch (ValidationException validationException) {
             throw new BusinessException(
                 validationException.getMessage(),
@@ -101,9 +92,8 @@ public class ProjectRegisterManager {
     private boolean executeProjectRegistration(
             ProjectDTO project,
             List<ProjectActivityDTO> activities,
-            List<ProjectScheduleDTO> schedules,
             Connection connection
-    ) throws BusinessException, SQLException {
+    ) throws BusinessException, DataAccessException, SQLException {
         boolean wasRegistered = false;
 
         connection.setAutoCommit(false);
@@ -118,12 +108,6 @@ public class ProjectRegisterManager {
             registerActivities(
                 projectId,
                 activities,
-                connection
-            );
-
-            registerSchedules(
-                projectId,
-                schedules,
                 connection
             );
 
@@ -162,7 +146,7 @@ public class ProjectRegisterManager {
             Integer projectId,
             List<ProjectActivityDTO> activities,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         for (ProjectActivityDTO activity : activities) {
             activity.setProjectId(projectId);
 
@@ -173,23 +157,8 @@ public class ProjectRegisterManager {
         }
     }
 
-    private void registerSchedules(
-            Integer projectId,
-            List<ProjectScheduleDTO> schedules,
-            Connection connection
-    ) throws BusinessException {
-        for (ProjectScheduleDTO schedule : schedules) {
-            schedule.setProjectId(projectId);
-
-            scheduleDAO.create(
-                schedule,
-                connection
-            );
-        }
-    }
-
     private void rollbackTransaction(Connection connection)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         try {
             connection.rollback();
         } catch (SQLException sqlException) {

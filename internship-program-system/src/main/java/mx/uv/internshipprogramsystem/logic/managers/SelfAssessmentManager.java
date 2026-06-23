@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +16,7 @@ public class SelfAssessmentManager {
         this.selfAssessmentDAO = new SelfAssessmentDAO();
     }
 
-    public List<SelfAssessmentDTO> getAllSelfAssessments() throws BusinessException {
+    public List<SelfAssessmentDTO> getAllSelfAssessments() throws BusinessException, DataAccessException {
         try {
             return selfAssessmentDAO.getAllSelfAssessments();
         } catch (Exception exception) {
@@ -42,7 +43,7 @@ public class SelfAssessmentManager {
             int afirmacion9,
             int afirmacion10,
             String observations
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
 
         validateData(studentId, projectId, organizationId, responsibleId, department, place);
 
@@ -87,7 +88,7 @@ public class SelfAssessmentManager {
             Integer responsibleId,
             String department,
             String place
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
 
         if (studentId == null)
             throw new BusinessException("Debes seleccionar un estudiante.");

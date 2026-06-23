@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -38,7 +39,19 @@ public class ProfessorDAO implements IProfessorDAO {
     private static final String SELECT_PROFESSORS_BY_NAME_QUERY =
         "SELECT p.numero_personal, p.es_coordinador, u.id, "
         + "u.correo_institucional, u.nombre, "
-        + "u.apellido_paterno, u.apellido_materno, u.activo "
+        + "u.apellido_paterno, u.apellido_materno, u.activo, u.contrasena, "
+        + "(SELECT GROUP_CONCAT("
+        + "CONCAT(ea.NRC, ' - ', ea.periodo_escolar, ' - Seccion ', ea.seccion) "
+        + "ORDER BY ea.periodo_escolar DESC, ea.NRC ASC SEPARATOR '\n') "
+        + "FROM EXPERIENCIA_EDUCATIVA ea "
+        + "WHERE ea.profesor_id = u.id AND ea.activa = TRUE) "
+        + "AS experiencia_actual, "
+        + "(SELECT GROUP_CONCAT("
+        + "CONCAT(eh.NRC, ' - ', eh.periodo_escolar, ' - Seccion ', "
+        + "eh.seccion, ' - ', IF(eh.activa, 'Activa', 'Inactiva')) "
+        + "ORDER BY eh.periodo_escolar DESC, eh.NRC ASC SEPARATOR '\n') "
+        + "FROM EXPERIENCIA_EDUCATIVA eh "
+        + "WHERE eh.profesor_id = u.id) AS historial_experiencias "
         + "FROM PROFESOR p "
         + "JOIN USUARIO u ON p.usuario_id = u.id "
         + "WHERE CONCAT("
@@ -51,7 +64,19 @@ public class ProfessorDAO implements IProfessorDAO {
         "SELECT p.numero_personal, p.es_coordinador, u.id, "
         + "u.correo_institucional, u.nombre, "
         + "u.apellido_paterno, u.apellido_materno, "
-        + "u.activo, COUNT(e.profesor_id) AS grupos "
+        + "u.activo, u.contrasena, COUNT(e.profesor_id) AS grupos, "
+        + "(SELECT GROUP_CONCAT("
+        + "CONCAT(ea.NRC, ' - ', ea.periodo_escolar, ' - Seccion ', ea.seccion) "
+        + "ORDER BY ea.periodo_escolar DESC, ea.NRC ASC SEPARATOR '\n') "
+        + "FROM EXPERIENCIA_EDUCATIVA ea "
+        + "WHERE ea.profesor_id = u.id AND ea.activa = TRUE) "
+        + "AS experiencia_actual, "
+        + "(SELECT GROUP_CONCAT("
+        + "CONCAT(eh.NRC, ' - ', eh.periodo_escolar, ' - Seccion ', "
+        + "eh.seccion, ' - ', IF(eh.activa, 'Activa', 'Inactiva')) "
+        + "ORDER BY eh.periodo_escolar DESC, eh.NRC ASC SEPARATOR '\n') "
+        + "FROM EXPERIENCIA_EDUCATIVA eh "
+        + "WHERE eh.profesor_id = u.id) AS historial_experiencias "
         + "FROM PROFESOR p "
         + "JOIN USUARIO u ON p.usuario_id = u.id "
         + "LEFT JOIN EXPERIENCIA_EDUCATIVA e "
@@ -59,12 +84,12 @@ public class ProfessorDAO implements IProfessorDAO {
         + "WHERE p.numero_personal = ? "
         + "GROUP BY p.numero_personal, p.es_coordinador, "
         + "u.id, u.correo_institucional, u.nombre, "
-        + "u.apellido_paterno, u.apellido_materno, u.activo";
+        + "u.apellido_paterno, u.apellido_materno, u.activo, u.contrasena";
 
     private static final String SELECT_ALL_PROFESSORS_QUERY =
         "SELECT p.numero_personal, p.es_coordinador, u.id, "
         + "u.correo_institucional, u.nombre, "
-        + "u.apellido_paterno, u.apellido_materno, u.activo "
+        + "u.apellido_paterno, u.apellido_materno, u.activo, u.contrasena "
         + "FROM PROFESOR p "
         + "JOIN USUARIO u ON p.usuario_id = u.id";
 
@@ -82,13 +107,28 @@ public class ProfessorDAO implements IProfessorDAO {
     private static final String SELECT_COUNT_PROFESSORS_QUERY =
         "SELECT COUNT(*) AS total FROM PROFESOR";
     
+    private static final String SELECT_COUNT_ACTIVE_PROFESSORS_QUERY =
+        "SELECT COUNT(*) AS total FROM PROFESOR p JOIN USUARIO u ON p.usuario_id = u.id WHERE u.activo = TRUE AND u.contrasena IS NOT NULL";
+
+    private static final String SELECT_COUNT_INACTIVE_PROFESSORS_QUERY =
+        "SELECT COUNT(*) AS total FROM PROFESOR p JOIN USUARIO u ON p.usuario_id = u.id WHERE u.activo = FALSE AND u.contrasena IS NOT NULL";
+
+    private static final String SELECT_COUNT_PENDING_PROFESSORS_QUERY =
+        "SELECT COUNT(*) AS total FROM PROFESOR p JOIN USUARIO u ON p.usuario_id = u.id WHERE u.contrasena IS NULL";
+    
     private static final String EXISTS_COORDINATOR_QUERY =
         "SELECT COUNT(*) AS total "
         + "FROM PROFESOR "
         + "WHERE es_coordinador = TRUE";
 
+    private static final String EXISTS_ACTIVE_EDUCATIONAL_EXPERIENCE_QUERY =
+        "SELECT COUNT(*) AS total "
+        + "FROM EXPERIENCIA_EDUCATIVA "
+        + "WHERE profesor_id = ? "
+        + "AND activa = TRUE";
+
     @Override
-    public boolean create(ProfessorDTO professor, Connection connection) throws BusinessException {
+    public boolean create(ProfessorDTO professor, Connection connection) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(connection, "La conexión no puede ser nula.");
         ProfessorValidator professorValidator = new ProfessorValidator();
         professorValidator.validateProfessorForCreation(professor);
@@ -134,7 +174,7 @@ public class ProfessorDAO implements IProfessorDAO {
     @Override
     public boolean update(
             ProfessorDTO professor
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             professor,
             "ProfessorDTO no puede ser nulo."
@@ -144,7 +184,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
         boolean wasUpdated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement updateProfessorStatement =
                 connection.prepareStatement(
                     UPDATE_PROFESSOR_QUERY
@@ -209,7 +249,7 @@ public class ProfessorDAO implements IProfessorDAO {
     @Override
     public Optional<ProfessorDTO> findByStaffNumber(
             String staffNumber
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             staffNumber,
             "El número de personal no puede estar vacío."
@@ -217,7 +257,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
         Optional<ProfessorDTO> professor;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectProfessorStatement =
                     connection.prepareStatement(
                         SELECT_PROFESSOR_BY_STAFF_NUMBER_QUERY
@@ -258,7 +298,7 @@ public class ProfessorDAO implements IProfessorDAO {
 
     @Override
 
-    public List<ProfessorDTO> findByName(String searchName) throws BusinessException {
+    public List<ProfessorDTO> findByName(String searchName) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             searchName,
             "El nombre del profesor no puede estar vacío."
@@ -267,7 +307,7 @@ public class ProfessorDAO implements IProfessorDAO {
         List<ProfessorDTO> professors = new ArrayList<>();
         String searchPattern = "%" + searchName.trim() + "%";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectProfessorsStatement =
                     connection.prepareStatement(
                         SELECT_PROFESSORS_BY_NAME_QUERY
@@ -308,10 +348,10 @@ public class ProfessorDAO implements IProfessorDAO {
 
     @Override
     public List<ProfessorDTO> findAllName()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProfessorDTO> professors = new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectAllProfessorsStatement =
                     connection.prepareStatement(
                         SELECT_ALL_PROFESSORS_NAME_QUERY
@@ -356,10 +396,10 @@ public class ProfessorDAO implements IProfessorDAO {
 
     @Override
     public List<ProfessorDTO> findAll()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProfessorDTO> professors = new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectAllProfessorsStatement =
                     connection.prepareStatement(
                         SELECT_ALL_PROFESSORS_QUERY
@@ -398,10 +438,10 @@ public class ProfessorDAO implements IProfessorDAO {
 
     @Override
     public Optional<ProfessorDTO> findCoordinator()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         Optional<ProfessorDTO> coordinator;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectCoordinatorStatement =
                     connection.prepareStatement(
                         SELECT_COORDINATOR_QUERY
@@ -438,10 +478,10 @@ public class ProfessorDAO implements IProfessorDAO {
     }
 
     @Override
-    public int countAll() throws BusinessException {
+    public int countAll() throws BusinessException, DataAccessException {
         int totalProfessors = 0;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectCountProfessorStatement =
                     connection.prepareStatement(
                         SELECT_COUNT_PROFESSORS_QUERY
@@ -478,12 +518,75 @@ public class ProfessorDAO implements IProfessorDAO {
 
         return totalProfessors;
     }
+
+    @Override
+    public int countActive() throws BusinessException, DataAccessException {
+        int totalActive = 0;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_COUNT_ACTIVE_PROFESSORS_QUERY);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                totalActive = resultSet.getInt("total");
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new DataAccessException("El servicio de almacenamiento no se encuentra disponible de momento.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al contar profesores activos", sqlException);
+            throw new DataAccessException("Error al obtener el total de profesores activos.", sqlException);
+        }
+
+        return totalActive;
+    }
+
+    @Override
+    public int countInactive() throws BusinessException, DataAccessException {
+        int totalInactive = 0;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_COUNT_INACTIVE_PROFESSORS_QUERY);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                totalInactive = resultSet.getInt("total");
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new DataAccessException("El servicio de almacenamiento no se encuentra disponible de momento.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al contar profesores inactivos", sqlException);
+            throw new DataAccessException("Error al obtener el total de profesores inactivos.", sqlException);
+        }
+
+        return totalInactive;
+    }
+
+    @Override
+    public int countPending() throws BusinessException, DataAccessException {
+        int totalPending = 0;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_COUNT_PENDING_PROFESSORS_QUERY);
+             ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+                totalPending = resultSet.getInt("total");
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new DataAccessException("El servicio de almacenamiento no se encuentra disponible de momento.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al contar profesores pendientes", sqlException);
+            throw new DataAccessException("Error al obtener el total de profesores pendientes.", sqlException);
+        }
+
+        return totalPending;
+    }
     
     @Override
-    public boolean existsCoordinator() throws BusinessException {
+    public boolean existsCoordinator() throws BusinessException, DataAccessException {
         boolean coordinatorExists = false;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement =
                     connection.prepareStatement(EXISTS_COORDINATOR_QUERY);
              ResultSet resultSet = statement.executeQuery()) {
@@ -517,10 +620,62 @@ public class ProfessorDAO implements IProfessorDAO {
         return coordinatorExists;
     }
 
-    private void validateProfessor(ProfessorDTO professor) throws BusinessException {
+    @Override
+    public boolean hasActiveEducationalExperience(
+            int professorId
+    ) throws BusinessException, DataAccessException {
+        InputValidator.validatePositive(
+            professorId,
+            "El identificador del profesor debe ser positivo."
+        );
+
+        boolean hasActiveEducationalExperience;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement =
+                    connection.prepareStatement(
+                        EXISTS_ACTIVE_EDUCATIONAL_EXPERIENCE_QUERY
+                    )) {
+            statement.setInt(
+                1,
+                professorId
+            );
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                hasActiveEducationalExperience =
+                    resultSet.next()
+                    && resultSet.getInt("total") > 0;
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexion con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al verificar experiencia educativa activa.",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al verificar si el profesor tiene una experiencia activa.",
+                sqlException
+            );
+        }
+
+        return hasActiveEducationalExperience;
+    }
+
+    private void validateProfessor(ProfessorDTO professor) throws BusinessException, DataAccessException {
         ProfessorValidator validator = new ProfessorValidator();
 
         validator.validateStaffNumber(professor.getStaffNumber());
+        validator.validateProfessorForUpdate(professor);
     }
 
     private Optional<ProfessorDTO> buildOptionalProfessorWithGroups(
@@ -567,8 +722,39 @@ public class ProfessorDAO implements IProfessorDAO {
         professor.setFirstSurname(resultSet.getString("apellido_paterno"));
         professor.setSecondSurname(resultSet.getString("apellido_materno"));
         professor.setIsActive(resultSet.getBoolean("activo"));
+        try {
+            professor.setPassword(resultSet.getString("contrasena"));
+        } catch (SQLException sqlException) {
+            LOGGER.debug(
+                "La consulta de profesor no incluye contrasena.",
+                sqlException
+            );
+        }
+        setProfessorEducationalExperienceData(
+            professor,
+            resultSet
+        );
 
         return professor;
+    }
+
+    private void setProfessorEducationalExperienceData(
+            ProfessorDTO professor,
+            ResultSet resultSet
+    ) throws SQLException {
+        try {
+            professor.setCurrentEducationalExperience(
+                resultSet.getString("experiencia_actual")
+            );
+            professor.setEducationalExperienceHistory(
+                resultSet.getString("historial_experiencias")
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.debug(
+                "La consulta de profesor no incluye historial de NRC.",
+                sqlException
+            );
+        }
     }
 
     private ProfessorDTO buildProfessorWithGroups(

@@ -17,26 +17,50 @@ public class LinkedOrganizationValidator {
             throw new ValidationException("La organización no puede ser nula.");
         }
 
-        validateRequiredFields(organization);
-        validateEmailFormat(organization.getEmail());
-        validatePhoneNumber(organization.getPhoneNumber());
-        validateUserCounts(
-            organization.getDirectUserCount(),
-            organization.getIndirectUserCount()
-        );
-    }
+        java.util.List<String> errors = new java.util.ArrayList<>();
 
-    private void validateRequiredFields(LinkedOrganizationDTO organization)
-            throws ValidationException {
-        
-        if (isNullOrEmpty(organization.getName())
-                || isNullOrEmpty(organization.getAddress())
-                || isNullOrEmpty(organization.getCity())
-                || isNullOrEmpty(organization.getState())
-                || isNullOrEmpty(organization.getSector())) {
-            throw new ValidationException(
-                "Todos los campos marcados como obligatorios deben ser completados."
+        if (isNullOrEmpty(organization.getName())) {
+            errors.add("El campo nombre es obligatorio.");
+        }
+        if (isNullOrEmpty(organization.getAddress())) {
+            errors.add("El campo dirección es obligatorio.");
+        }
+        if (isNullOrEmpty(organization.getCountry())) {
+            errors.add("El campo país es obligatorio.");
+        }
+        if (isNullOrEmpty(organization.getState())) {
+            errors.add("El campo estado es obligatorio.");
+        }
+        if (isNullOrEmpty(organization.getCity())) {
+            errors.add("El campo ciudad es obligatorio.");
+        }
+        if (isNullOrEmpty(organization.getSector())) {
+            errors.add("El campo sector es obligatorio.");
+        }
+
+        try {
+            validateEmailFormat(organization.getEmail());
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
+
+        try {
+            validatePhoneNumber(organization.getPhoneNumber());
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
+
+        try {
+            validateUserCounts(
+                organization.getDirectUserCount(),
+                organization.getIndirectUserCount()
             );
+        } catch (ValidationException e) {
+            errors.addAll(e.getErrors());
+        }
+
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
         }
     }
 
@@ -58,9 +82,15 @@ public class LinkedOrganizationValidator {
 
     private void validateUserCounts(Integer direct, Integer indirect)
             throws ValidationException {
-        
-        if (direct == null || direct < 0 || indirect == null || indirect < 0) {
-            throw new ValidationException("El número de usuarios no puede ser negativo.");
+        java.util.List<String> errors = new java.util.ArrayList<>();
+        if (direct == null || direct < 0) {
+            errors.add("El número de usuarios directos no puede ser negativo.");
+        }
+        if (indirect == null || indirect < 0) {
+            errors.add("El número de usuarios indirectos no puede ser negativo.");
+        }
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
         }
     }
 

@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane
+    prefHeight="700.0"
+    prefWidth="1000.0"
+    style="-fx-background-color: #f5f6fa;"
+    xmlns="http://javafx.com/javafx/26"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="mx.uv.internshipprogramsystem.gui.controllers.RegisterLinkedOrganizationDashboardController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" 
+              prefWidth="70.0" 
+              spacing="18.0" 
+              style="-fx-background-color:#4a90e2;" 
+              BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" 
+                        top="20.0" />
+            </padding>
+            <StackPane prefHeight="40.0" 
+                       prefWidth="40.0" 
+                       style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                <children>
+                    <Label text="PC" 
+                           textFill="WHITE">
+                        <font>
+                            <Font name="System Bold" 
+                                  size="12.0" />
+                        </font>
+                    </Label>
+                </children>
+            </StackPane>
+            <Button fx:id="btnHome" 
+                    mnemonicParsing="false" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;" 
+                    text="⌂" 
+                    textFill="WHITE" />
+            <Button fx:id="btnIntern" 
+                    mnemonicParsing="false" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="👥" 
+                    textFill="WHITE" />
+            <Button fx:id="btnReports" 
+                    mnemonicParsing="false" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="📋" textFill="WHITE" />
+            <Button fx:id="btnProjects" 
+                    mnemonicParsing="false" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="🛠️" textFill="WHITE" />
+            <Button fx:id="btnLinkedOrganization" 
+                    mnemonicParsing="false" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="💼" textFill="WHITE" />
+            <Region VBox.vgrow="ALWAYS" />
+            <Button fx:id="btnExit" 
+                    mnemonicParsing="false" 
+                    prefHeight="40.0" 
+                    prefWidth="40.0" 
+                    style="-fx-background-color: transparent;" 
+                    text="🚪" textFill="WHITE" />
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16.0">
+
+            <padding>
+                <Insets top="24.0" right="28.0" bottom="24.0" left="28.0" />
+            </padding>
+
+            <children>
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <VBox HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Registrar organizacion" textFill="#1a2744">
+                                    <font>
+                                        <Font name="System Bold" size="22.0" />
+                                    </font>
+                                </Label>
+
+                                <Label
+                                    text="Ingrese los datos de la organizacion vinculada."
+                                    textFill="#6b7280" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <VBox
+                    spacing="20.0"
+                    style="-fx-background-color: white; -fx-background-radius: 16; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 16;">
+
+                    <padding>
+                        <Insets top="28.0" right="28.0" bottom="28.0" left="28.0" />
+                    </padding>
+
+                    <children>
+                        <GridPane hgap="22.0" vgap="18.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="50.0" />
+                                <ColumnConstraints percentWidth="50.0" />
+                            </columnConstraints>
+
+                            <children>
+                                <VBox spacing="7.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Nombre *" />
+
+                                        <TextField
+                                            fx:id="txtName"
+                                            prefHeight="44.0"
+                                            promptText="Nombre de la organizacion"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Correo *" />
+
+                                        <TextField
+                                            fx:id="txtEmail"
+                                            prefHeight="44.0"
+                                            promptText="contacto@organizacion.mx"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Telefono *" />
+
+                                        <TextField
+                                            fx:id="txtPhoneNumber"
+                                            prefHeight="44.0"
+                                            promptText="2281234567"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Direccion *" />
+
+                                        <TextField
+                                            fx:id="txtAddress"
+                                            prefHeight="44.0"
+                                            promptText="Calle, numero y colonia"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Pais *" />
+
+                                        <ComboBox
+                                            fx:id="cmbCountry"
+                                            maxWidth="Infinity"
+                                            prefHeight="44.0"
+                                            promptText="Seleccione un pais"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 4; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Estado *" />
+
+                                        <ComboBox
+                                            fx:id="cmbState"
+                                            maxWidth="Infinity"
+                                            prefHeight="44.0"
+                                            promptText="Seleccione un estado"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 4; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Ciudad *" />
+
+                                        <ComboBox
+                                            fx:id="cmbCity"
+                                            maxWidth="Infinity"
+                                            prefHeight="44.0"
+                                            promptText="Seleccione una ciudad"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 4; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Sector *" />
+
+                                        <TextField
+                                            fx:id="txtSector"
+                                            prefHeight="44.0"
+                                            promptText="Publico, privado o social"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="0" GridPane.rowIndex="4">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Usuarios directos" />
+
+                                        <TextField
+                                            fx:id="txtDirectUserCount"
+                                            prefHeight="44.0"
+                                            promptText="0"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="7.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                    <children>
+                                        <Label
+                                            style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1a2744;"
+                                            text="Usuarios indirectos" />
+
+                                        <TextField
+                                            fx:id="txtIndirectUserCount"
+                                            prefHeight="44.0"
+                                            promptText="0"
+                                            style="-fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #d1d5db; -fx-background-color: white; -fx-padding: 10; -fx-font-size: 15px;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </GridPane>
+
+                        <Label
+                            text="Los campos marcados con * son obligatorios. Pais, estado y ciudad muestran coincidencias del catalogo local, pero tambien puede escribirlos manualmente. El telefono debe tener 10 digitos y los usuarios deben ser numeros enteros no negativos."
+                            textFill="#6b7280"
+                            wrapText="true" />
+
+                        <HBox alignment="CENTER" spacing="16.0">
+                            <children>
+                                <Button
+                                    mnemonicParsing="false"
+                                    onAction="#validateOrganizationForm"
+                                    prefHeight="44.0"
+                                    prefWidth="220.0"
+                                    style="-fx-background-color: #4a90e2; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-weight: bold;"
+                                    text="Registrar" />
+
+                                <Button
+                                    mnemonicParsing="false"
+                                    onAction="#clearForm"
+                                    prefHeight="44.0"
+                                    prefWidth="220.0"
+                                    style="-fx-background-color: #e5e7eb; -fx-background-radius: 12; -fx-text-fill: #1a2744; -fx-font-weight: bold;"
+                                    text="Cancelar" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

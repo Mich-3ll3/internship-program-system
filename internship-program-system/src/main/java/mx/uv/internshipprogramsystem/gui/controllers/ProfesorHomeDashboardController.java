@@ -6,6 +6,28 @@ import javafx.fxml.FXML;
 public class ProfesorHomeDashboardController {
 
     @FXML
+    private javafx.scene.control.Label lblProfessorName;
+
+    @FXML
+    private javafx.scene.control.Label lblProfessorDetails;
+
+    @FXML
+    private void initialize() {
+        initializeProfile();
+    }
+
+    private void initializeProfile() {
+        mx.uv.internshipprogramsystem.logic.dto.UserDTO currentUser =
+            mx.uv.internshipprogramsystem.logic.managers.UserSessionManager.getCurrentUser();
+        if (currentUser != null) {
+            lblProfessorName.setText(currentUser.getFullName());
+            String details = "Ingeniería en Software • Profesor • "
+                + currentUser.getInstitutionalEmail();
+            lblProfessorDetails.setText(details);
+        }
+    }
+
+    @FXML
     private void abrirAlumnos(ActionEvent event) {
     }
 

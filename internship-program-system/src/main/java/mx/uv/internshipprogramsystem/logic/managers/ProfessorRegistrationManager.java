@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -7,7 +8,7 @@ import java.sql.SQLTransientConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
@@ -25,13 +26,13 @@ public class ProfessorRegistrationManager {
         activationEmailManager = new ActivationEmailManager();
     }
 
-    public boolean registerProfessor(UserDTO user, ProfessorDTO professor) throws BusinessException {
+    public boolean registerProfessor(UserDTO user, ProfessorDTO professor) throws BusinessException, DataAccessException {
         boolean wasRegistered = false;
         String activationToken;
 
         validateRegisterProfessorData(user, professor);
 
-        try (Connection connection = DataBaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             connection.setAutoCommit(false);
 
             try {
@@ -41,7 +42,13 @@ public class ProfessorRegistrationManager {
                     new ProfessorDTO(
                         professor.getStaffNumber(),
                         getCoordinatorValue(professor),
-                        userId
+                        userId,
+                        user.getInstitutionalEmail(),
+                        user.getName(),
+                        user.getFirstSurname(),
+                        user.getSecondSurname(),
+                        true,
+                        mx.uv.internshipprogramsystem.logic.dto.UserRole.PROFESSOR
                 );
 
                 createProfessor(registeredProfessor, connection);
@@ -101,14 +108,14 @@ public class ProfessorRegistrationManager {
     private void validateRegisterProfessorData(
         UserDTO user,
         ProfessorDTO professor
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         UserValidator userValidator = new UserValidator();
         ProfessorValidator professorValidator = new ProfessorValidator();
         userValidator.validateUserForCreation(user);
         professorValidator.validateStaffNumber(professor.getStaffNumber());
     }
 
-    private int createUser(UserDTO user, Connection connection) throws BusinessException {
+    private int createUser(UserDTO user, Connection connection) throws BusinessException, DataAccessException {
         UserDAO userDAO = new UserDAO();
         int userId = userDAO.create(user, connection);
         return userId;
@@ -117,7 +124,7 @@ public class ProfessorRegistrationManager {
     private void createProfessor(
         ProfessorDTO professor,
         Connection connection) 
-    throws BusinessException {
+    throws BusinessException, DataAccessException {
         ProfessorDAO professorDAO = new ProfessorDAO();
         professorDAO.create(professor, connection);
     }

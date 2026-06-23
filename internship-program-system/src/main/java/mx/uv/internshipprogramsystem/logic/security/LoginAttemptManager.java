@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.BlockedUserException;
 
 public class LoginAttemptManager {
     private static final int MAX_FAILED_ATTEMPTS = 5;
@@ -15,7 +16,7 @@ public class LoginAttemptManager {
             Timestamp lockDate
     ) throws BusinessException {
         if (lockDate != null && isStillLocked(lockDate)) {
-            throw new BusinessException(
+            throw new BlockedUserException(
                 "La cuenta está bloqueada temporalmente. "
                 + "Intente nuevamente más tarde."
             );

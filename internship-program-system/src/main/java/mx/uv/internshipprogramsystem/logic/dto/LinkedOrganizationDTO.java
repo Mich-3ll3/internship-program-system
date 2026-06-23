@@ -4,6 +4,7 @@ public class LinkedOrganizationDTO {
     private Integer id;
     private String name;
     private String address;
+    private String country;
     private String city;
     private String state;
     private String email;
@@ -19,6 +20,7 @@ public class LinkedOrganizationDTO {
     public LinkedOrganizationDTO(
             String name,
             String address,
+            String country,
             String city,
             String state,
             String email,
@@ -29,6 +31,7 @@ public class LinkedOrganizationDTO {
     ) {
         this.name = name;
         this.address = address;
+        this.country = country;
         this.city = city;
         this.state = state;
         this.email = email;
@@ -42,6 +45,7 @@ public class LinkedOrganizationDTO {
             Integer id,
             String name,
             String address,
+            String country,
             String city,
             String state,
             String email,
@@ -53,6 +57,7 @@ public class LinkedOrganizationDTO {
         this.id = id;
         this.name = name;
         this.address = address;
+        this.country = country;
         this.city = city;
         this.state = state;
         this.email = email;
@@ -84,6 +89,14 @@ public class LinkedOrganizationDTO {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getCity() {

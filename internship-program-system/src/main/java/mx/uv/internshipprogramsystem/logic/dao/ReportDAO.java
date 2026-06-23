@@ -13,7 +13,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ReportDTO;
 import mx.uv.internshipprogramsystem.logic.dto.MonthlyReportContextDTO;
 import mx.uv.internshipprogramsystem.logic.dto.PlannedActivityDTO;
@@ -64,7 +64,7 @@ public class ReportDAO implements IReportDAO {
         Connection connection = null;
 
         try {
-            connection = DataBaseManager.getConnection();
+            connection = DatabaseManager.getConnection();
             connection.setAutoCommit(false);
 
             int generatedReportId;
@@ -137,7 +137,7 @@ public class ReportDAO implements IReportDAO {
             "FROM REPORTE r " +
             "LEFT JOIN REPORTE_AVANCES ra ON r.id = ra.reporte_id";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -182,7 +182,7 @@ public class ReportDAO implements IReportDAO {
 
         String updateQuery = "UPDATE REPORTE SET ruta_archivo = ? WHERE id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
             preparedStatement.setString(1, filePath);
@@ -205,7 +205,7 @@ public class ReportDAO implements IReportDAO {
         String updateQuery = 
             "UPDATE REPORTE SET estado = ?, observaciones_generales = ?, fecha_revision = CURRENT_TIMESTAMP WHERE id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
             preparedStatement.setString(1, newStatus);
@@ -228,7 +228,7 @@ public class ReportDAO implements IReportDAO {
 
         String selectQuery = "SELECT * FROM REPORTE WHERE estudiante_id = ?";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
 
             preparedStatement.setInt(1, studentId);
@@ -275,7 +275,7 @@ public class ReportDAO implements IReportDAO {
         List<String> projects = new ArrayList<>();
         String selectQuery = "SELECT nombre FROM PROYECTO";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(selectQuery);
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
@@ -293,7 +293,7 @@ public class ReportDAO implements IReportDAO {
     public List<PlannedActivityDTO> getProjectActivities(int projectId) {
         List<PlannedActivityDTO> activities = new ArrayList<>();
         
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_PLANNED_ACTIVITIES)) {
             
             preparedStatement.setInt(1, projectId);
@@ -321,7 +321,7 @@ public class ReportDAO implements IReportDAO {
         MonthlyReportContextDTO context = new MonthlyReportContextDTO();
         int projectId = 0;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_CONTEXT)) {
              
             preparedStatement.setInt(1, internId);
@@ -350,7 +350,7 @@ public class ReportDAO implements IReportDAO {
 
         if (projectId > 0) {
             List<String> internNames = new ArrayList<>();
-            try (Connection connection = DataBaseManager.getConnection();
+            try (Connection connection = DatabaseManager.getConnection();
                  PreparedStatement preparedStatement = connection.prepareStatement(SQL_GET_INTERNS_BY_PROJECT)) {
                  
                 preparedStatement.setInt(1, projectId);
@@ -379,7 +379,7 @@ public class ReportDAO implements IReportDAO {
 
         String query = "SELECT COUNT(*) FROM REPORTE WHERE estudiante_id = ? AND tipo = ?"; 
         
-        try (java.sql.Connection connection = DataBaseManager.getConnection(); 
+        try (java.sql.Connection connection = DatabaseManager.getConnection(); 
              java.sql.PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             
             preparedStatement.setInt(PARAM_INTERN_ID, internId);
@@ -412,7 +412,7 @@ public class ReportDAO implements IReportDAO {
                        "JOIN REPORTE r ON ra.reporte_id = r.id " +
                        "WHERE r.estudiante_id = ?"; 
         
-        try (java.sql.Connection connection = DataBaseManager.getConnection(); 
+        try (java.sql.Connection connection = DatabaseManager.getConnection(); 
              java.sql.PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             
             preparedStatement.setInt(PARAM_INTERN_ID, internId);

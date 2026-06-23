@@ -32,24 +32,6 @@ public class InternHomeDashboardController implements Initializable {
     private static final String DETAILS_FORMAT = "%s • Matrícula %s • %s";
 
     @FXML
-    private Button btnHome;
-
-    @FXML
-    private Button btnProjects;
-
-    @FXML
-    private Button btnDocuments;
-
-    @FXML
-    private Button btnReports;
-
-    @FXML
-    private Button btnExit;
-
-    @FXML
-    private Label lblFecha;
-
-    @FXML
     private Label lblStudentName;
 
     @FXML
@@ -58,52 +40,35 @@ public class InternHomeDashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         LOGGER.info("Dashboard de estudiante cargado correctamente.");
-        configureCurrentDate();
         configureInternData();
     }
 
-    private void configureCurrentDate() {
-        LocalDate currentDate = LocalDate.now();
-        Locale regionalConfiguration = new Locale(LOCALE_LANGUAGE, LOCALE_COUNTRY);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_PATTERN, regionalConfiguration);
-        
-        String formattedDate = currentDate.format(formatter);
-        
-        if (formattedDate != null && !formattedDate.isEmpty()) {
-            formattedDate = Character.toUpperCase(formattedDate.charAt(FIRST_LETTER_INDEX)) 
-                            + formattedDate.substring(REST_OF_WORD_INDEX);
-        }
-        
-        lblFecha.setText(formattedDate);
-    }
-
     private void configureInternData() {
+        Optional<InternDTO> currentInternOpt = UserSessionManager.getCurrentIntern();
 
-            Optional<InternDTO> currentInternOpt = UserSessionManager.getCurrentIntern();
+        if (currentInternOpt.isPresent()) {
+            InternDTO currentIntern = currentInternOpt.get();
 
-            if (currentInternOpt.isPresent()) {
-                InternDTO currentIntern = currentInternOpt.get();
+            String fullName = String.format("%s %s %s", 
+                currentIntern.getName(), 
+                currentIntern.getFirstSurname(), 
+                currentIntern.getSecondSurname()
+            ).trim();
 
-                String fullName = String.format("%s %s %s", 
-                    currentIntern.getName(), 
-                    currentIntern.getFirstSurname(), 
-                    currentIntern.getSecondSurname()
-                ).trim();
+            String internDetails = String.format(DETAILS_FORMAT, 
+                DEFAULT_MAJOR, 
+                currentIntern.getEnrollmentNumber(), 
+                currentIntern.getInstitutionalEmail() 
+            );
 
-                String internDetails = String.format(DETAILS_FORMAT, 
-                    DEFAULT_MAJOR, 
-                    currentIntern.getEnrollmentNumber(), 
-                    currentIntern.getInstitutionalEmail() 
-                );
-
-                lblStudentName.setText(fullName);
-                lblStudentDetails.setText(internDetails);
-            } else {
-                LOGGER.warn("No se encontró información del practicante en la sesión activa.");
-                lblStudentName.setText("Usuario Desconocido");
-                lblStudentDetails.setText("Información no disponible");
-            }
+            lblStudentName.setText(fullName);
+            lblStudentDetails.setText(internDetails);
+        } else {
+            LOGGER.warn("No se encontró información del practicante en la sesión activa.");
+            lblStudentName.setText("Usuario Desconocido");
+            lblStudentDetails.setText("Información no disponible");
         }
+    }
 
     @FXML
     private void goHome(ActionEvent event) {
@@ -182,4 +147,6 @@ public class InternHomeDashboardController implements Initializable {
     private void enviarReporte(ActionEvent event) {
         LOGGER.info("Envío de reporte realizado.");
     }
+
+
 }

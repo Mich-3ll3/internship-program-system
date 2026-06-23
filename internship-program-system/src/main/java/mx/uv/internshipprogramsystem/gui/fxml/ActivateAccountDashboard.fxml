@@ -6,79 +6,200 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane prefHeight="650.0"
             prefWidth="800.0"
-            style="-fx-background-color: #F4F4F9;"
+            style="-fx-background-color: linear-gradient(to bottom right, #F4F4F9, #EDEBFA);"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ActivateAccountDashboardController">
+
     <children>
-        <VBox alignment="TOP_CENTER"
-              layoutX="220.0"
-              layoutY="70.0"
-              prefWidth="360.0"
-              spacing="12.0"
-              style="-fx-background-color: white; -fx-background-radius: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);">
-            <padding>
-                <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
-            </padding>
+        <VBox alignment="CENTER"
+              AnchorPane.bottomAnchor="0.0"
+              AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
 
             <children>
-                <Label style="-fx-font-size: 20; -fx-font-weight: bold;"
-                       text="Activar cuenta" />
+                <VBox alignment="TOP_CENTER"
+                      maxWidth="390.0"
+                      prefWidth="390.0"
+                      spacing="14.0"
+                      style="-fx-background-color: white;
+                             -fx-background-radius: 18;
+                             -fx-border-radius: 18;
+                             -fx-border-color: #E5E7EB;
+                             -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.12), 18, 0.18, 0, 6);">
 
-                <VBox spacing="3.0">
-                    <children>
-                        <Label style="-fx-font-size: 11;" text="Token de activación" />
-                        <TextField fx:id="txtActivationToken"
-                                   prefHeight="35.0"
-                                   style="-fx-background-color: transparent; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;" />
-                    </children>
-                </VBox>
+                    <padding>
+                        <Insets bottom="32.0"
+                                left="34.0"
+                                right="34.0"
+                                top="32.0" />
+                    </padding>
 
-                <VBox spacing="3.0">
                     <children>
-                        <Label style="-fx-font-size: 11;" text="Nueva contraseña" />
-                        <PasswordField fx:id="pwdNewPassword"
-                                       prefHeight="35.0"
-                                       style="-fx-background-color: transparent; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;" />
-                    </children>
-                </VBox>
+                        <Label text="Activar cuenta"
+                               style="-fx-font-size: 22;
+                                      -fx-font-weight: bold;
+                                      -fx-text-fill: #1F2937;" />
 
-                <VBox spacing="3.0">
-                    <children>
-                        <Label style="-fx-font-size: 11;" text="Confirmar contraseña" />
-                        <PasswordField fx:id="pwdConfirmPassword"
-                                       prefHeight="35.0"
-                                       style="-fx-background-color: transparent; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;" />
-                    </children>
-                </VBox>
-                <VBox spacing="3.0">
-                    <children>
-                        <Label style="-fx-font-size: 11;"
-                            text="Correo institucional" />
+                        <Label text="Ingresa tu token y crea una contraseña segura."
+                               wrapText="true"
+                               textAlignment="CENTER"
+                               style="-fx-font-size: 12;
+                                      -fx-text-fill: #6B7280;" />
 
-                        <TextField fx:id="txtInstitutionalEmail"
-                                prefHeight="35.0"
-                                promptText="ejemplo@estudiantes.uv.mx"
+                        <Region prefHeight="4.0" />
+
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Token de activación"
+                                       style="-fx-font-size: 11;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #374151;" />
+
+                                <TextField fx:id="txtActivationToken"
+                                           prefHeight="38.0"
+                                           promptText="Ingresa el token recibido"
+                                           style="-fx-background-color: #F9FAFB;
+                                                  -fx-background-radius: 8;
+                                                  -fx-border-color: #D1D5DB;
+                                                  -fx-border-radius: 8;
+                                                  -fx-padding: 0 10 0 10;" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Nueva contraseña"
+                                       style="-fx-font-size: 11;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #374151;" />
+
+                                <PasswordField fx:id="pwdNewPassword"
+                                               prefHeight="38.0"
+                                               promptText="Nueva contraseña"
+                                               style="-fx-background-color: #F9FAFB;
+                                                      -fx-background-radius: 8;
+                                                      -fx-border-color: #D1D5DB;
+                                                      -fx-border-radius: 8;
+                                                      -fx-padding: 0 10 0 10;" />
+
+                                <HBox alignment="CENTER"
+                                      spacing="5.0">
+                                    <children>
+                                        <Pane fx:id="pneStrengthBarPart1"
+                                              prefHeight="4.0"
+                                              prefWidth="72.0"
+                                              style="-fx-background-color: #E5E7EB;
+                                                     -fx-background-radius: 10;" />
+
+                                        <Pane fx:id="pneStrengthBarPart2"
+                                              prefHeight="4.0"
+                                              prefWidth="72.0"
+                                              style="-fx-background-color: #E5E7EB;
+                                                     -fx-background-radius: 10;" />
+
+                                        <Pane fx:id="pneStrengthBarPart3"
+                                              prefHeight="4.0"
+                                              prefWidth="72.0"
+                                              style="-fx-background-color: #E5E7EB;
+                                                     -fx-background-radius: 10;" />
+
+                                        <Pane fx:id="pneStrengthBarPart4"
+                                              prefHeight="4.0"
+                                              prefWidth="72.0"
+                                              style="-fx-background-color: #E5E7EB;
+                                                     -fx-background-radius: 10;" />
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <VBox alignment="CENTER_LEFT"
+                              spacing="3.0"
+                              style="-fx-background-color: #F9FAFB;
+                                     -fx-background-radius: 10;
+                                     -fx-padding: 10;">
+                            <children>
+                                <Label fx:id="lblMinLengthRequirement"
+                                       text="• Mínimo 8 caracteres"
+                                       textFill="GRAY"
+                                       style="-fx-font-size: 10;" />
+
+                                <Label fx:id="lblUppercaseRequirement"
+                                       text="• Al menos una mayúscula"
+                                       textFill="GRAY"
+                                       style="-fx-font-size: 10;" />
+
+                                <Label fx:id="lblNumberRequirement"
+                                       text="• Al menos un número"
+                                       textFill="GRAY"
+                                       style="-fx-font-size: 10;" />
+
+                                <Label fx:id="lblSymbolRequirement"
+                                       text="• Al menos un símbolo (@#$%^&amp;+=!)"
+                                       textFill="GRAY"
+                                       style="-fx-font-size: 10;" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Confirmar contraseña"
+                                       style="-fx-font-size: 11;
+                                              -fx-font-weight: bold;
+                                              -fx-text-fill: #374151;" />
+
+                                <PasswordField fx:id="pwdConfirmPassword"
+                                               prefHeight="38.0"
+                                               promptText="Confirma tu contraseña"
+                                               style="-fx-background-color: #F9FAFB;
+                                                      -fx-background-radius: 8;
+                                                      -fx-border-color: #D1D5DB;
+                                                      -fx-border-radius: 8;
+                                                      -fx-padding: 0 10 0 10;" />
+                                <Label fx:id="lblPasswordMatch"
+                                    text=""
+                                    visible="false"
+                                    managed="false"
+                                    style="-fx-font-size: 10;" />
+                            </children>
+                        </VBox>
+
+                        <Button text="Activar cuenta"
+                                maxWidth="Infinity"
+                                prefHeight="42.0"
+                                onAction="#handleActivateAccount"
+                                style="-fx-background-color: #534AB7;
+                                       -fx-text-fill: white;
+                                       -fx-font-weight: bold;
+                                       -fx-background-radius: 8;" />
+
+                        <Button text="Reenviar token"
+                                maxWidth="Infinity"
+                                prefHeight="36.0"
+                                onAction="#handleOpenResendTokenView"
+                                style="-fx-background-color: #EEF2FF;
+                                       -fx-text-fill: #534AB7;
+                                       -fx-font-weight: bold;
+                                       -fx-background-radius: 8;" />
+
+                        <Button text="Volver al inicio de sesión"
+                                maxWidth="Infinity"
+                                prefHeight="36.0"
+                                onAction="#handleBackToLogin"
                                 style="-fx-background-color: transparent;
-                                        -fx-border-color: #E0E0E0;
-                                        -fx-border-width: 0 0 1 0;" />
+                                       -fx-text-fill: #534AB7;
+                                       -fx-font-weight: bold;" />
                     </children>
                 </VBox>
-                <Button maxWidth="Infinity"
-                        onAction="#handleActivateAccount"
-                        prefHeight="40.0"
-                        style="-fx-background-color: #534AB7; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5;"
-                        text="Activar cuenta" />
-
-                <Button maxWidth="Infinity"
-                        onAction="#handleBackToLogin"
-                        prefHeight="35.0"
-                        style="-fx-background-color: transparent; -fx-text-fill: #534AB7; -fx-font-weight: bold;"
-                        text="Volver al inicio de sesión" />
             </children>
         </VBox>
     </children>

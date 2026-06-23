@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,7 +12,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.ILinkedOrganizationDAO;
@@ -23,18 +24,18 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
 
     private static final String INSERT_LINKED_ORGANIZATION_QUERY =
         "INSERT INTO ORGANIZACION_VINCULADA "
-        + "(nombre, correo, telefono, direccion, estado, ciudad, sector, "
+        + "(nombre, correo, telefono, direccion, pais, estado, ciudad, sector, "
         + "numero_usuarios_indirectos, numero_usuarios_directos) "
-        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_ALL_LINKED_ORGANIZATIONS_QUERY =
-        "SELECT id, nombre, direccion, ciudad, estado, correo, telefono, "
+        "SELECT id, nombre, direccion, pais, ciudad, estado, correo, telefono, "
         + "sector, numero_usuarios_indirectos, numero_usuarios_directos "
         + "FROM ORGANIZACION_VINCULADA";
 
     private static final String UPDATE_LINKED_ORGANIZATION_QUERY =
         "UPDATE ORGANIZACION_VINCULADA SET nombre = ?, correo = ?, "
-        + "telefono = ?, direccion = ?, estado = ?, ciudad = ?, "
+        + "telefono = ?, direccion = ?, pais = ?, estado = ?, ciudad = ?, "
         + "sector = ?, numero_usuarios_indirectos = ?, "
         + "numero_usuarios_directos = ? "
         + "WHERE id = ?";
@@ -42,7 +43,7 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
     @Override
     public boolean createLinkedOrganization(
             LinkedOrganizationDTO linkedOrganization
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             linkedOrganization,
             "La organización vinculada no puede ser nula."
@@ -50,7 +51,7 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
 
         boolean wasCreated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertLinkedOrganizationStatement =
                  connection.prepareStatement(
                      INSERT_LINKED_ORGANIZATION_QUERY
@@ -91,11 +92,11 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
 
     @Override
     public List<LinkedOrganizationDTO> findAll()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<LinkedOrganizationDTO> linkedOrganizations =
             new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectAllLinkedOrganizationsStatement =
                  connection.prepareStatement(
                      SELECT_ALL_LINKED_ORGANIZATIONS_QUERY
@@ -134,7 +135,7 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
 
     @Override
     public boolean update(LinkedOrganizationDTO linkedOrganization)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             linkedOrganization,
             "La organización vinculada no puede ser nula."
@@ -142,7 +143,7 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
 
         boolean wasUpdated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement updateLinkedOrganizationStatement =
                  connection.prepareStatement(
                      UPDATE_LINKED_ORGANIZATION_QUERY
@@ -153,7 +154,7 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
             );
 
             updateLinkedOrganizationStatement.setInt(
-                10,
+                11,
                 linkedOrganization.getId()
             );
 
@@ -194,11 +195,12 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
         statement.setString(2, linkedOrganization.getEmail());
         statement.setString(3, linkedOrganization.getPhoneNumber());
         statement.setString(4, linkedOrganization.getAddress());
-        statement.setString(5, linkedOrganization.getState());
-        statement.setString(6, linkedOrganization.getCity());
-        statement.setString(7, linkedOrganization.getSector());
-        statement.setInt(8, linkedOrganization.getIndirectUserCount());
-        statement.setInt(9, linkedOrganization.getDirectUserCount());
+        statement.setString(5, linkedOrganization.getCountry());
+        statement.setString(6, linkedOrganization.getState());
+        statement.setString(7, linkedOrganization.getCity());
+        statement.setString(8, linkedOrganization.getSector());
+        statement.setInt(9, linkedOrganization.getIndirectUserCount());
+        statement.setInt(10, linkedOrganization.getDirectUserCount());
     }
 
     private LinkedOrganizationDTO buildLinkedOrganization(
@@ -209,6 +211,7 @@ public class LinkedOrganizationDAO implements ILinkedOrganizationDAO {
                 resultSet.getInt("id"),
                 resultSet.getString("nombre"),
                 resultSet.getString("direccion"),
+                resultSet.getString("pais"),
                 resultSet.getString("ciudad"),
                 resultSet.getString("estado"),
                 resultSet.getString("correo"),

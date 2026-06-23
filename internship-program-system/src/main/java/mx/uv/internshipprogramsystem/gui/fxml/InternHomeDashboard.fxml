@@ -18,78 +18,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uv.internshipprogramsystem.gui.controllers.InternHomeDashboardController">
-    <left>
-        <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#4a90e2;" BorderPane.alignment="CENTER">
-            <children>
-                <StackPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
-                    <VBox.margin>
-                        <Insets top="20.0" />
-                    </VBox.margin>
-                    <children>
-                        <Label text="ES" textFill="WHITE">
-                            <font><Font name="System Bold" size="12.0" /></font>
-                        </Label>
-                    </children>
-                </StackPane>
-                <Button fx:id="btnHome" 
-                        mnemonicParsing="false" 
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" 
-                        text="⌂" 
-                        textFill="WHITE"
-                        onAction="#goHome"/>
-                <Button fx:id="btnProjects" 
-                        mnemonicParsing="false" 
-                        onAction="#goProjectsModule" 
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: transparent;" 
-                        text="🛠️" 
-                        textFill="WHITE" />
-                <Button fx:id="btnDocuments" 
-                        mnemonicParsing="false" 
-                        onAction="#goDocumentsModule" 
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: transparent;" 
-                        text="📑" 
-                        textFill="WHITE" />
-                <Button fx:id="btnReports" 
-                        mnemonicParsing="false" 
-                        onAction="#goReportsModule" 
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: transparent;" 
-                        text="📋" 
-                        textFill="WHITE" />
-                <Button fx:id="btnSelfAssessments" 
-                        mnemonicParsing="false" 
-                        onAction="#goSelfAssessmentsModule" 
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: transparent;" 
-                        text="📝" 
-                        textFill="WHITE" />
-                <Region VBox.vgrow="ALWAYS" />
-                <Button fx:id="btnExit" 
-                        mnemonicParsing="false" 
-                        onAction="#logOut"
-                        prefHeight="40.0" 
-                        prefWidth="40.0" 
-                        style="-fx-background-color: transparent;" 
-                        text="🚪" 
-                        textFill="WHITE">
-                    <VBox.margin>
-                        <Insets bottom="20.0" />
-                    </VBox.margin>
-                </Button>
-            </children>
-        </VBox>
-    </left>
-
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
             <content>
@@ -98,26 +29,6 @@
                         <Insets bottom="24.0" left="24.0" right="24.0" top="20.0" />
                     </padding>
                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <children>
-                                <VBox>
-                                    <children>
-                                        <Label text="Panel de Estudiantes" textFill="#1a2744">
-                                            <font><Font name="System Bold" size="22.0" /></font>
-                                        </Label>
-                                        <Label fx:id="lblFecha" text="Martes, 5 de mayo de 2026" textFill="#6b7280" />
-                                    </children>
-                                </VBox>
-                                <Region HBox.hgrow="ALWAYS" />
-                                <StackPane prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
-                                    <children>
-                                        <Label text="SF" textFill="WHITE">
-                                            <font><Font name="System Bold" size="11.0" /></font>
-                                        </Label>
-                                    </children>
-                                </StackPane>
-                            </children>
-                        </HBox>
 
                         <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="18.0" style="-fx-background-color: #4a90e2; -fx-background-radius: 10;">
                             <padding>

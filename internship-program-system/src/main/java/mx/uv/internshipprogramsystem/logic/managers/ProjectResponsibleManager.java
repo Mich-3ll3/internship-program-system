@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class ProjectResponsibleManager {
 
     public boolean registerProjectResponsible(
             ProjectResponsibleDTO responsible
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         projectResponsibleValidator.validateForRegistration(
             responsible
         );
@@ -51,7 +52,7 @@ public class ProjectResponsibleManager {
     }
 
     public List<ProjectResponsibleDTO> getAllProjectResponsibles()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectResponsibleDTO> projectResponsibles =
             projectResponsibleDAO.findAll();
 
@@ -66,7 +67,7 @@ public class ProjectResponsibleManager {
 
     public List<ProjectResponsibleDTO> searchProjectResponsibles(
             String searchText
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             searchText,
             "El texto de búsqueda no puede estar vacío."

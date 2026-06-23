@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -7,7 +8,7 @@ import java.sql.SQLTransientConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dao.InternDAO;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
@@ -26,13 +27,13 @@ public class InternRegistrationManager {
         activationEmailManager = new ActivationEmailManager();
     }
 
-    public boolean registerIntern(UserDTO user, InternDTO intern) throws BusinessException {
+    public boolean registerIntern(UserDTO user, InternDTO intern) throws BusinessException, DataAccessException {
         boolean wasRegistered = false;
         String activationToken;
 
         validateRegisterInternData(user, intern);
 
-        try (Connection connection = DataBaseManager.getConnection()) {
+        try (Connection connection = DatabaseManager.getConnection()) {
             connection.setAutoCommit(false);
 
             try {
@@ -40,7 +41,13 @@ public class InternRegistrationManager {
 
                 InternDTO registeredIntern = new InternDTO(
                     intern.getEnrollmentNumber(),
-                    userId
+                    userId,
+                    user.getInstitutionalEmail(),
+                    user.getName(),
+                    user.getFirstSurname(),
+                    user.getSecondSurname(),
+                    true,
+                    mx.uv.internshipprogramsystem.logic.dto.UserRole.STUDENT
                 );
 
                 createIntern(registeredIntern, connection);
@@ -100,20 +107,20 @@ public class InternRegistrationManager {
     private void validateRegisterInternData(
         UserDTO user,
         InternDTO intern
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         UserValidator userValidator = new UserValidator();
         InternValidator internValidator = new InternValidator();
         userValidator.validateUserForCreation(user);
         internValidator.validateEnrollmentNumber(intern.getEnrollmentNumber());
     }
 
-    private int createUser(UserDTO user, Connection connection) throws BusinessException {
+    private int createUser(UserDTO user, Connection connection) throws BusinessException, DataAccessException {
         UserDAO userDAO = new UserDAO();
         int userId = userDAO.create(user, connection);
         return userId;
     }
 
-    private void createIntern(InternDTO intern, Connection connection) throws BusinessException {
+    private void createIntern(InternDTO intern, Connection connection) throws BusinessException, DataAccessException {
         InternDAO internDAO = new InternDAO();
         internDAO.create(intern, connection);
     }

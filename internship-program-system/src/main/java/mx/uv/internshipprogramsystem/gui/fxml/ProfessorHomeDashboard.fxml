@@ -19,35 +19,9 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.shape.Circle?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfesorHomeDashboardController">
-    <left>
-        <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#4a90e2;" BorderPane.alignment="CENTER">
-            <children>
-                <StackPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
-                    <VBox.margin>
-                        <Insets top="20.0" />
-                    </VBox.margin>
-                    <children>
-                        <Label text="PF" textFill="WHITE">
-                            <font>
-                                <Font name="System Bold" size="12.0" />
-                            </font>
-                        </Label>
-                    </children>
-                </StackPane>
-                <Button fx:id="btnAlumnosNav" mnemonicParsing="false" onAction="#abrirAlumnos" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🎓" textFill="WHITE" />
-                <Button fx:id="btnReportesNav" mnemonicParsing="false" onAction="#abrirReportes" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📑" textFill="WHITE" />
-                <Region VBox.vgrow="ALWAYS" />
-                <Button fx:id="btnSalir" mnemonicParsing="false" onAction="#cerrarSesion" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🚪" textFill="WHITE">
-                    <VBox.margin>
-                        <Insets bottom="20.0" />
-                    </VBox.margin>
-                </Button>
-            </children>
-        </VBox>
-    </left>
-
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
             <content>
@@ -56,30 +30,6 @@
                         <Insets bottom="24.0" left="24.0" right="24.0" top="20.0" />
                     </padding>
                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="10.0">
-                            <children>
-                                <VBox>
-                                    <children>
-                                        <Label text="Panel de Profesores" textFill="#1a2744">
-                                            <font>
-                                                <Font name="System Bold" size="22.0" />
-                                            </font>
-                                        </Label>
-                                        <Label fx:id="lblFecha" text="Martes, 5 de mayo de 2026" textFill="#6b7280" />
-                                    </children>
-                                </VBox>
-                                <Region HBox.hgrow="ALWAYS" />
-                                <StackPane prefHeight="35.0" prefWidth="35.0" style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
-                                    <children>
-                                        <Label text="MF" textFill="WHITE">
-                                            <font>
-                                                <Font name="System Bold" size="11.0" />
-                                            </font>
-                                        </Label>
-                                    </children>
-                                </StackPane>
-                            </children>
-                        </HBox>
 
                         <HBox alignment="CENTER_LEFT" prefHeight="100.0" spacing="18.0" style="-fx-background-color: #4a90e2; -fx-background-radius: 10;">
                             <padding>
@@ -89,8 +39,8 @@
                                 <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
                                     <children>
                                         <Label style="-fx-text-fill: white; -fx-font-size: 14;" text="Bienvenido de nuevo" />
-                                        <Label style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;" text="Miguel Flores Mendoza" />
-                                        <Label style="-fx-text-fill: #E5E7EB; -fx-font-size: 12;" text="Ingeniería en Software • Profesor • Periodo Ene-Jun 2026" />
+                                        <Label fx:id="lblProfessorName" style="-fx-text-fill: white; -fx-font-size: 18; -fx-font-weight: bold;" text="Cargando..." />
+                                        <Label fx:id="lblProfessorDetails" style="-fx-text-fill: #E5E7EB; -fx-font-size: 12;" text="Cargando..." />
                                     </children>
                                 </VBox>
                                 <VBox alignment="CENTER" maxHeight="45.0" prefWidth="120.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 8;">

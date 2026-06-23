@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ActivationTokenDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IActivationTokenDAO;
@@ -40,7 +41,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
         + "WHERE usuario_id = ? AND usado = false";
 
     @Override
-    public boolean create(ActivationTokenDTO activationToken) throws BusinessException {
+    public boolean create(ActivationTokenDTO activationToken) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
         activationToken,
         "El token de activación no puede ser nulo."
@@ -48,7 +49,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
 
         boolean wasCreated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
             PreparedStatement insertActivationTokenStatement =
                 connection.prepareStatement(INSERT_ACTIVATION_TOKEN_QUERY)) {
             insertActivationTokenStatement.setInt(1, activationToken.getUserId());
@@ -74,7 +75,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
     public boolean create(
         ActivationTokenDTO activationToken,
         Connection connection
-        ) throws BusinessException {
+        ) throws BusinessException, DataAccessException {
             InputValidator.validateNotNull(
                 activationToken,
                 "El token de activación no puede ser nulo."
@@ -119,7 +120,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
 
     @Override
     public Optional<ActivationTokenDTO> findByTokenHash(String tokenHash)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             tokenHash,
             "El hash del token no puede estar vacío."
@@ -127,7 +128,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
 
         Optional<ActivationTokenDTO> activationToken;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectActivationTokenStatement =
                  connection.prepareStatement(
                      SELECT_ACTIVATION_TOKEN_BY_HASH_QUERY
@@ -164,12 +165,12 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
     }
 
     @Override
-    public boolean markAsUsed(int tokenId) throws BusinessException {
+    public boolean markAsUsed(int tokenId) throws BusinessException, DataAccessException {
         validateTokenId(tokenId);
 
         boolean wasMarkedAsUsed;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement markActivationTokenStatement =
                  connection.prepareStatement(
                      MARK_ACTIVATION_TOKEN_AS_USED_QUERY
@@ -204,7 +205,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
     }
 
     public boolean invalidateTokensByUserId(int userId)
-        throws BusinessException {
+        throws BusinessException, DataAccessException {
         InputValidator.validatePositive(
             userId,
             "El identificador del usuario no es válido."
@@ -212,7 +213,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
 
         boolean wereTokensInvalidated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
             PreparedStatement invalidateTokensStatement =
                 connection.prepareStatement(
                     INVALIDATE_USER_TOKENS_QUERY
@@ -249,7 +250,7 @@ public class ActivationTokenDAO implements IActivationTokenDAO {
         return wereTokensInvalidated;
     }
 
-    private void validateTokenId(int tokenId) throws BusinessException {
+    private void validateTokenId(int tokenId) throws BusinessException, DataAccessException {
         if (tokenId <= 0) {
             throw new BusinessException(
                 "El identificador del token no es válido."

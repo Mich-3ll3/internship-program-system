@@ -20,19 +20,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.mockito.MockedStatic;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 
 final class DaoTestSupport {
     private DaoTestSupport() {
     }
 
-    static MockedStatic<DataBaseManager> mockDataBaseConnection(
+    static MockedStatic<DatabaseManager> mockDataBaseConnection(
             Connection connection
     ) throws SQLException {
-        MockedStatic<DataBaseManager> dataBaseManager =
-            mockStatic(DataBaseManager.class);
+        MockedStatic<DatabaseManager> dataBaseManager =
+            mockStatic(DatabaseManager.class);
 
-        dataBaseManager.when(DataBaseManager::getConnection)
+        dataBaseManager.when(DatabaseManager::getConnection)
             .thenReturn(connection);
 
         return dataBaseManager;

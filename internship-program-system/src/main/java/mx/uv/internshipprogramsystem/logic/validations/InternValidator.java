@@ -9,8 +9,8 @@ import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 public class InternValidator {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(InternValidator.class);
-    private static final int MAX_ENROLLMENT_LENGTH = 10;
-    private static final String ENROLLMENT_FORMAT_REGEX = "^zS\\d{8}$";
+    private static final int MAX_ENROLLMENT_LENGTH = 9;
+    private static final String ENROLLMENT_FORMAT_REGEX = "^S\\d{8}$";
 
     public void validateInternForCreation(InternDTO intern) throws BusinessException {
         

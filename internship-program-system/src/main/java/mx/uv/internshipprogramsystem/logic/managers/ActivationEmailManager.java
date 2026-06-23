@@ -19,7 +19,9 @@ import org.slf4j.LoggerFactory;
 import mx.uv.internshipprogramsystem.logic.dao.ActivationTokenDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ActivationTokenDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.security.SecurityManager;
+import mx.uv.internshipprogramsystem.logic.security.EmailConfiguration;
 import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
 
 public class ActivationEmailManager {
@@ -27,12 +29,6 @@ public class ActivationEmailManager {
         LoggerFactory.getLogger(ActivationEmailManager.class);
 
     private static final int ACTIVATION_TOKEN_EXPIRATION_HOURS = 24;
-    private static final String SMTP_HOST = "smtp.gmail.com";
-    private static final String SMTP_PORT = "587";
-    private static final String SYSTEM_EMAIL =
-        "internship.system.uv@gmail.com";
-    private static final String SYSTEM_EMAIL_PASSWORD =
-        "ugxmnvljsieuxhpu";
 
     private final ActivationTokenDAO activationTokenDAO;
     private final SecurityManager securityManager;
@@ -45,7 +41,7 @@ public class ActivationEmailManager {
     public String createActivationToken(
             int userId,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         String activationToken = securityManager.generateActivationToken();
         String tokenHash = securityManager.hashToken(activationToken);
 
@@ -60,7 +56,7 @@ public class ActivationEmailManager {
     public void resendActivationToken(
             int userId,
             String institutionalEmail
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validatePositive(
             userId,
             "El identificador del usuario no es válido."
@@ -95,7 +91,7 @@ public class ActivationEmailManager {
     public void sendActivationEmail(
             String recipientEmail,
             String activationToken
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         Properties properties = buildEmailProperties();
         Session session = Session.getInstance(properties);
         Transport transport = null;
@@ -103,7 +99,11 @@ public class ActivationEmailManager {
         try {
             Message message = new MimeMessage(session);
 
-            message.setFrom(new InternetAddress(SYSTEM_EMAIL));
+            message.setFrom(
+                new InternetAddress(
+                    EmailConfiguration.getEmail()
+                )
+            );
             message.setRecipients(
                 Message.RecipientType.TO,
                 InternetAddress.parse(recipientEmail)
@@ -113,9 +113,9 @@ public class ActivationEmailManager {
 
             transport = session.getTransport("smtp");
             transport.connect(
-                SMTP_HOST,
-                SYSTEM_EMAIL,
-                SYSTEM_EMAIL_PASSWORD
+                EmailConfiguration.getHost(),
+                EmailConfiguration.getEmail(),
+                EmailConfiguration.getPassword()
             );
             transport.sendMessage(
                 message,
@@ -127,8 +127,9 @@ public class ActivationEmailManager {
                 recipientEmail
             );
         } catch (MessagingException messagingException) {
-            throw new BusinessException(
-                "No se pudo enviar el correo de activación.",
+            LOGGER.error("Fallo crítico de entorno: El servidor de correo SMTP no está disponible en el host configurado.", messagingException);
+            throw new DataAccessException(
+                "El servicio de envío de correos no se encuentra disponible de momento.",
                 messagingException
             );
         } finally {
@@ -137,7 +138,7 @@ public class ActivationEmailManager {
     }
 
     private void invalidatePreviousTokens(int userId)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         boolean wereTokensInvalidated =
             activationTokenDAO.invalidateTokensByUserId(userId);
 
@@ -178,7 +179,7 @@ public class ActivationEmailManager {
     private void saveActivationToken(
             ActivationTokenDTO activationToken,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasCreated = activationTokenDAO.create(
             activationToken,
             connection
@@ -189,14 +190,14 @@ public class ActivationEmailManager {
 
     private void saveActivationToken(
             ActivationTokenDTO activationToken
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasCreated = activationTokenDAO.create(activationToken);
 
         validateActivationTokenWasCreated(wasCreated);
     }
 
     private void validateActivationTokenWasCreated(boolean wasCreated)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         if (!wasCreated) {
             throw new BusinessException(
                 "No se pudo generar el token de activación."
@@ -209,8 +210,15 @@ public class ActivationEmailManager {
 
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
-        properties.put("mail.smtp.host", SMTP_HOST);
-        properties.put("mail.smtp.port", SMTP_PORT);
+        properties.put(
+            "mail.smtp.host",
+            EmailConfiguration.getHost()
+        );
+
+        properties.put(
+            "mail.smtp.port",
+            EmailConfiguration.getPort()
+        );
 
         return properties;
     }
@@ -226,19 +234,13 @@ public class ActivationEmailManager {
         return activationMessage;
     }
 
-    private void closeTransport(Transport transport)
-            throws BusinessException {
+    private void closeTransport(Transport transport) {
         if (transport != null && transport.isConnected()) {
             try {
                 transport.close();
             } catch (MessagingException messagingException) {
                 LOGGER.error(
                     "Error al cerrar la conexión SMTP",
-                    messagingException
-                );
-
-                throw new BusinessException(
-                    "No se pudo cerrar la conexión de correo.",
                     messagingException
                 );
             }

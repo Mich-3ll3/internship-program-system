@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IProjectDAO;
@@ -27,9 +28,9 @@ public class ProjectDAO implements IProjectDAO {
         "INSERT INTO PROYECTO "
         + "(nombre, descripcion_general, objetivo_general, "
         + "objetivos_inmediatos, objetivos_mediatos, metodologia, "
-        + "recursos, responsabilidades, duracion, organizacion_id, "
+        + "recursos, responsabilidades, organizacion_id, "
         + "responsable_id, activo) "
-        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_ALL_PROJECTS_QUERY =
         "SELECT * "
@@ -56,7 +57,7 @@ public class ProjectDAO implements IProjectDAO {
         + "descripcion_general = ?, objetivo_general = ?, "
         + "objetivos_inmediatos = ?, objetivos_mediatos = ?, "
         + "metodologia = ?, recursos = ?, responsabilidades = ?, "
-        + "duracion = ?, organizacion_id = ?, responsable_id = ?, "
+        + "organizacion_id = ?, responsable_id = ?, "
         + "activo = ? "
         + "WHERE id = ?";
 
@@ -67,7 +68,7 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public boolean create(ProjectDTO project)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             project,
             "ProjectDTO no puede ser nulo."
@@ -75,7 +76,7 @@ public class ProjectDAO implements IProjectDAO {
 
         boolean wasCreated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertProjectStatement =
                  connection.prepareStatement(INSERT_PROJECT_QUERY)) {
             setProjectData(insertProjectStatement, project);
@@ -111,10 +112,10 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public List<ProjectDTO> findAll()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectDTO> projects = new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectAllProjectsStatement =
                  connection.prepareStatement(SELECT_ALL_PROJECTS_QUERY);
              ResultSet resultSet =
@@ -149,7 +150,7 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public Optional<ProjectDTO> findById(int id)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         InputValidator.validatePositive(
             id,
             "El id del proyecto debe ser positivo."
@@ -157,7 +158,7 @@ public class ProjectDAO implements IProjectDAO {
 
         Optional<ProjectDTO> project = Optional.empty();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectProjectByIdStatement =
                  connection.prepareStatement(SELECT_PROJECT_BY_ID_QUERY)) {
             selectProjectByIdStatement.setInt(
@@ -199,10 +200,10 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public List<ProjectDTO> findByStatus(boolean isActive)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectDTO> projects = new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectProjectsByStatusStatement =
                  connection.prepareStatement(
                      SELECT_PROJECTS_BY_STATUS_QUERY
@@ -247,10 +248,10 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public int countAll()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         int totalProjects = 0;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement countAllProjectsStatement =
                  connection.prepareStatement(COUNT_ALL_PROJECTS_QUERY);
              ResultSet resultSet =
@@ -285,7 +286,7 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public boolean update(ProjectDTO project)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             project,
             "ProjectDTO no puede ser nulo."
@@ -298,13 +299,13 @@ public class ProjectDAO implements IProjectDAO {
 
         boolean wasUpdated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement updateProjectStatement =
                  connection.prepareStatement(UPDATE_PROJECT_QUERY)) {
             setProjectData(updateProjectStatement, project);
 
             updateProjectStatement.setInt(
-                13,
+                12,
                 project.getId()
             );
 
@@ -341,7 +342,7 @@ public class ProjectDAO implements IProjectDAO {
     public boolean update(
             ProjectDTO project,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             project,
             "ProjectDTO no puede ser nulo."
@@ -364,7 +365,7 @@ public class ProjectDAO implements IProjectDAO {
             setProjectData(updateProjectStatement, project);
 
             updateProjectStatement.setInt(
-                13,
+                12,
                 project.getId()
             );
 
@@ -389,7 +390,7 @@ public class ProjectDAO implements IProjectDAO {
 
     @Override
     public boolean deactivate(int id)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         InputValidator.validatePositive(
             id,
             "El id del proyecto debe ser positivo."
@@ -397,7 +398,7 @@ public class ProjectDAO implements IProjectDAO {
 
         boolean wasDeactivated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement deactivateProjectStatement =
                  connection.prepareStatement(
                      DEACTIVATE_PROJECT_QUERY
@@ -439,7 +440,7 @@ public class ProjectDAO implements IProjectDAO {
     public int createAndReturnId(
             ProjectDTO project,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             project,
             "ProjectDTO no puede ser nulo."
@@ -526,18 +527,14 @@ public class ProjectDAO implements IProjectDAO {
         );
         statement.setInt(
             9,
-            project.getDuration()
-        );
-        statement.setInt(
-            10,
             project.getLinkedOrganizationId()
         );
         statement.setInt(
-            11,
+            10,
             project.getProjectResponsibleId()
         );
         statement.setBoolean(
-            12,
+            11,
             project.getIsActive()
         );
     }
@@ -554,7 +551,6 @@ public class ProjectDAO implements IProjectDAO {
             resultSet.getString("metodologia"),
             resultSet.getString("recursos"),
             resultSet.getString("responsabilidades"),
-            resultSet.getInt("duracion"),
             resultSet.getInt("organizacion_id"),
             resultSet.getInt("responsable_id"),
             resultSet.getBoolean("activo")

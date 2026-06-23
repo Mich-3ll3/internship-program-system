@@ -9,7 +9,6 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
@@ -22,13 +21,14 @@ import org.slf4j.LoggerFactory;
 import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectResponsibleDAO;
 import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
-import mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectScheduleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers.ProjectRegisterManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.gui.util.FormAlertSupport;
 
 public class ProjectRegisterDashboardController implements Initializable {
     private static final Logger LOGGER =
@@ -67,91 +67,53 @@ public class ProjectRegisterDashboardController implements Initializable {
     private TextField txtResponsibilities;
 
     @FXML
-    private TextField txtDuration;
-
-    @FXML
     private ComboBox<String> cmbOrganization;
 
     @FXML
     private ComboBox<String> cmbResponsible;
-
-    @FXML
-    private TextField txtActivityName;
-
-    @FXML
-    private TextField txtActivityMonth;
-
-    @FXML
-    private TextField txtActivityStartWeek;
-
-    @FXML
-    private TextField txtActivityEndWeek;
-
-    @FXML
-    private ListView<String> lstActivities;
-
-    @FXML
-    private ComboBox<String> cmbScheduleDay;
-
-    @FXML
-    private TextField txtEntryTime;
-
-    @FXML
-    private TextField txtExitTime;
-
-    @FXML
-    private ListView<String> lstSchedules;
 
     private ProjectRegisterManager projectRegisterManager;
     private LinkedOrganizationDAO linkedOrganizationDAO;
     private ProjectResponsibleDAO projectResponsibleDAO;
     private List<LinkedOrganizationDTO> linkedOrganizations;
     private List<ProjectResponsibleDTO> projectResponsibles;
-    private List<ProjectActivityDTO> activities;
-    private List<ProjectScheduleDTO> schedules;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         projectRegisterManager = new ProjectRegisterManager();
         linkedOrganizationDAO = new LinkedOrganizationDAO();
         projectResponsibleDAO = new ProjectResponsibleDAO();
-        activities = new ArrayList<>();
-        schedules = new ArrayList<>();
 
         loadComboBoxData();
-        loadScheduleDays();
+
+        cmbOrganization.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            filterResponsiblesByOrganization();
+        });
     }
 
     @FXML
     private void handleBtnSaveProject(ActionEvent event) {
+        FormAlertSupport.clearFieldErrorsFromActiveWindow();
+
         try {
             ProjectDTO project = buildProjectFromForm();
 
             projectRegisterManager.registerProject(
                 project,
-                activities,
-                schedules
+                List.of()
             );
 
             LOGGER.info(
                 "Proyecto registrado correctamente."
             );
 
-            showInformationAlert(
+            FormAlertSupport.showInformation(
+                "Proyecto registrado",
                 "Proyecto registrado correctamente."
             );
 
             WindowManagerController.changeView(
                 "ProjectsModuleDashboard.fxml"
-            );
-        } catch (NumberFormatException numberFormatException) {
-            LOGGER.error(
-                "Error convirtiendo datos numéricos del proyecto",
-                numberFormatException
-            );
-
-            showErrorAlert(
-                "Revisa los campos numéricos: duración y semanas."
             );
         } catch (BusinessException businessException) {
             LOGGER.error(
@@ -159,8 +121,19 @@ public class ProjectRegisterDashboardController implements Initializable {
                 businessException
             );
 
-            showErrorAlert(
-                businessException.getMessage()
+            FormAlertSupport.showWarning(
+                "Validación fallida",
+                businessException
+            );
+        } catch (DataAccessException dataAccessException) {
+            LOGGER.error(
+                "Error de conexion al guardar proyecto",
+                dataAccessException
+            );
+
+            FormAlertSupport.showError(
+                "Error de conexión",
+                "No se pudo conectar con la base de datos para registrar el proyecto. Por favor intente mas tarde."
             );
         }
     }
@@ -172,77 +145,7 @@ public class ProjectRegisterDashboardController implements Initializable {
         );
     }
 
-    @FXML
-    private void handleBtnAddActivity(ActionEvent event) {
-        try {
-            ProjectActivityDTO activity =
-                buildActivityFromForm();
 
-            activities.add(activity);
-            lstActivities.getItems().add(
-                buildActivityDisplayText(activity)
-            );
-
-            clearActivityFields();
-        } catch (NumberFormatException numberFormatException) {
-            showErrorAlert(
-                "Las semanas de la actividad deben ser números válidos."
-            );
-        } catch (BusinessException businessException) {
-            showErrorAlert(
-                businessException.getMessage()
-            );
-        }
-    }
-
-    @FXML
-    private void handleBtnRemoveActivity(ActionEvent event) {
-        int selectedIndex =
-            lstActivities.getSelectionModel().getSelectedIndex();
-
-        if (selectedIndex >= 0) {
-            activities.remove(selectedIndex);
-            lstActivities.getItems().remove(selectedIndex);
-        } else {
-            showErrorAlert(
-                "Debe seleccionar una actividad para eliminar."
-            );
-        }
-    }
-
-    @FXML
-    private void handleBtnAddSchedule(ActionEvent event) {
-        try {
-            ProjectScheduleDTO schedule =
-                buildScheduleFromForm();
-
-            schedules.add(schedule);
-            lstSchedules.getItems().add(
-                buildScheduleDisplayText(schedule)
-            );
-
-            clearScheduleFields();
-        } catch (BusinessException businessException) {
-            showErrorAlert(
-                businessException.getMessage()
-            );
-        }
-    }
-
-    @FXML
-    private void handleBtnRemoveSchedule(ActionEvent event) {
-        int selectedIndex =
-            lstSchedules.getSelectionModel().getSelectedIndex();
-
-        if (selectedIndex >= 0) {
-            schedules.remove(selectedIndex);
-            lstSchedules.getItems().remove(selectedIndex);
-        } else {
-            showErrorAlert(
-                "Debe seleccionar un horario para eliminar."
-            );
-        }
-    }
 
     @FXML
     private void goHome(ActionEvent event) {
@@ -319,8 +222,19 @@ public class ProjectRegisterDashboardController implements Initializable {
                 businessException
             );
 
-            showErrorAlert(
+            FormAlertSupport.showError(
+                "Error",
                 "No se pudieron cargar las organizaciones o responsables."
+            );
+        } catch (DataAccessException dataAccessException) {
+            LOGGER.error(
+                "Error de conexion al cargar datos para proyecto",
+                dataAccessException
+            );
+
+            FormAlertSupport.showError(
+                "Error de conexión",
+                "No se pudo conectar con la base de datos para cargar las organizaciones o responsables. Por favor intente mas tarde."
             );
         }
     }
@@ -346,114 +260,89 @@ public class ProjectRegisterDashboardController implements Initializable {
                     + " - "
                     + responsible.getFirstName()
                     + " "
-                    + responsible.getLastNameFather()
+                    + (responsible.getLastNameFather() != null ? responsible.getLastNameFather() : "")
             );
         }
     }
 
-    private void loadScheduleDays() {
-        cmbScheduleDay.getItems().clear();
-        cmbScheduleDay.getItems().add("LUNES");
-        cmbScheduleDay.getItems().add("MARTES");
-        cmbScheduleDay.getItems().add("MIERCOLES");
-        cmbScheduleDay.getItems().add("JUEVES");
-        cmbScheduleDay.getItems().add("VIERNES");
+    private void filterResponsiblesByOrganization() {
+        String selectedOrg = cmbOrganization.getValue();
+        if (selectedOrg == null || selectedOrg.trim().isEmpty()) {
+            cmbResponsible.getItems().clear();
+            cmbResponsible.setValue(null);
+            return;
+        }
+        try {
+            Integer orgId = getIdFromComboValue(selectedOrg, "Debe seleccionar una organización.");
+            
+            Integer currentRespId = null;
+            String selectedResp = cmbResponsible.getValue();
+            if (selectedResp != null && !selectedResp.trim().isEmpty()) {
+                try {
+                    currentRespId = getIdFromComboValue(selectedResp, "");
+                } catch (Exception e) {
+                    // Ignore
+                }
+            }
+
+            cmbResponsible.getItems().clear();
+            String matchedItem = null;
+            for (ProjectResponsibleDTO responsible : projectResponsibles) {
+                if (responsible.getOrganizationId() == orgId) {
+                    String item = responsible.getId()
+                            + " - "
+                            + responsible.getFirstName()
+                            + " "
+                            + (responsible.getLastNameFather() != null ? responsible.getLastNameFather() : "");
+                    cmbResponsible.getItems().add(item);
+                    if (currentRespId != null && responsible.getId() == currentRespId) {
+                        matchedItem = item;
+                    }
+                }
+            }
+            if (matchedItem != null) {
+                cmbResponsible.setValue(matchedItem);
+            } else {
+                cmbResponsible.setValue(null);
+            }
+        } catch (BusinessException e) {
+            cmbResponsible.getItems().clear();
+            cmbResponsible.setValue(null);
+        }
     }
 
-    private ProjectDTO buildProjectFromForm()
-            throws BusinessException {
-        Integer duration = Integer.valueOf(
-            txtDuration.getText().trim()
-        );
 
-        Integer organizationId =
-            getSelectedOrganizationId();
 
-        Integer responsibleId =
-            getSelectedResponsibleId();
+    private ProjectDTO buildProjectFromForm() {
+        Integer organizationId = null;
+        try {
+            organizationId = getSelectedOrganizationId();
+        } catch (BusinessException e) {
+            // Checked by validator
+        }
+
+        Integer responsibleId = null;
+        try {
+            responsibleId = getSelectedResponsibleId();
+        } catch (BusinessException e) {
+            // Checked by validator
+        }
 
         ProjectDTO project = new ProjectDTO(
-            getTrimmedText(txtProjectName),
-            getTrimmedText(txaGeneralDescription),
-            getTrimmedText(txaGeneralObjective),
-            getTrimmedText(txaImmediateObjectives),
-            getTrimmedText(txaMediateObjectives),
-            getTrimmedText(txtMethodology),
-            getTrimmedText(txaResources),
-            getTrimmedText(txtResponsibilities),
-            duration,
+            txtProjectName.getText().trim(),
+            txaGeneralDescription.getText().trim(),
+            txaGeneralObjective.getText().trim(),
+            txaImmediateObjectives.getText().trim(),
+            txaMediateObjectives.getText().trim(),
+            txtMethodology.getText().trim(),
+            txaResources.getText().trim(),
+            txtResponsibilities.getText().trim(),
             organizationId,
             responsibleId,
             true
         );
 
         return project;
-    }
-
-    private ProjectActivityDTO buildActivityFromForm()
-            throws BusinessException {
-        validateRequiredTextField(
-            txtActivityName,
-            "El nombre de la actividad es obligatorio."
-        );
-
-        validateRequiredTextField(
-            txtActivityMonth,
-            "El mes de la actividad es obligatorio."
-        );
-
-        Integer startWeek = Integer.valueOf(
-            txtActivityStartWeek.getText().trim()
-        );
-
-        Integer endWeek = Integer.valueOf(
-            txtActivityEndWeek.getText().trim()
-        );
-
-        ProjectActivityDTO activity = new ProjectActivityDTO(
-            getTrimmedText(txtActivityName),
-            getTrimmedText(txtActivityMonth),
-            startWeek,
-            endWeek,
-            0
-        );
-
-        return activity;
-    }
-
-    private ProjectScheduleDTO buildScheduleFromForm()
-            throws BusinessException {
-        String selectedDay =
-            cmbScheduleDay.getValue();
-
-        if (selectedDay == null || selectedDay.trim().isEmpty()) {
-            throw new BusinessException(
-                "Debe seleccionar un día para el horario."
-            );
-        }
-
-        validateRequiredTextField(
-            txtEntryTime,
-            "La hora de entrada es obligatoria."
-        );
-
-        validateRequiredTextField(
-            txtExitTime,
-            "La hora de salida es obligatoria."
-        );
-
-        ProjectScheduleDTO schedule = new ProjectScheduleDTO(
-            selectedDay,
-            LocalTime.parse(
-                txtEntryTime.getText().trim()
-            ),
-            LocalTime.parse(
-                txtExitTime.getText().trim()
-            ),
-            0
-        );
-
-        return schedule;
     }
 
     private Integer getSelectedOrganizationId()
@@ -498,86 +387,5 @@ public class ProjectRegisterDashboardController implements Initializable {
         id = Integer.valueOf(parts[0]);
 
         return id;
-    }
-
-    private String buildActivityDisplayText(
-            ProjectActivityDTO activity
-    ) {
-        String displayText =
-            activity.getName()
-                + " | "
-                + activity.getMonth()
-                + " | Semana "
-                + activity.getStartWeek()
-                + " a "
-                + activity.getEndWeek();
-
-        return displayText;
-    }
-
-    private String buildScheduleDisplayText(
-            ProjectScheduleDTO schedule
-    ) {
-        String displayText =
-            schedule.getWeekDay()
-                + " | "
-                + schedule.getEntryTime()
-                + " - "
-                + schedule.getExitTime();
-
-        return displayText;
-    }
-
-    private void clearActivityFields() {
-        txtActivityName.clear();
-        txtActivityMonth.clear();
-        txtActivityStartWeek.clear();
-        txtActivityEndWeek.clear();
-    }
-
-    private void clearScheduleFields() {
-        cmbScheduleDay.getSelectionModel().clearSelection();
-        txtEntryTime.clear();
-        txtExitTime.clear();
-    }
-
-    private void validateRequiredTextField(
-            TextField textField,
-            String message
-    ) throws BusinessException {
-        if (textField.getText() == null
-                || textField.getText().trim().isEmpty()) {
-            throw new BusinessException(message);
-        }
-    }
-
-    private String getTrimmedText(TextField textField) {
-        String trimmedText = textField.getText().trim();
-
-        return trimmedText;
-    }
-
-    private String getTrimmedText(TextArea textArea) {
-        String trimmedText = textArea.getText().trim();
-
-        return trimmedText;
-    }
-
-    private void showInformationAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-
-        alert.setTitle("Registro exitoso");
-        alert.setHeaderText("Operación completada");
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    private void showErrorAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-
-        alert.setTitle("Error");
-        alert.setHeaderText("No se pudo registrar el proyecto");
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }

@@ -5,9 +5,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mx.uv.internshipprogramsystem.gui.controllers.WindowManagerController;
 
 public class InternshipProgramSystem extends Application {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(InternshipProgramSystem.class);
 
     @Override
     public void start(Stage primaryStage) {
@@ -25,7 +30,7 @@ public class InternshipProgramSystem extends Application {
             primaryStage.show();
             
         } catch (Exception e) {
-            e.printStackTrace(); 
+            LOGGER.error("Error al iniciar la aplicacion", e);
         }
     }
 

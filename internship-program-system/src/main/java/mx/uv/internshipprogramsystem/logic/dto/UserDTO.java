@@ -9,6 +9,8 @@ public class UserDTO {
     private String secondSurname;
     private Boolean isActive;
     private UserRole role;
+    private Integer failedLoginAttempts;
+    private java.sql.Timestamp loginLockDate;
 
     public UserDTO() {
     }
@@ -128,5 +130,25 @@ public class UserDTO {
 
     public String getActive() {
         return getIsActive() != null && getIsActive() ? "Activo" : "Inactivo";
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Integer getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(Integer failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public java.sql.Timestamp getLoginLockDate() {
+        return loginLockDate;
+    }
+
+    public void setLoginLockDate(java.sql.Timestamp loginLockDate) {
+        this.loginLockDate = loginLockDate;
     }
 }

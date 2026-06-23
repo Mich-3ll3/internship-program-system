@@ -1,6 +1,8 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +15,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IEducationalExperienceDAO;
@@ -27,28 +29,40 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
     private static final String INSERT_EDUCATIONAL_EXPERIENCE_QUERY =
         "INSERT INTO EXPERIENCIA_EDUCATIVA "
         + "(NRC, periodo_escolar, seccion, "
-        + "profesor_id, activa) "
-        + "VALUES (?, ?, ?, ?, ?)";
+        + "profesor_id, activa, fecha_inicio, fecha_fin) "
+        + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SELECT_EDUCATIONAL_EXPERIENCE_BY_NRC_QUERY =
-        "SELECT NRC, periodo_escolar, seccion, "
-        + "profesor_id, activa "
-        + "FROM EXPERIENCIA_EDUCATIVA "
-        + "WHERE NRC = ?";
+        "SELECT ee.NRC, ee.periodo_escolar, ee.seccion, "
+        + "ee.profesor_id, ee.activa, ee.fecha_inicio, ee.fecha_fin, "
+        + "CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', "
+        + "COALESCE(u.apellido_materno, '')) AS profesor_nombre "
+        + "FROM EXPERIENCIA_EDUCATIVA ee "
+        + "LEFT JOIN USUARIO u ON ee.profesor_id = u.id "
+        + "WHERE ee.NRC = ?";
 
     private static final String SELECT_ALL_EDUCATIONAL_EXPERIENCES_QUERY =
-        "SELECT NRC, periodo_escolar, seccion, "
-        + "profesor_id, activa "
-        + "FROM EXPERIENCIA_EDUCATIVA";
+        "SELECT ee.NRC, ee.periodo_escolar, ee.seccion, "
+        + "ee.profesor_id, ee.activa, ee.fecha_inicio, ee.fecha_fin, "
+        + "CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', "
+        + "COALESCE(u.apellido_materno, '')) AS profesor_nombre "
+        + "FROM EXPERIENCIA_EDUCATIVA ee "
+        + "LEFT JOIN USUARIO u ON ee.profesor_id = u.id";
+
+    private static final String EXISTS_SECTION_BY_PERIOD_QUERY =
+        "SELECT COUNT(*) AS total "
+        + "FROM EXPERIENCIA_EDUCATIVA "
+        + "WHERE periodo_escolar = ? "
+        + "AND seccion = ?";
 
     @Override
     public boolean create(
             EducationalExperienceDTO educationalExperience
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         EducationalExperienceValidator validator = new EducationalExperienceValidator();
         validator.validateForCreation(educationalExperience);
         boolean wasCreated;
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertStatement =
                     connection.prepareStatement(
                         INSERT_EDUCATIONAL_EXPERIENCE_QUERY
@@ -58,6 +72,18 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
             insertStatement.setString(3, educationalExperience.getSection());
             insertStatement.setInt(4,educationalExperience.getProfessorId());
             insertStatement.setBoolean(5, educationalExperience.getIsActive());
+            insertStatement.setDate(
+                6,
+                Date.valueOf(
+                    educationalExperience.getStartDate()
+                )
+            );
+            insertStatement.setDate(
+                7,
+                Date.valueOf(
+                    educationalExperience.getEndDate()
+                )
+            );
 
             wasCreated = insertStatement.executeUpdate() > 0;
 
@@ -105,7 +131,7 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
     @Override
     public Optional<EducationalExperienceDTO> findByNrc(
             String nrc
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             nrc,
             "El NRC no puede estar vacío."
@@ -113,7 +139,7 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
 
         Optional<EducationalExperienceDTO> educationalExperience;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectStatement =
                     connection.prepareStatement(
                         SELECT_EDUCATIONAL_EXPERIENCE_BY_NRC_QUERY
@@ -151,11 +177,11 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
 
     @Override
     public List<EducationalExperienceDTO> findAll()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<EducationalExperienceDTO> educationalExperiences =
             new ArrayList<>();
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectStatement =
                     connection.prepareStatement(
                         SELECT_ALL_EDUCATIONAL_EXPERIENCES_QUERY
@@ -191,6 +217,46 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
         return List.copyOf(educationalExperiences);
     }
 
+    public boolean existsSectionByPeriod(
+            String schoolPeriod,
+            String section
+    ) throws BusinessException, DataAccessException {
+        boolean exists;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement =
+                    connection.prepareStatement(
+                        EXISTS_SECTION_BY_PERIOD_QUERY
+                    )) {
+            statement.setString(
+                1,
+                schoolPeriod
+            );
+            statement.setString(
+                2,
+                section
+            );
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                exists =
+                    resultSet.next()
+                    && resultSet.getInt("total") > 0;
+            }
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al validar seccion por periodo.",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al validar si la seccion ya existe en el periodo.",
+                sqlException
+            );
+        }
+
+        return exists;
+    }
+
     private Optional<EducationalExperienceDTO>
             buildOptionalEducationalExperience(
                     ResultSet resultSet
@@ -220,7 +286,37 @@ public class EducationalExperienceDAO implements IEducationalExperienceDAO {
                 resultSet.getInt("profesor_id"),
                 resultSet.getBoolean("activa")
             );
+        setOptionalEducationalExperienceData(
+            educationalExperience,
+            resultSet
+        );
 
         return educationalExperience;
+    }
+
+    private void setOptionalEducationalExperienceData(
+            EducationalExperienceDTO educationalExperience,
+            ResultSet resultSet
+    ) throws SQLException {
+        Date startDate =
+            resultSet.getDate("fecha_inicio");
+        Date endDate =
+            resultSet.getDate("fecha_fin");
+
+        if (startDate != null) {
+            educationalExperience.setStartDate(
+                startDate.toLocalDate()
+            );
+        }
+
+        if (endDate != null) {
+            educationalExperience.setEndDate(
+                endDate.toLocalDate()
+            );
+        }
+
+        educationalExperience.setProfessorName(
+            resultSet.getString("profesor_nombre")
+        );
     }
 }

@@ -48,7 +48,7 @@
                     prefHeight="42.0"
                     prefWidth="42.0"
                     style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 12; -fx-cursor: hand;"
-                    text="⌂"
+                    text="âŒ‚"
                     textFill="WHITE" />
 
                 <Button
@@ -58,7 +58,7 @@
                     prefHeight="42.0"
                     prefWidth="42.0"
                     style="-fx-background-color: transparent; -fx-cursor: hand;"
-                    text="🎓"
+                    text="ðŸŽ“"
                     textFill="WHITE" />
 
                 <Button
@@ -68,7 +68,7 @@
                     prefHeight="42.0"
                     prefWidth="42.0"
                     style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 12; -fx-cursor: hand;"
-                    text="👥"
+                    text="ðŸ‘¥"
                     textFill="WHITE" />
 
                 <Region VBox.vgrow="ALWAYS" />
@@ -80,7 +80,7 @@
                     prefHeight="42.0"
                     prefWidth="42.0"
                     style="-fx-background-color: transparent; -fx-cursor: hand;"
-                    text="🚪"
+                    text="ðŸšª"
                     textFill="WHITE">
 
                     <VBox.margin>
@@ -94,11 +94,7 @@
     <center>
         <VBox spacing="18.0">
             <padding>
-                <Insets
-                    bottom="26.0"
-                    left="30.0"
-                    right="30.0"
-                    top="28.0" />
+                <Insets bottom="26.0" left="30.0" right="30.0" top="28.0" />
             </padding>
 
             <children>
@@ -106,21 +102,15 @@
                     <children>
                         <VBox HBox.hgrow="ALWAYS">
                             <children>
-                                <Label
-                                    text="Gestión de estudiantes"
-                                    textFill="#14213d">
-
+                                <Label text="Gestión de estudiantes" textFill="#14213d">
                                     <font>
-                                        <Font
-                                            name="System Bold"
-                                            size="24.0" />
+                                        <Font name="System Bold" size="24.0" />
                                     </font>
                                 </Label>
 
                                 <Label
                                     text="Consulta, registro, modificación y asignación de experiencia educativa."
                                     textFill="#64748b">
-
                                     <font>
                                         <Font size="13.0" />
                                     </font>
@@ -143,24 +133,18 @@
                     style="-fx-background-color: white; -fx-background-radius: 18; -fx-border-color: #e2e8f0; -fx-border-radius: 18; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 14, 0.16, 0, 4);">
 
                     <padding>
-                        <Insets
-                            bottom="20.0"
-                            left="20.0"
-                            right="20.0"
-                            top="20.0" />
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                     </padding>
 
                     <children>
-                        <HBox
-                            alignment="CENTER_LEFT"
-                            spacing="10.0">
-
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
                             <children>
                                 <TextField
                                     fx:id="txtSearchEnrollment"
                                     onAction="#handleSearchIntern"
+                                    onKeyReleased="#handleSearchIntern"
                                     prefHeight="40.0"
-                                    promptText="Buscar por matrícula: zS12345678"
+                                    promptText="Buscar por matricula, correo, nombre o NRC"
                                     style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-radius: 12; -fx-border-color: #cbd5e1; -fx-padding: 0 14 0 14;"
                                     HBox.hgrow="ALWAYS" />
 
@@ -171,14 +155,6 @@
                                     prefHeight="40.0"
                                     style="-fx-background-color: #14213d; -fx-background-radius: 12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
                                     text="Buscar" />
-
-                                <Button
-                                    fx:id="btnRefreshInterns"
-                                    mnemonicParsing="false"
-                                    onAction="#handleRefreshInterns"
-                                    prefHeight="40.0"
-                                    style="-fx-background-color: #eef2f7; -fx-background-radius: 12; -fx-text-fill: #334155; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 18 0 18;"
-                                    text="Mostrar todos" />
                             </children>
                         </HBox>
 
@@ -189,25 +165,11 @@
                             style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-radius: 14; -fx-border-color: #dbe1ea; -fx-padding: 0; -fx-selection-bar: #dbeafe; -fx-selection-bar-non-focused: #dbeafe; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.08), 12, 0.15, 0, 3);">
 
                             <columns>
-                                <TableColumn
-                                    fx:id="colEnrollment"
-                                    text="Matrícula" />
-
-                                <TableColumn
-                                    fx:id="colName"
-                                    text="Nombre" />
-
-                                <TableColumn
-                                    fx:id="colEmail"
-                                    text="Correo institucional" />
-
-                                <TableColumn
-                                    fx:id="colNRC"
-                                    text="NRC" />
-
-                                <TableColumn
-                                    fx:id="colStatus"
-                                    text="Estado" />
+                                <TableColumn fx:id="colEnrollment" text="Matricula" />
+                                <TableColumn fx:id="colName" text="Nombre" />
+                                <TableColumn fx:id="colEmail" text="Correo institucional" />
+                                <TableColumn fx:id="colStatus" text="Estado interno" />
+                                <TableColumn fx:id="colActions" prefWidth="86.0" text="" />
                             </columns>
                         </TableView>
 
@@ -217,11 +179,7 @@
                             style="-fx-background-color: #f8fafc; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14;">
 
                             <padding>
-                                <Insets
-                                    bottom="12.0"
-                                    left="14.0"
-                                    right="14.0"
-                                    top="12.0" />
+                                <Insets bottom="12.0" left="14.0" right="14.0" top="12.0" />
                             </padding>
 
                             <children>
@@ -253,29 +211,17 @@
                             style="-fx-background-color: #f8fafc; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14;">
 
                             <padding>
-                                <Insets
-                                    bottom="15.0"
-                                    left="15.0"
-                                    right="15.0"
-                                    top="15.0" />
+                                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
                             </padding>
 
                             <children>
-                                <Label
-                                    text="Asignar experiencia educativa"
-                                    textFill="#14213d">
-
+                                <Label text="Asignar experiencia educativa" textFill="#14213d">
                                     <font>
-                                        <Font
-                                            name="System Bold"
-                                            size="16.0" />
+                                        <Font name="System Bold" size="16.0" />
                                     </font>
                                 </Label>
 
-                                <HBox
-                                    alignment="CENTER_LEFT"
-                                    spacing="10.0">
-
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
                                         <ComboBox
                                             fx:id="cmbEducationalExperience"
@@ -296,7 +242,7 @@
                                 </HBox>
 
                                 <Label
-                                    text="Seleccione un estudiante de la tabla y después elija la experiencia educativa."
+                                    text="Seleccione un estudiante de la tabla y despues elija la experiencia educativa."
                                     textFill="#64748b"
                                     wrapText="true" />
                             </children>

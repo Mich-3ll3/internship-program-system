@@ -7,139 +7,112 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane prefHeight="700.0"
-            prefWidth="1000.0"
+            prefWidth="1100.0"
             style="-fx-background-color: #f5f6fa;"
             xmlns="http://javafx.com/javafx/26"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="mx.uv.internshipprogramsystem.gui.controllers.LinkedOrganizationManagementController">
-    
+
     <left>
-        <VBox alignment="TOP_CENTER" 
-              prefWidth="70.0" 
-              spacing="18.0" 
-              style="-fx-background-color:#4a90e2;" 
+        <VBox alignment="TOP_CENTER"
+              prefWidth="70.0"
+              spacing="18.0"
+              style="-fx-background-color:#4a90e2;"
               BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="20.0" 
-                        top="20.0" >
-                </Insets>
+                <Insets bottom="20.0" top="20.0" />
             </padding>
-            <StackPane prefHeight="40.0" 
-                       prefWidth="40.0" 
+            <StackPane prefHeight="40.0"
+                       prefWidth="40.0"
                        style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
                 <children>
-                    <Label text="PC" 
-                           textFill="WHITE">
+                    <Label text="PC" textFill="WHITE">
                         <font>
-                            <Font name="System Bold" 
-                                  size="12.0" >
-                            </Font>
+                            <Font name="System Bold" size="12.0" />
                         </font>
                     </Label>
                 </children>
             </StackPane>
-            <Button fx:id="btnHome" 
-                    mnemonicParsing="false" 
-                    onAction="#goHome" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;" 
-                    text="⌂" 
+            <Button fx:id="btnHome"
+                    mnemonicParsing="false"
+                    onAction="#goHome"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;"
+                    text="H"
                     textFill="WHITE" />
-            <Button fx:id="btnIntern" 
-                    mnemonicParsing="false" 
-                    onAction="#goInternModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="👥" 
+            <Button fx:id="btnIntern"
+                    mnemonicParsing="false"
+                    onAction="#goInternModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="A"
                     textFill="WHITE" />
-            <Button fx:id="btnReports" 
-                    mnemonicParsing="false" 
-                    onAction="#goReportsModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="📋" textFill="WHITE" />
-            <Button fx:id="btnProjects" 
-                    mnemonicParsing="false" 
-                    onAction="#goProjectsModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="🛠️" textFill="WHITE" >
-            </Button>
-            <Button fx:id="btnLinkedOrganization" 
-                    mnemonicParsing="false" 
-                    onAction="#goLinkedOrganizationModule" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="💼" textFill="WHITE">
-            </Button>
+            <Button fx:id="btnReports"
+                    mnemonicParsing="false"
+                    onAction="#goReportsModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="R"
+                    textFill="WHITE" />
+            <Button fx:id="btnProjects"
+                    mnemonicParsing="false"
+                    onAction="#goProjectsModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="P"
+                    textFill="WHITE" />
+            <Button fx:id="btnLinkedOrganization"
+                    mnemonicParsing="false"
+                    onAction="#goLinkedOrganizationModule"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 10;"
+                    text="O"
+                    textFill="WHITE" />
             <Region VBox.vgrow="ALWAYS" />
-            <Button fx:id="btnExit" 
-                    mnemonicParsing="false" 
-                    onAction="#logOut" 
-                    prefHeight="40.0" 
-                    prefWidth="40.0" 
-                    style="-fx-background-color: transparent;" 
-                    text="🚪" textFill="WHITE" >
-            </Button>
+            <Button fx:id="btnExit"
+                    mnemonicParsing="false"
+                    onAction="#logOut"
+                    prefHeight="40.0"
+                    prefWidth="40.0"
+                    style="-fx-background-color: transparent;"
+                    text="S"
+                    textFill="WHITE" />
         </VBox>
     </left>
-    
+
     <center>
-        <VBox spacing="16.0">
+        <VBox spacing="18.0">
             <padding>
                 <Insets bottom="24.0" left="28.0" right="28.0" top="24.0" />
             </padding>
-            <VBox>
-                <Label text="Gestión de organizaciones vinculadas" textFill="#1a2744">
-                    <font>
-                        <Font name="System Bold" size="22.0" />
-                    </font>
-                </Label>
-                <Label text="Registro y consulta de organizaciones para proyectos de prácticas profesionales." textFill="#6b7280" />
-            </VBox>
-
-            <VBox spacing="12.0"
-                  style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 12;">
-                <padding>
-                    <Insets bottom="18.0" left="18.0" right="18.0" top="18.0" />
-                </padding>
-                <GridPane hgap="10.0" vgap="10.0">
-                    <TextField fx:id="txtName" promptText="Nombre de la organización" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <TextField fx:id="txtEmail" promptText="Correo" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <TextField fx:id="txtPhoneNumber" promptText="Teléfono de 10 dígitos" GridPane.columnIndex="2" GridPane.rowIndex="0" />
-                    <TextField fx:id="txtAddress" promptText="Dirección" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                    <TextField fx:id="txtCity" promptText="Ciudad" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                    <TextField fx:id="txtState" promptText="Estado" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                    <TextField fx:id="txtSector" promptText="Sector" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                    <TextField fx:id="txtDirectUserCount" promptText="Usuarios directos" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <TextField fx:id="txtIndirectUserCount" promptText="Usuarios indirectos" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-                </GridPane>
-
-                <HBox alignment="CENTER_RIGHT" spacing="8.0">
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button mnemonicParsing="false"
-                            onAction="#clearForm"
-                            style="-fx-background-color: #f5f6fa; -fx-background-radius: 8; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 8; -fx-text-fill: #6b7280;"
-                            text="Cancelar" />
-                    <Button mnemonicParsing="false"
-                            onAction="#validateOrganizationForm"
-                            style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;"
-                            text="Validar organización" />
-                </HBox>
-            </VBox>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <VBox HBox.hgrow="ALWAYS">
+                    <Label text="Organizaciones vinculadas" textFill="#1a2744">
+                        <font>
+                            <Font name="System Bold" size="24.0" />
+                        </font>
+                    </Label>
+                    <Label text="Consulte las organizaciones registradas y sus datos de contacto."
+                           textFill="#6b7280" />
+                </VBox>
+                <Button mnemonicParsing="false"
+                        onAction="#goRegisterOrganization"
+                        prefHeight="38.0"
+                        style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;"
+                        text="Registrar organizacion" />
+            </HBox>
 
             <VBox spacing="12.0"
                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 12;">
@@ -149,20 +122,24 @@
                 <HBox spacing="8.0">
                     <TextField fx:id="txtSearchName"
                                onAction="#validateSearchOrganization"
-                               promptText="Buscar organización por nombre"
+                               promptText="Buscar por nombre, correo, pais, estado, ciudad o sector"
                                HBox.hgrow="ALWAYS" />
                     <Button mnemonicParsing="false"
                             onAction="#validateSearchOrganization"
+                            prefHeight="34.0"
                             style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;"
                             text="Buscar" />
                 </HBox>
-                <TableView fx:id="tblOrganizations" prefHeight="210.0">
+
+                <TableView fx:id="tblOrganizations" prefHeight="470.0">
                     <columns>
-                        <TableColumn fx:id="colName" prefWidth="200.0" text="Organización" />
+                        <TableColumn fx:id="colName" prefWidth="190.0" text="Organizacion" />
                         <TableColumn fx:id="colEmail" prefWidth="190.0" text="Correo" />
-                        <TableColumn fx:id="colPhoneNumber" prefWidth="120.0" text="Teléfono" />
-                        <TableColumn fx:id="colCity" prefWidth="120.0" text="Ciudad" />
-                        <TableColumn fx:id="colSector" prefWidth="140.0" text="Sector" />
+                        <TableColumn fx:id="colPhoneNumber" prefWidth="110.0" text="Telefono" />
+                        <TableColumn fx:id="colCountry" prefWidth="130.0" text="Pais" />
+                        <TableColumn fx:id="colState" prefWidth="140.0" text="Estado" />
+                        <TableColumn fx:id="colCity" prefWidth="140.0" text="Ciudad" />
+                        <TableColumn fx:id="colSector" prefWidth="130.0" text="Sector" />
                     </columns>
                 </TableView>
             </VBox>

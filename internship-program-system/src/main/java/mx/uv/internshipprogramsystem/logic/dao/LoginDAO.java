@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,7 +10,7 @@ import java.sql.SQLTransientConnectionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
@@ -53,12 +54,12 @@ public class LoginDAO implements ILoginDAO {
     public UserDTO login(
             String email,
             String plainPassword
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         validateLoginData(email, plainPassword);
 
         UserDTO loggedUser;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement loginUserStatement =
                  connection.prepareStatement(
                      SELECT_USER_BY_EMAIL_FOR_LOGIN_QUERY
@@ -98,12 +99,63 @@ public class LoginDAO implements ILoginDAO {
         return loggedUser;
     }
 
+    @Override
+    public UserDTO findUserByEmail(
+            String email
+    ) throws BusinessException, DataAccessException {
+        if (email == null || email.trim().isEmpty()) {
+            throw new BusinessException("El correo institucional es obligatorio.");
+        }
+
+        UserDTO user = null;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement statement =
+                 connection.prepareStatement(
+                     SELECT_USER_BY_EMAIL_FOR_LOGIN_QUERY
+                 )) {
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    user = buildUserByRole(resultSet);
+                    user.setPassword(resultSet.getString("contrasena"));
+                    user.setFailedLoginAttempts(resultSet.getInt("intentos_fallidos_login"));
+                    user.setLoginLockDate(resultSet.getTimestamp("fecha_bloqueo_login"));
+                }
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos al buscar usuario por correo",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al buscar usuario por correo {}",
+                maskEmailForLog(email),
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al buscar el usuario por correo.",
+                sqlException
+            );
+        }
+
+        return user;
+    }
+
     public boolean incrementFailedLoginAttempts(
             int userId
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasIncremented;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement incrementAttemptsStatement =
                  connection.prepareStatement(
                      INCREMENT_FAILED_ATTEMPTS_QUERY
@@ -139,10 +191,10 @@ public class LoginDAO implements ILoginDAO {
 
     public boolean resetFailedLoginAttempts(
             int userId
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasReset;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement resetAttemptsStatement =
                  connection.prepareStatement(
                      RESET_FAILED_ATTEMPTS_QUERY
@@ -177,10 +229,10 @@ public class LoginDAO implements ILoginDAO {
 
     public boolean lockUserLogin(
             int userId
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasLocked;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement lockUserStatement =
                  connection.prepareStatement(
                      LOCK_USER_LOGIN_QUERY
@@ -216,7 +268,7 @@ public class LoginDAO implements ILoginDAO {
     private void validateLoginData(
             String email,
             String plainPassword
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             email,
             "El correo institucional es obligatorio."
@@ -234,7 +286,7 @@ public class LoginDAO implements ILoginDAO {
     private UserDTO buildLoggedUser(
             ResultSet resultSet,
             String plainPassword
-    ) throws SQLException, BusinessException {
+    ) throws SQLException, BusinessException, DataAccessException {
         UserDTO loggedUser;
 
         if (!resultSet.next()) {
@@ -255,7 +307,7 @@ public class LoginDAO implements ILoginDAO {
     private void validateStoredPassword(
             ResultSet resultSet,
             String plainPassword
-    ) throws SQLException, BusinessException {
+    ) throws SQLException, BusinessException, DataAccessException {
         String passwordHash = resultSet.getString("contrasena");
 
         if (passwordHash == null) {
@@ -295,7 +347,7 @@ public class LoginDAO implements ILoginDAO {
 
     private void registerFailedLoginAttempt(
             ResultSet resultSet
-    ) throws SQLException, BusinessException {
+    ) throws SQLException, BusinessException, DataAccessException {
         int userId = resultSet.getInt("id");
         int failedAttempts =
             resultSet.getInt("intentos_fallidos_login");

@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.dao.EducationalExperienceInternDAO;
 import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternDTO;
+import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternStatus;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.validations.EducationalExperienceInternValidator;
 
 public class EducationalExperienceInternAssignmentManager {
@@ -118,5 +120,15 @@ public class EducationalExperienceInternAssignmentManager {
                 "El estudiante ya tiene una experiencia educativa activa."
             );
         }
+    }
+
+    public boolean closeActiveEducationalExperience(
+            int internId,
+            EducationalExperienceInternStatus status
+    ) throws BusinessException, DataAccessException {
+        return educationalExperienceInternDAO.closeActiveEducationalExperience(
+            internId,
+            status
+        );
     }
 }

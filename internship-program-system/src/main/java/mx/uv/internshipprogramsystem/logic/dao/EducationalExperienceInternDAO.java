@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -7,12 +8,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.SQLTransientConnectionException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternDTO;
+import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternStatus;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces
         .IEducationalExperienceInternDAO;
@@ -35,6 +39,18 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
         + "WHERE NRC = ? "
         + "AND estudiante_id = ?";
 
+    private static final String SELECT_ASSIGNMENTS_BY_NRC_QUERY =
+        "SELECT ee.NRC, ee.estudiante_id, ee.fecha_asignacion, "
+        + "ee.cuenta_oportunidad, ee.numero_oportunidad, ee.estado, "
+        + "e.matricula, u.correo_institucional, "
+        + "CONCAT(u.nombre, ' ', u.apellido_paterno, ' ', "
+        + "COALESCE(u.apellido_materno, '')) AS nombre_estudiante "
+        + "FROM EXPERIENCIA_ESTUDIANTES ee "
+        + "JOIN ESTUDIANTE e ON ee.estudiante_id = e.usuario_id "
+        + "JOIN USUARIO u ON e.usuario_id = u.id "
+        + "WHERE ee.NRC = ? "
+        + "ORDER BY u.apellido_paterno, u.apellido_materno, u.nombre";
+
     private static final String EXISTS_ACTIVE_ASSIGNMENT_QUERY =
         "SELECT COUNT(*) AS total "
         + "FROM EXPERIENCIA_ESTUDIANTES "
@@ -53,13 +69,19 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
         + "WHERE estudiante_id = ? "
         + "AND cuenta_oportunidad = TRUE";
 
+    private static final String CLOSE_ACTIVE_ASSIGNMENT_QUERY =
+        "UPDATE EXPERIENCIA_ESTUDIANTES "
+        + "SET estado = ? "
+        + "WHERE estudiante_id = ? "
+        + "AND estado = 'ACTIVA'";
+
     @Override
     public boolean create(
             EducationalExperienceInternDTO assignment
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean wasCreated;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertStatement =
                     connection.prepareStatement(
                         INSERT_ASSIGNMENT_QUERY
@@ -115,10 +137,10 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
     @Override
     public boolean existsAssignment(
             EducationalExperienceInternDTO assignment
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean existsAssignment;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectStatement =
                     connection.prepareStatement(
                         EXISTS_ASSIGNMENT_QUERY
@@ -158,12 +180,63 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
     }
 
     @Override
+    public List<EducationalExperienceInternDTO> findByNrc(
+            String nrc
+    ) throws BusinessException, DataAccessException {
+        List<EducationalExperienceInternDTO> assignments =
+            new ArrayList<>();
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement selectStatement =
+                    connection.prepareStatement(
+                        SELECT_ASSIGNMENTS_BY_NRC_QUERY
+                    )) {
+            selectStatement.setString(
+                1,
+                nrc
+            );
+
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    assignments.add(
+                        buildAssignmentWithInternData(
+                            resultSet
+                        )
+                    );
+                }
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexion con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al consultar estudiantes por NRC",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al consultar estudiantes inscritos al NRC.",
+                sqlException
+            );
+        }
+
+        return List.copyOf(assignments);
+    }
+
+    @Override
     public boolean existsActiveAssignmentByInternId(
             int internId
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean existsActiveAssignment;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectStatement =
                     connection.prepareStatement(
                         EXISTS_ACTIVE_ASSIGNMENT_QUERY
@@ -205,10 +278,10 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
     @Override
     public boolean existsActiveEducationalExperienceByNrc(
             String nrc
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         boolean existsActiveExperience;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectStatement =
                     connection.prepareStatement(
                         EXISTS_ACTIVE_EXPERIENCE_QUERY
@@ -249,10 +322,10 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
 
     public int countValidOpportunitiesByInternId(
             int internId
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         int opportunityCount;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectStatement =
                     connection.prepareStatement(
                         COUNT_VALID_OPPORTUNITIES_QUERY
@@ -289,6 +362,59 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
         }
 
         return opportunityCount;
+    }
+
+    @Override
+    public boolean closeActiveEducationalExperience(
+            int internId,
+            EducationalExperienceInternStatus status
+    ) throws BusinessException, DataAccessException {
+        boolean wasClosed;
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement updateStatement =
+                    connection.prepareStatement(
+                        CLOSE_ACTIVE_ASSIGNMENT_QUERY
+                    )) {
+            updateStatement.setString(
+                1,
+                status.name()
+            );
+            updateStatement.setInt(
+                2,
+                internId
+            );
+
+            wasClosed =
+                updateStatement.executeUpdate() > 0;
+
+            LOGGER.info(
+                "Inscripcion activa del estudiante cerrada con estado {}.",
+                status
+            );
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexion con la base de datos",
+                connectionException
+            );
+
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error SQL al cerrar experiencia activa del estudiante",
+                sqlException
+            );
+
+            throw new BusinessException(
+                "Error al cerrar la experiencia educativa activa del estudiante.",
+                sqlException
+            );
+        }
+
+        return wasClosed;
     }
 
     private void setBasicAssignmentParameters(
@@ -369,5 +495,36 @@ public class EducationalExperienceInternDAO implements IEducationalExperienceInt
         }
 
         return total;
+    }
+
+    private EducationalExperienceInternDTO buildAssignmentWithInternData(
+            ResultSet resultSet
+    ) throws SQLException {
+        Date assignmentDate =
+            resultSet.getDate("fecha_asignacion");
+
+        EducationalExperienceInternDTO assignment =
+            new EducationalExperienceInternDTO(
+                resultSet.getString("NRC"),
+                resultSet.getInt("estudiante_id"),
+                assignmentDate != null ? assignmentDate.toLocalDate() : null,
+                resultSet.getBoolean("cuenta_oportunidad"),
+                resultSet.getInt("numero_oportunidad"),
+                EducationalExperienceInternStatus.valueOf(
+                    resultSet.getString("estado")
+                )
+            );
+
+        assignment.setEnrollmentNumber(
+            resultSet.getString("matricula")
+        );
+        assignment.setInternName(
+            resultSet.getString("nombre_estudiante")
+        );
+        assignment.setInstitutionalEmail(
+            resultSet.getString("correo_institucional")
+        );
+
+        return assignment;
     }
 }

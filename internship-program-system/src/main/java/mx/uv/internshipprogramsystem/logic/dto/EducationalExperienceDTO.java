@@ -1,11 +1,16 @@
 package mx.uv.internshipprogramsystem.logic.dto;
 
+import java.time.LocalDate;
+
 public class EducationalExperienceDTO {
     private String nrc;
     private String schoolPeriod;
     private String section;
     private int professorId;
     private boolean isActive;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String professorName;
 
     public EducationalExperienceDTO (
             String nrc,
@@ -59,6 +64,52 @@ public class EducationalExperienceDTO {
 
     public void setIsActive(boolean isActive) {
         this.isActive = isActive;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getProfessorName() {
+        String name = professorName;
+
+        if (name == null || name.isBlank()) {
+            name = "Profesor " + professorId;
+        }
+
+        return name;
+    }
+
+    public void setProfessorName(String professorName) {
+        this.professorName = professorName;
+    }
+
+    public String getStartDateDisplay() {
+        return (startDate != null) ? startDate.toString() : "-";
+    }
+
+    public String getEndDateDisplay() {
+        return (endDate != null) ? endDate.toString() : "-";
+    }
+
+    public String getDateRangeDisplay() {
+        return getStartDateDisplay() + " - " + getEndDateDisplay();
+    }
+
+    public String getActiveStatus() {
+        return getIsActive() ? "Activa" : "Inactiva";
     }
     
     @Override

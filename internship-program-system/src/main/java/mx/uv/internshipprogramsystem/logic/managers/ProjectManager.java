@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.managers;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +19,7 @@ public class ProjectManager {
     }
 
     public boolean updateProject(ProjectDTO project)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         boolean wasUpdated;
 
         try {
@@ -36,7 +37,7 @@ public class ProjectManager {
     }
 
     public boolean deactivateProject(int projectId)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         boolean wasDeactivated;
 
         try {
@@ -54,7 +55,7 @@ public class ProjectManager {
     }
 
     public Optional<ProjectDTO> findProjectById(int projectId)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         Optional<ProjectDTO> project;
 
         try {
@@ -72,7 +73,7 @@ public class ProjectManager {
     }
 
     public List<ProjectDTO> findAllProjects()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectDTO> projects =
             projectDAO.findAll();
 
@@ -80,7 +81,7 @@ public class ProjectManager {
     }
 
     public List<ProjectDTO> findActiveProjects()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectDTO> projects =
             projectDAO.findByStatus(true);
 
@@ -88,7 +89,7 @@ public class ProjectManager {
     }
 
     public List<ProjectDTO> findInactiveProjects()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectDTO> projects =
             projectDAO.findByStatus(false);
 
@@ -96,7 +97,7 @@ public class ProjectManager {
     }
 
     public int countProjects()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         int totalProjects =
             projectDAO.countAll();
 

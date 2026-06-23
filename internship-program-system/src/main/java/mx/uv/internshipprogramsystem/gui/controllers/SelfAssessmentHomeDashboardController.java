@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import mx.uv.internshipprogramsystem.logic.dto.SelfAssessmentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers.SelfAssessmentManager;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -67,6 +68,8 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
             tblSelfAssessments.setItems(FXCollections.observableArrayList(assessments));
         } catch (BusinessException exception) {
             showError("Error cargando autoevaluaciones: " + exception.getMessage());
+        } catch (DataAccessException exception) {
+            showError("Error de conexion al cargar autoevaluaciones. Por favor intente mas tarde.");
         }
     }
 
@@ -159,6 +162,8 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
             tblSelfAssessments.setItems(FXCollections.observableArrayList(filtered));
         } catch (BusinessException exception) {
             showError("Error al buscar autoevaluaciones: " + exception.getMessage());
+        } catch (DataAccessException exception) {
+            showError("Error de conexion al buscar autoevaluaciones. Por favor intente mas tarde.");
         }
     }
 
@@ -175,12 +180,12 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
 
     @FXML
     private void goProjectsModule(javafx.event.ActionEvent actionEvent) {
-        WindowManagerController.changeView("ProjectsDashboard.fxml");
+        WindowManagerController.changeView("ProjectsModuleDashboard.fxml");
     }
 
     @FXML
     private void goDocumentsModule(javafx.event.ActionEvent actionEvent) {
-        WindowManagerController.changeView("DocumentsDashboard.fxml");
+        WindowManagerController.changeView("DocumentsHomeDashboard.fxml");
     }
 
     @FXML

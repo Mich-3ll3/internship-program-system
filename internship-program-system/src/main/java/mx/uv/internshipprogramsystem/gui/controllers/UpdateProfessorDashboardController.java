@@ -2,18 +2,26 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.util.List;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
+import mx.uv.internshipprogramsystem.gui.handlers.NameTextFormatterFilter;
+import mx.uv.internshipprogramsystem.gui.handlers.StaffNumberTextFormatterFilter;
+import mx.uv.internshipprogramsystem.gui.util.FormAlertSupport;
+import mx.uv.internshipprogramsystem.gui.util.TextFormatterUtil;
 import mx.uv.internshipprogramsystem.logic.dao.ProfessorDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
+import mx.uv.internshipprogramsystem.logic.validations.ProfessorValidator;
 
 public class UpdateProfessorDashboardController {
 
@@ -25,10 +33,34 @@ public class UpdateProfessorDashboardController {
     @FXML private TextField txtSecondSurname;
     @FXML private TextField txtStaffNumber;
     @FXML private CheckBox chkCoordinator;
+    @FXML private javafx.scene.control.Label lblCoordinatorWarning;
     
     private ProfessorDTO currentProfessor;
     private final ProfessorDAO professorDAO = new ProfessorDAO();
     
+    @FXML
+    public void initialize() {
+        setupFormatFilters();
+    }
+
+    private void setupFormatFilters() {
+        txtInstitutionalEmail.setTextFormatter(
+            new TextFormatter<>(new mx.uv.internshipprogramsystem.gui.handlers.LengthFilterTextFormatter(255))
+        );
+        txtName.setTextFormatter(
+            new TextFormatter<>(new NameTextFormatterFilter())
+        );
+        txtFirstSurname.setTextFormatter(
+            new TextFormatter<>(new NameTextFormatterFilter())
+        );
+        txtSecondSurname.setTextFormatter(
+            new TextFormatter<>(new NameTextFormatterFilter())
+        );
+        txtStaffNumber.setTextFormatter(
+            new TextFormatter<>(new StaffNumberTextFormatterFilter())
+        );
+    }
+
     @FXML
     private void goHome(ActionEvent event) {
         WindowManagerController.changeView("AdminHomeDashboard.fxml");
@@ -65,51 +97,135 @@ public class UpdateProfessorDashboardController {
 
         txtInstitutionalEmail.setEditable(false);
         txtStaffNumber.setEditable(false);
+
+        lblCoordinatorWarning.setVisible(false);
+        lblCoordinatorWarning.setManaged(false);
+        chkCoordinator.setDisable(false);
+
+        if (professor.getIsCoordinator() != null && professor.getIsCoordinator()) {
+            chkCoordinator.setDisable(false);
+        } else {
+            checkCoordinatorStatus();
+        }
+    }
+
+    private void checkCoordinatorStatus() {
+        mx.uv.internshipprogramsystem.gui.util.CoordinatorCheckTask task =
+            new mx.uv.internshipprogramsystem.gui.util.CoordinatorCheckTask();
+        task.setOnSucceeded(
+            new mx.uv.internshipprogramsystem.gui.handlers.UpdateProfessorCoordinatorCheckSuccessHandler(this)
+        );
+        task.setOnFailed(
+            new mx.uv.internshipprogramsystem.gui.handlers.UpdateProfessorCoordinatorCheckFailureHandler(this)
+        );
+        new Thread(task).start();
+    }
+
+    public void handleCoordinatorCheckSuccess(boolean exists) {
+        if (exists) {
+            chkCoordinator.setSelected(false);
+            chkCoordinator.setDisable(true);
+            lblCoordinatorWarning.setVisible(true);
+            lblCoordinatorWarning.setManaged(true);
+        } else {
+            chkCoordinator.setDisable(false);
+            lblCoordinatorWarning.setVisible(false);
+            lblCoordinatorWarning.setManaged(false);
+        }
+    }
+
+    public void handleCoordinatorCheckFailure(Throwable exception) {
+        LOGGER.log(Level.SEVERE, "Error técnico al verificar coordinador en edición: " + exception.getMessage(), exception);
+        chkCoordinator.setSelected(false);
+        chkCoordinator.setDisable(true);
+        lblCoordinatorWarning.setText("No disponible (Error de conexión)");
+        lblCoordinatorWarning.setVisible(true);
+        lblCoordinatorWarning.setManaged(true);
     }
     
     @FXML
     private void handleUpdateAction() {
-        if (isFormValid()) {
-            updateProfessor();
-        }
+        updateProfessor();
     }
 
     private void updateProfessor() {
         try {
-            currentProfessor.setName(txtName.getText().trim());
-            currentProfessor.setFirstSurname(txtFirstSurname.getText().trim());
-            currentProfessor.setSecondSurname(txtSecondSurname.getText().trim());
+            FormAlertSupport.clearFieldErrorsFromActiveWindow();
+
+            String rawName = InputCleaner.sanitizeText(txtName.getText());
+            String rawFirstSurname = InputCleaner.sanitizeText(txtFirstSurname.getText());
+            String rawSecondSurname = InputCleaner.sanitizeText(txtSecondSurname.getText());
+
+            ProfessorDTO tempProfessor = new ProfessorDTO();
+            tempProfessor.setName(rawName);
+            tempProfessor.setFirstSurname(rawFirstSurname);
+            tempProfessor.setSecondSurname(rawSecondSurname);
+            tempProfessor.setStaffNumber(currentProfessor.getStaffNumber());
+            tempProfessor.setInstitutionalEmail(currentProfessor.getInstitutionalEmail());
+
+            java.util.List<String> errors = new java.util.ArrayList<>();
+
+            try {
+                new ProfessorValidator().validateProfessorForUpdate(tempProfessor);
+            } catch (ValidationException e) {
+                errors.addAll(e.getErrors());
+            }
+
+            try {
+                new UserValidator().validateUserForUpdate(tempProfessor);
+            } catch (ValidationException e) {
+                errors.addAll(e.getErrors());
+            } catch (BusinessException e) {
+                errors.add(e.getMessage());
+            }
+
+            if (!errors.isEmpty()) {
+                throw new ValidationException(errors);
+            }
+
+            String cleanName = TextFormatterUtil.formatToTitleCase(rawName);
+            String cleanFirstSurname = TextFormatterUtil.formatToTitleCase(rawFirstSurname);
+            String cleanSecondSurname = TextFormatterUtil.formatToTitleCase(rawSecondSurname);
+
+            txtName.setText(cleanName);
+            txtFirstSurname.setText(cleanFirstSurname);
+            txtSecondSurname.setText(cleanSecondSurname);
+
+            currentProfessor.setName(cleanName);
+            currentProfessor.setFirstSurname(cleanFirstSurname);
+            currentProfessor.setSecondSurname(cleanSecondSurname);
             currentProfessor.setIsCoordinator(chkCoordinator.isSelected());
-            
             currentProfessor.setRole(mx.uv.internshipprogramsystem.logic.dto.UserRole.PROFESSOR);
-            
-            new UserValidator().validateUserForUpdate(currentProfessor);
 
             UserDAO userDAO = new UserDAO(); 
             boolean userUpdated = userDAO.update(currentProfessor);
-
             boolean professorUpdated = professorDAO.update(currentProfessor);
 
             if (userUpdated && professorUpdated) {
-                showNotification(Alert.AlertType.INFORMATION, "Ã‰xito", "Los datos se actualizaron correctamente.");
+                FormAlertSupport.showInformation("Exito", "Los datos se actualizaron correctamente.");
                 goProfessorModule(null);
             } else {
-                showNotification(Alert.AlertType.WARNING, "AtenciÃ³n", "No se pudieron actualizar todos los registros.");
+                FormAlertSupport.showWarning("Atencion", "No se pudieron actualizar todos los registros.");
             }
 
         } catch (BusinessException exception) {
-            LOGGER.log(Level.SEVERE, "Error al actualizar", exception);
-            showNotification(Alert.AlertType.ERROR, "Error", exception.getMessage());
+            LOGGER.log(Level.WARNING, "Error de validacion o negocio al actualizar profesor: " + exception.getMessage(), exception);
+            String message = exception.getMessage();
+            if (message == null || message.trim().isEmpty()) {
+                message = "Datos de formulario invalidos o incompletos.";
+            }
+            FormAlertSupport.showWarning("Validacion fallida", message);
+        } catch (Exception exception) {
+            LOGGER.log(Level.SEVERE, "Error tecnico al actualizar profesor", exception);
+            String message = exception.getMessage();
+            if (message == null || message.trim().isEmpty()) {
+                message = "Ocurrio un error inesperado al actualizar el profesor.";
+            }
+            FormAlertSupport.showError("Error", message);
         }
     }
 
-    private boolean isFormValid() {
-        if (txtName.getText().trim().isEmpty() || txtFirstSurname.getText().trim().isEmpty()) {
-            showNotification(Alert.AlertType.WARNING, "Campos vacios", "El nombre y primer apellido son obligatorios.");
-            return false;
-        }
-        return true;
-    }
+
     
 
     @FXML
@@ -120,13 +236,5 @@ public class UpdateProfessorDashboardController {
         txtSecondSurname.clear();
         txtStaffNumber.clear();
         chkCoordinator.setSelected(false);
-    }
-
-    private void showNotification(Alert.AlertType type, String title, String content) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
     }
 }

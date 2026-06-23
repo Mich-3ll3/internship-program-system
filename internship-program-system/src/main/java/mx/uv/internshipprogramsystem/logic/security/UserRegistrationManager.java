@@ -20,6 +20,7 @@ import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ActivationTokenDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 public class UserRegistrationManager {
     private static final Logger LOGGER =
@@ -41,7 +42,7 @@ public class UserRegistrationManager {
         securityManager = new SecurityManager();
     }
 
-    public int registerUser(UserDTO user) throws BusinessException {
+    public int registerUser(UserDTO user) throws BusinessException, DataAccessException {
         int userId = userDAO.create(user);
         String activationToken = securityManager.generateActivationToken();
         String tokenHash = securityManager.hashToken(activationToken);
@@ -85,7 +86,7 @@ public class UserRegistrationManager {
     }
 
     private void saveActivationToken(ActivationTokenDTO activationToken)
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         boolean wasCreated = activationTokenDAO.create(activationToken);
 
         if (!wasCreated) {

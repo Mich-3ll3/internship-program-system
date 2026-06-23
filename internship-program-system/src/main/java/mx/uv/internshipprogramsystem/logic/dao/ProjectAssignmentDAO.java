@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectAssignmentDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IProjectAssignmentDAO;
@@ -44,7 +44,7 @@ public class ProjectAssignmentDAO implements IProjectAssignmentDAO {
 
         boolean wasInserted;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement insertAssignmentStatement =
                     connection.prepareStatement(INSERT_ASSIGNMENT_QUERY)) {
             insertAssignmentStatement.setInt(
@@ -109,7 +109,7 @@ public class ProjectAssignmentDAO implements IProjectAssignmentDAO {
 
         Optional<ProjectAssignmentDTO> assignment;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement selectAssignmentStatement =
                     connection.prepareStatement(
                         SELECT_ASSIGNMENT_BY_ID_QUERY
@@ -156,7 +156,7 @@ public class ProjectAssignmentDAO implements IProjectAssignmentDAO {
 
         boolean wasDeleted;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement deleteAssignmentStatement =
                     connection.prepareStatement(
                         DELETE_ASSIGNMENT_BY_ID_QUERY

@@ -11,12 +11,19 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +36,15 @@ import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.EducationalExperienceInternStatus;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
+import mx.uv.internshipprogramsystem.gui.handlers.InternSelectionListener;
+import mx.uv.internshipprogramsystem.gui.handlers.InternActionCellFactory;
+import mx.uv.internshipprogramsystem.gui.util.ExperienceHistoryRow;
 import mx.uv.internshipprogramsystem.logic.managers.EducationalExperienceInternAssignmentManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
-import mx.uv.internshipprogramsystem.logic.validations.InternValidator;
 
 public class InternManagementController {
+    
     private static final Logger LOGGER =
         LoggerFactory.getLogger(
             InternManagementController.class
@@ -41,33 +52,52 @@ public class InternManagementController {
 
     private static final boolean DEFAULT_COUNTS_OPPORTUNITY = true;
     private static final int DEFAULT_OPPORTUNITY_NUMBER = 0;
+    private static final String DEFAULT_STATUS_BUTTON_TEXT =
+        "Desactivar alumno";
+    private static final List<EducationalExperienceInternStatus>
+            CLOSURE_STATUSES =
+                List.of(
+                    EducationalExperienceInternStatus.APROBADA,
+                    EducationalExperienceInternStatus.REPROBADA,
+                    EducationalExperienceInternStatus.BAJA_NO_CONTABILIZADA,
+                    EducationalExperienceInternStatus.BAJA_EXTEMPORANEA
+                );
 
     @FXML
     private TextField txtSearchEnrollment;
-    @FXML
-    private TextArea txtInternDetails;
+
     @FXML
     private ComboBox<EducationalExperienceDTO> cmbEducationalExperience;
+
     @FXML
     private TableView<InternDTO> tblInterns;
+
     @FXML
     private TableColumn<InternDTO, String> colEnrollment;
+
     @FXML
     private TableColumn<InternDTO, String> colName;
+
     @FXML
     private TableColumn<InternDTO, String> colEmail;
-    @FXML
-    private TableColumn<InternDTO, String> colNRC;
+
     @FXML
     private TableColumn<InternDTO, String> colStatus;
+
+    @FXML
+    private TableColumn<InternDTO, Void> colActions;
+
     @FXML
     private Button btnUpdateIntern;
+
     @FXML
     private Button btnChangeInternStatus;
 
-    private final InternDAO internDAO = new InternDAO();
+    private final InternDAO internDAO =
+        new InternDAO();
 
-    private final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO =
+        new UserDAO();
 
     private final EducationalExperienceDAO educationalExperienceDAO =
         new EducationalExperienceDAO();
@@ -82,13 +112,18 @@ public class InternManagementController {
     @FXML
     public void initialize() {
         configureTable();
-        tblInterns.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        configureSelectionListener();
+
+        tblInterns.setColumnResizePolicy(
+            TableView.CONSTRAINED_RESIZE_POLICY
+        );
+
         loadInternsData();
         loadEducationalExperiences();
         disableActionButtons();
 
         LOGGER.info(
-            "Módulo de gestión de estudiantes cargado correctamente."
+            "Modulo de gestion de estudiantes cargado correctamente."
         );
     }
 
@@ -111,17 +146,44 @@ public class InternManagementController {
             )
         );
 
-        colNRC.setCellValueFactory(
-            new PropertyValueFactory<InternDTO, String>(
-                "nrc"
-            )
-        );
-
         colStatus.setCellValueFactory(
             new PropertyValueFactory<InternDTO, String>(
                 "active"
             )
         );
+
+        configureActionsColumn();
+    }
+
+    private void configureActionsColumn() {
+        colActions.setCellFactory(
+            new InternActionCellFactory(this)
+        );
+    }
+
+    private Button buildViewButton() {
+        Button viewButton =
+            new Button("Ver");
+
+        viewButton.setStyle(
+            "-fx-background-color: #e0f2fe; "
+            + "-fx-background-radius: 10; "
+            + "-fx-text-fill: #075985; "
+            + "-fx-font-weight: bold; "
+            + "-fx-cursor: hand; "
+            + "-fx-padding: 6 14 6 14;"
+        );
+
+        return viewButton;
+    }
+
+    private void configureSelectionListener() {
+        tblInterns
+            .getSelectionModel()
+            .selectedItemProperty()
+            .addListener(
+                new InternSelectionListener(this)
+            );
     }
 
     private void loadInternsData() {
@@ -151,6 +213,17 @@ public class InternManagementController {
                 "Error de carga",
                 "No se pudo cargar la lista de estudiantes."
             );
+        } catch (DataAccessException exception) {
+            LOGGER.error(
+                "Error de conexion al cargar estudiantes.",
+                exception
+            );
+
+            showNotification(
+                Alert.AlertType.ERROR,
+                "Error de conexion",
+                "No se pudo conectar con la base de datos para cargar los estudiantes. Por favor intente mas tarde."
+            );
         }
     }
 
@@ -177,11 +250,22 @@ public class InternManagementController {
                 "Error de carga",
                 "No se pudieron cargar las experiencias educativas."
             );
+        } catch (DataAccessException exception) {
+            LOGGER.error(
+                "Error de conexion al cargar experiencias educativas.",
+                exception
+            );
+
+            showNotification(
+                Alert.AlertType.ERROR,
+                "Error de conexion",
+                "No se pudo conectar con la base de datos para cargar las experiencias educativas. Por favor intente mas tarde."
+            );
         }
     }
 
     private List<EducationalExperienceDTO> getActiveEducationalExperiences()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<EducationalExperienceDTO> allExperiences =
             educationalExperienceDAO.findAll();
 
@@ -202,96 +286,82 @@ public class InternManagementController {
     }
 
     @FXML
-    private void handleSearchIntern(
-            ActionEvent event
-    ) {
-        try {
-            String enrollmentNumber =
-                txtSearchEnrollment.getText().trim();
+    private void handleSearchIntern() {
+        String searchValue =
+            txtSearchEnrollment.getText()
+                .trim()
+                .toLowerCase();
 
-            InternValidator validator =
-                new InternValidator();
-
-            validator.validateEnrollmentNumber(
-                enrollmentNumber
+        if (searchValue.isBlank()) {
+            tblInterns.setItems(
+                masterData
             );
 
-            Optional<InternDTO> foundIntern =
-                internDAO.findByEnrollmentNumber(
-                    enrollmentNumber
-                );
-
-            handleSearchResult(
-                foundIntern
-            );
-        } catch (BusinessException businessException) {
-            LOGGER.warn(
-                "Búsqueda de estudiante inválida.",
-                businessException
-            );
-
-            showNotification(
-                Alert.AlertType.ERROR,
-                "Error de búsqueda",
-                businessException.getMessage()
-            );
-        }
-    }
-
-    private void handleSearchResult(
-            Optional<InternDTO> foundIntern
-    ) {
-        if (foundIntern.isPresent()) {
-            showFoundIntern(
-                foundIntern.get()
-            );
+            disableActionButtons();
         } else {
-            showInternNotFoundMessage();
+            filterInterns(
+                searchValue
+            );
         }
     }
 
-    private void showFoundIntern(
-            InternDTO intern
+    private void filterInterns(
+            String searchValue
     ) {
+        ObservableList<InternDTO> filteredInterns =
+            FXCollections.observableArrayList();
+
+        for (InternDTO intern : masterData) {
+            if (containsSearchValue(
+                    intern,
+                    searchValue
+            )) {
+                filteredInterns.add(
+                    intern
+                );
+            }
+        }
+
         tblInterns.setItems(
-            FXCollections.observableArrayList(
-                intern
-            )
+            filteredInterns
         );
 
-        enableActionButtons();
-
-        LOGGER.info(
-            "Estudiante encontrado correctamente."
-        );
-    }
-
-    private void showInternNotFoundMessage() {
         disableActionButtons();
-
-        LOGGER.warn(
-            "No se encontró estudiante con la matrícula proporcionada."
-        );
-
-        showNotification(
-            Alert.AlertType.WARNING,
-            "Sin resultados",
-            "No se encontró ningún estudiante con esa matrícula."
-        );
     }
 
-    @FXML
-    private void handleRefreshInterns(
-            ActionEvent event
+    private boolean containsSearchValue(
+            InternDTO intern,
+            String searchValue
     ) {
-        txtSearchEnrollment.clear();
+        String searchableText =
+            String.join(
+                " ",
+                getTextValue(intern.getEnrollmentNumber()),
+                getTextValue(intern.getInstitutionalEmail()),
+                getTextValue(intern.getFullName()),
+                getTextValue(intern.getNrc()),
+                getTextValue(intern.getActive()),
+                getTextValue(intern.getCurrentEducationalExperienceDisplay()),
+                getTextValue(intern.getEducationalExperienceHistoryDisplay())
+            );
 
-        loadInternsData();
-        disableActionButtons();
-
-        LOGGER.info(
-            "Lista de estudiantes actualizada correctamente."
+        return searchableText.contains(
+            searchValue
         );
+    }
+
+    private String getTextValue(
+            String text
+    ) {
+        String value =
+            "";
+
+        if (text != null) {
+            value =
+                text.toLowerCase();
+        }
+
+        return value;
     }
 
     @FXML
@@ -299,6 +369,14 @@ public class InternManagementController {
         InternDTO selectedIntern =
             tblInterns.getSelectionModel().getSelectedItem();
 
+        updateInternSelection(
+            selectedIntern
+        );
+    }
+
+    public void updateInternSelection(
+            InternDTO selectedIntern
+    ) {
         if (selectedIntern == null) {
             disableActionButtons();
         } else {
@@ -307,6 +385,335 @@ public class InternManagementController {
                 selectedIntern
             );
         }
+    }
+
+    public void showInternDetailsDialog(
+            InternDTO intern
+    ) {
+        Dialog<Void> detailsDialog =
+            new Dialog<>();
+
+        detailsDialog.setTitle(
+            "Detalle de estudiante"
+        );
+
+        DialogPane dialogPane =
+            detailsDialog.getDialogPane();
+
+        dialogPane.getButtonTypes().add(
+            ButtonType.CLOSE
+        );
+
+        dialogPane.setContent(
+            buildInternDetailsContent(
+                intern
+            )
+        );
+
+        dialogPane.setStyle(
+            "-fx-background-color: #f8fafc;"
+        );
+
+        detailsDialog.showAndWait();
+    }
+
+    private VBox buildInternDetailsContent(
+            InternDTO intern
+    ) {
+        VBox content =
+            new VBox(16);
+
+        content.setPrefWidth(780);
+        content.setStyle(
+            "-fx-background-color: #f8fafc; "
+            + "-fx-padding: 18;"
+        );
+
+        content.getChildren().addAll(
+            buildInternDetailsHeader(
+                intern
+            ),
+            buildInternDetailsSummary(
+                intern
+            ),
+            buildInternHistoryCard(
+                intern
+            )
+        );
+
+        return content;
+    }
+
+    private VBox buildInternDetailsHeader(
+            InternDTO intern
+    ) {
+        VBox header =
+            new VBox(6);
+
+        header.setStyle(
+            "-fx-background-color: white; "
+            + "-fx-background-radius: 14; "
+            + "-fx-border-color: #dbeafe; "
+            + "-fx-border-radius: 14; "
+            + "-fx-padding: 18;"
+        );
+
+        Label title =
+            new Label(
+                intern.getFullName()
+            );
+
+        title.setStyle(
+            "-fx-text-fill: #14213d; "
+            + "-fx-font-size: 22px; "
+            + "-fx-font-weight: bold;"
+        );
+
+        Label subtitle =
+            new Label(
+                intern.getEnrollmentNumber()
+                + " | " + intern.getInstitutionalEmail()
+            );
+
+        subtitle.setStyle(
+            "-fx-text-fill: #475569; "
+            + "-fx-font-size: 14px;"
+        );
+
+        header.getChildren().addAll(
+            title,
+            subtitle
+        );
+
+        return header;
+    }
+
+    private HBox buildInternDetailsSummary(
+            InternDTO intern
+    ) {
+        HBox summary =
+            new HBox(10);
+
+        summary.getChildren().addAll(
+            buildSummaryItem(
+                "Estado interno",
+                intern.getActive()
+            ),
+            buildSummaryItem(
+                "Estado en EE",
+                intern.getEducationalExperienceStatusDisplayName()
+            ),
+            buildSummaryItem(
+                "Experiencia actual",
+                intern.getCurrentEducationalExperienceDisplay()
+            )
+        );
+
+        return summary;
+    }
+
+    private VBox buildInternHistoryCard(
+            InternDTO intern
+    ) {
+        VBox card =
+            new VBox(8);
+
+        card.setStyle(
+            "-fx-background-color: white; "
+            + "-fx-background-radius: 12; "
+            + "-fx-border-color: #e2e8f0; "
+            + "-fx-border-radius: 12; "
+            + "-fx-padding: 14;"
+        );
+
+        Label title =
+            new Label("Historial de NRC");
+
+        title.setStyle(
+            "-fx-text-fill: #64748b; "
+            + "-fx-font-size: 12px;"
+        );
+
+        card.getChildren().addAll(
+            title,
+            buildExperienceHistoryTable(
+                intern.getEducationalExperienceHistory()
+            )
+        );
+
+        return card;
+    }
+
+    private VBox buildSummaryItem(
+            String label,
+            String value
+    ) {
+        VBox summaryItem =
+            new VBox(4);
+
+        summaryItem.setPrefWidth(246);
+        summaryItem.setStyle(
+            "-fx-background-color: white; "
+            + "-fx-background-radius: 12; "
+            + "-fx-border-color: #e2e8f0; "
+            + "-fx-border-radius: 12; "
+            + "-fx-padding: 12;"
+        );
+
+        Label title =
+            new Label(label);
+
+        title.setStyle(
+            "-fx-text-fill: #64748b; "
+            + "-fx-font-size: 12px;"
+        );
+
+        Label text =
+            new Label(value);
+
+        text.setWrapText(true);
+        text.setStyle(
+            "-fx-text-fill: #14213d; "
+            + "-fx-font-size: 14px; "
+            + "-fx-font-weight: bold;"
+        );
+
+        summaryItem.getChildren().addAll(
+            title,
+            text
+        );
+
+        return summaryItem;
+    }
+
+    private TableView<ExperienceHistoryRow> buildExperienceHistoryTable(
+            String history
+    ) {
+        TableView<ExperienceHistoryRow> historyTable =
+            new TableView<>();
+
+        historyTable.setPrefHeight(220);
+        historyTable.setColumnResizePolicy(
+            TableView.CONSTRAINED_RESIZE_POLICY
+        );
+        historyTable.setItems(
+            FXCollections.observableArrayList(
+                buildExperienceHistoryRows(
+                    history
+                )
+            )
+        );
+        historyTable.setPlaceholder(
+            new Label("Sin NRC registrados")
+        );
+        historyTable.setStyle(
+            "-fx-background-color: white; "
+            + "-fx-background-radius: 10; "
+            + "-fx-border-color: #e2e8f0; "
+            + "-fx-border-radius: 10;"
+        );
+
+        historyTable.getColumns().addAll(
+            buildHistoryColumn(
+                "NRC",
+                "nrc",
+                90
+            ),
+            buildHistoryColumn(
+                "Periodo",
+                "period",
+                120
+            ),
+            buildHistoryColumn(
+                "Seccion",
+                "section",
+                120
+            ),
+            buildHistoryColumn(
+                "Estado",
+                "status",
+                150
+            )
+        );
+
+        return historyTable;
+    }
+
+    private TableColumn<ExperienceHistoryRow, String> buildHistoryColumn(
+            String title,
+            String property,
+            double width
+    ) {
+        TableColumn<ExperienceHistoryRow, String> column =
+            new TableColumn<>(title);
+
+        column.setPrefWidth(width);
+        column.setCellValueFactory(
+            new PropertyValueFactory<ExperienceHistoryRow, String>(
+                property
+            )
+        );
+
+        return column;
+    }
+
+    private List<ExperienceHistoryRow> buildExperienceHistoryRows(
+            String history
+    ) {
+        ObservableList<ExperienceHistoryRow> rows =
+            FXCollections.observableArrayList();
+
+        if (history != null && !history.isBlank()) {
+            String normalizedHistory =
+                history.replace(
+                    ", ",
+                    "\n"
+                );
+
+            for (String experience : normalizedHistory.split("\\R")) {
+                if (!experience.isBlank()) {
+                    rows.add(
+                        buildExperienceHistoryRow(
+                            experience
+                        )
+                    );
+                }
+            }
+        }
+
+        return rows;
+    }
+
+    private ExperienceHistoryRow buildExperienceHistoryRow(
+            String experience
+    ) {
+        String[] parts =
+            experience.split(
+                " - ",
+                -1
+            );
+
+        return new ExperienceHistoryRow(
+            getPartValue(parts, 0),
+            getPartValue(parts, 1),
+            getPartValue(parts, 2),
+            getPartValue(parts, 3)
+        );
+    }
+
+    private String getPartValue(
+            String[] parts,
+            int index
+    ) {
+        String value =
+            "-";
+
+        if (parts.length > index && !parts[index].isBlank()) {
+            value =
+                parts[index].trim();
+        }
+
+        return value;
     }
 
     @FXML
@@ -326,18 +733,19 @@ public class InternManagementController {
                     selectedExperience
                 );
 
-            educationalExperienceInternAssignmentManager
-                .assignInternToEducationalExperience(
-                    assignment
-                );
+            activateInternWithEducationalExperience(
+                selectedIntern,
+                assignment
+            );
 
             showNotification(
                 Alert.AlertType.INFORMATION,
-                "Asignación exitosa",
+                "Asignacion exitosa",
                 "La experiencia educativa fue asignada correctamente."
             );
 
             loadInternsData();
+            disableActionButtons();
         } catch (BusinessException businessException) {
             LOGGER.warn(
                 "No se pudo asignar experiencia educativa al estudiante.",
@@ -346,8 +754,19 @@ public class InternManagementController {
 
             showNotification(
                 Alert.AlertType.WARNING,
-                "Asignación no realizada",
+                "Asignacion no realizada",
                 businessException.getMessage()
+            );
+        } catch (DataAccessException exception) {
+            LOGGER.error(
+                "Error de conexion al asignar experiencia educativa.",
+                exception
+            );
+
+            showNotification(
+                Alert.AlertType.ERROR,
+                "Error de conexion",
+                "No se pudo conectar con la base de datos para asignar la experiencia educativa. Por favor intente mas tarde."
             );
         }
     }
@@ -387,17 +806,29 @@ public class InternManagementController {
                     InternDTO intern,
                     EducationalExperienceDTO educationalExperience
     ) {
-        EducationalExperienceInternDTO assignment =
-            new EducationalExperienceInternDTO(
-                educationalExperience.getNrc(),
-                intern.getId(),
-                LocalDate.now(),
-                DEFAULT_COUNTS_OPPORTUNITY,
-                DEFAULT_OPPORTUNITY_NUMBER,
-                EducationalExperienceInternStatus.ACTIVA
+        return new EducationalExperienceInternDTO(
+            educationalExperience.getNrc(),
+            intern.getId(),
+            LocalDate.now(),
+            DEFAULT_COUNTS_OPPORTUNITY,
+            DEFAULT_OPPORTUNITY_NUMBER,
+            EducationalExperienceInternStatus.ACTIVA
+        );
+    }
+
+    private void activateInternWithEducationalExperience(
+            InternDTO intern,
+            EducationalExperienceInternDTO assignment
+    ) throws BusinessException, DataAccessException {
+        educationalExperienceInternAssignmentManager
+            .assignInternToEducationalExperience(
+                assignment
             );
 
-        return assignment;
+        changeUserStatus(
+            intern.getId(),
+            true
+        );
     }
 
     @FXML
@@ -410,6 +841,12 @@ public class InternManagementController {
 
             changeInternStatus(
                 selectedIntern
+            );
+
+            showNotification(
+                Alert.AlertType.INFORMATION,
+                "Estado actualizado",
+                "El estado del estudiante fue actualizado correctamente."
             );
 
             loadInternsData();
@@ -425,19 +862,92 @@ public class InternManagementController {
                 "Error",
                 businessException.getMessage()
             );
+        } catch (DataAccessException exception) {
+            LOGGER.error(
+                "Error de conexion al cambiar estado del estudiante.",
+                exception
+            );
+
+            showNotification(
+                Alert.AlertType.ERROR,
+                "Error de conexion",
+                "No se pudo conectar con la base de datos para cambiar el estado del estudiante. Por favor intente mas tarde."
+            );
         }
     }
 
     private void changeInternStatus(
             InternDTO intern
-    ) throws BusinessException {
-        boolean newStatus =
-            !intern.getIsActive();
+    ) throws BusinessException, DataAccessException {
+        if (!intern.hasActiveEducationalExperience()) {
+            throw new BusinessException(
+                "Seleccione el NRC activo para desactivar al estudiante."
+            );
+        }
 
+        closeInternEducationalExperience(
+            intern
+        );
+    }
+
+    private void closeInternEducationalExperience(
+            InternDTO intern
+    ) throws BusinessException, DataAccessException {
+        EducationalExperienceInternStatus closureStatus =
+            requestClosureStatus();
+
+        educationalExperienceInternAssignmentManager
+            .closeActiveEducationalExperience(
+                intern.getId(),
+                closureStatus
+            );
+
+        changeUserStatus(
+            intern.getId(),
+            false
+        );
+    }
+
+    private EducationalExperienceInternStatus requestClosureStatus()
+            throws BusinessException {
+        ChoiceDialog<EducationalExperienceInternStatus> dialog =
+            new ChoiceDialog<>(
+                EducationalExperienceInternStatus.APROBADA,
+                CLOSURE_STATUSES
+            );
+
+        dialog.setTitle(
+            "Motivo de baja"
+        );
+
+        dialog.setHeaderText(
+            "Seleccione el motivo de baja del estudiante."
+        );
+
+        dialog.setContentText(
+            "Motivo:"
+        );
+
+        Optional<EducationalExperienceInternStatus> selectedStatus =
+            dialog.showAndWait();
+
+        if (selectedStatus.isEmpty()) {
+            throw new BusinessException(
+                "Operacion cancelada."
+            );
+        }
+
+        return selectedStatus.get();
+    }
+
+    private void changeUserStatus(
+            int internId,
+            boolean isActive
+    ) throws BusinessException, DataAccessException {
         boolean wasChanged =
             userDAO.changeStatus(
-                intern.getId(),
-                newStatus
+                internId,
+                isActive
             );
 
         if (!wasChanged) {
@@ -445,10 +955,6 @@ public class InternManagementController {
                 "No se pudo cambiar el estado del estudiante."
             );
         }
-
-        LOGGER.info(
-            "Estado del estudiante actualizado correctamente."
-        );
     }
 
     @FXML
@@ -465,17 +971,17 @@ public class InternManagementController {
             );
 
             LOGGER.info(
-                "Redirección a actualización de estudiante."
+                "Redireccion a actualizacion de estudiante."
             );
         } catch (BusinessException businessException) {
             LOGGER.warn(
-                "No se seleccionó estudiante para modificación.",
+                "No se selecciono estudiante para modificacion.",
                 businessException
             );
 
             showNotification(
                 Alert.AlertType.WARNING,
-                "Selección requerida",
+                "Seleccion requerida",
                 businessException.getMessage()
             );
         }
@@ -489,6 +995,14 @@ public class InternManagementController {
         btnChangeInternStatus.setDisable(
             false
         );
+
+        btnChangeInternStatus.setManaged(
+            true
+        );
+
+        btnChangeInternStatus.setVisible(
+            true
+        );
     }
 
     private void disableActionButtons() {
@@ -501,20 +1015,48 @@ public class InternManagementController {
         );
 
         btnChangeInternStatus.setText(
-            "Activar / Inactivar"
+            DEFAULT_STATUS_BUTTON_TEXT
+        );
+
+        btnChangeInternStatus.setManaged(
+            true
+        );
+
+        btnChangeInternStatus.setVisible(
+            true
         );
     }
 
     private void updateStatusButtonText(
             InternDTO intern
     ) {
-        if (intern.getIsActive()) {
+        if (intern.hasActiveEducationalExperience()) {
             btnChangeInternStatus.setText(
-                "Inactivar estudiante"
+                DEFAULT_STATUS_BUTTON_TEXT
+            );
+
+            btnChangeInternStatus.setDisable(
+                false
+            );
+
+            btnChangeInternStatus.setManaged(
+                true
+            );
+
+            btnChangeInternStatus.setVisible(
+                true
             );
         } else {
-            btnChangeInternStatus.setText(
-                "Activar estudiante"
+            btnChangeInternStatus.setDisable(
+                true
+            );
+
+            btnChangeInternStatus.setManaged(
+                false
+            );
+
+            btnChangeInternStatus.setVisible(
+                false
             );
         }
     }
@@ -539,7 +1081,7 @@ public class InternManagementController {
         );
 
         LOGGER.info(
-            "Acceso al módulo de profesores."
+            "Acceso al modulo de profesores."
         );
     }
 
@@ -552,7 +1094,7 @@ public class InternManagementController {
         );
 
         LOGGER.info(
-            "Acceso al módulo de estudiantes."
+            "Acceso al modulo de estudiantes."
         );
     }
 
@@ -576,7 +1118,7 @@ public class InternManagementController {
         UserSessionManager.clearSession();
 
         LOGGER.info(
-            "Cierre de sesión realizado correctamente."
+            "Cierre de sesion realizado correctamente."
         );
 
         WindowManagerController.changeView(

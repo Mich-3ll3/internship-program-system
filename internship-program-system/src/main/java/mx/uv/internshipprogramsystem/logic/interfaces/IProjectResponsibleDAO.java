@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.interfaces;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,20 +9,20 @@ import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 public interface IProjectResponsibleDAO {
     boolean insert(
             ProjectResponsibleDTO responsible
-    ) throws BusinessException;
+    ) throws BusinessException, DataAccessException;
 
     Optional<ProjectResponsibleDTO> findById(
             int id
-    ) throws BusinessException;
+    ) throws BusinessException, DataAccessException;
 
     List<ProjectResponsibleDTO> findAll()
-            throws BusinessException;
+            throws BusinessException, DataAccessException;
 
     List<ProjectResponsibleDTO> findBySearchText(
             String searchText
-    ) throws BusinessException;
+    ) throws BusinessException, DataAccessException;
 
     boolean delete(
             int id
-    ) throws BusinessException;
+    ) throws BusinessException, DataAccessException;
 }

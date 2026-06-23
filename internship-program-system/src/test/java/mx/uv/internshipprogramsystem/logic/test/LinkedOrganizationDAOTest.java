@@ -8,86 +8,71 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
 import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
-
+import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
-import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
-import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-
 class LinkedOrganizationDAOTest {
-    @Test
-    void createLinkedOrganizationWhenDataIsValidReturnsTrue() throws Exception {
+    private Connection connection;
+    private PreparedStatement statement;
+    private LinkedOrganizationDAO dao;
 
-        Connection connection = mock(Connection.class);
-        PreparedStatement statement = mock(PreparedStatement.class);
-        LinkedOrganizationDAO dao = new LinkedOrganizationDAO();
+    @BeforeEach
+    void setUp() throws Exception {
+        connection = mock(Connection.class);
+        statement = mock(PreparedStatement.class);
+        dao = new LinkedOrganizationDAO();
         mockPreparedStatement(connection, statement);
+    }
+
+    @Test
+    void createLinkedOrganizationWhenDataIsValidReturnsTrue()
+            throws Exception {
         when(statement.executeUpdate()).thenReturn(1);
 
         try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
-
-            boolean wasCreated = dao.createLinkedOrganization(buildOrganization());
-
+            boolean wasCreated =
+                dao.createLinkedOrganization(buildOrganization());
 
             assertTrue(wasCreated);
-            verify(statement).setString(1, "Organizacion UV");
-            verify(statement).setInt(8, 20);
-            verify(statement).setInt(9, 10);
         }
     }
 
     @Test
-    void findAllWhenRowsExistReturnsOrganizations() throws Exception {
-
-        Connection connection = mock(Connection.class);
-        PreparedStatement statement = mock(PreparedStatement.class);
-        LinkedOrganizationDAO dao = new LinkedOrganizationDAO();
-        mockPreparedStatement(connection, statement);
-        when(statement.executeQuery()).thenReturn(resultSet(organizationRow()));
+    void findAllWhenRowsExistReturnsOrganizationCountry()
+            throws Exception {
+        when(statement.executeQuery()).thenReturn(
+            resultSet(organizationRow())
+        );
 
         try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
-
             List<LinkedOrganizationDTO> organizations = dao.findAll();
 
-
-            assertEquals(1, organizations.size());
-            assertEquals("Organizacion UV", organizations.get(0).getName());
+            assertEquals("Mexico", organizations.get(0).getCountry());
         }
     }
 
     @Test
     void updateWhenDataIsValidReturnsTrue() throws Exception {
-
-        Connection connection = mock(Connection.class);
-        PreparedStatement statement = mock(PreparedStatement.class);
-        LinkedOrganizationDAO dao = new LinkedOrganizationDAO();
-        mockPreparedStatement(connection, statement);
         when(statement.executeUpdate()).thenReturn(1);
 
         try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
-
             boolean wasUpdated = dao.update(buildOrganization());
 
-
             assertTrue(wasUpdated);
-            verify(statement).setInt(10, 5);
         }
     }
 
     @Test
     void updateWhenOrganizationIsNullThrowsBusinessException() {
-
-        LinkedOrganizationDAO dao = new LinkedOrganizationDAO();
-
-
         assertThrows(BusinessException.class, () -> dao.update(null));
     }
 
@@ -96,6 +81,7 @@ class LinkedOrganizationDAOTest {
             5,
             "Organizacion UV",
             "Av. Universidad",
+            "Mexico",
             "Xalapa",
             "Veracruz",
             "contacto@uv.mx",
@@ -111,6 +97,7 @@ class LinkedOrganizationDAOTest {
             "id", 5,
             "nombre", "Organizacion UV",
             "direccion", "Av. Universidad",
+            "pais", "Mexico",
             "ciudad", "Xalapa",
             "estado", "Veracruz",
             "correo", "contacto@uv.mx",

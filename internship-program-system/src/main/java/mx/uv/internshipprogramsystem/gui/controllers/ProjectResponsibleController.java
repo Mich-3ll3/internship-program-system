@@ -6,6 +6,7 @@ import javafx.scene.control.TextField;
 import mx.uv.internshipprogramsystem.logic.dao.ProjectResponsibleDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.util.Optional;
 
@@ -40,6 +41,8 @@ public class ProjectResponsibleController {
             }
         } catch (BusinessException | NumberFormatException e) {
             showError("Error al guardar responsable: " + e.getMessage());
+        } catch (DataAccessException e) {
+            showError("Error de conexion al guardar responsable. Por favor intente mas tarde.");
         }
     }
 
@@ -61,6 +64,8 @@ public class ProjectResponsibleController {
 
         } catch (BusinessException | NumberFormatException e) {
             showError("Error al buscar responsable: " + e.getMessage());
+        } catch (DataAccessException e) {
+            showError("Error de conexion al buscar responsable. Por favor intente mas tarde.");
         }
     }
 
@@ -76,6 +81,8 @@ public class ProjectResponsibleController {
             }
         } catch (BusinessException | NumberFormatException e) {
             showError("Error al eliminar responsable: " + e.getMessage());
+        } catch (DataAccessException e) {
+            showError("Error de conexion al eliminar responsable. Por favor intente mas tarde.");
         }
     }
 

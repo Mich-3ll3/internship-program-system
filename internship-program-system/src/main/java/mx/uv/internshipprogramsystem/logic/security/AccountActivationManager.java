@@ -8,6 +8,7 @@ import mx.uv.internshipprogramsystem.logic.dao.ActivationTokenDAO;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
 import mx.uv.internshipprogramsystem.logic.dto.ActivationTokenDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.security.SecurityManager;
 import mx.uv.internshipprogramsystem.logic.validations.InputValidator;
 import mx.uv.internshipprogramsystem.logic.validations.PasswordValidator;
@@ -29,7 +30,7 @@ public class AccountActivationManager {
             String token,
             String password,
             String confirmPassword
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty( token,"El token de activación no puede estar vacío.");
 
         passwordValidator.validatePassword(password);
@@ -99,7 +100,7 @@ public class AccountActivationManager {
         }
     }
 
-    private void activateUserAccount(int userId, String passwordHash) throws BusinessException {
+    private void activateUserAccount(int userId, String passwordHash) throws BusinessException, DataAccessException {
         boolean wasActivated = userDAO.activateAccount(userId, passwordHash);
 
         if (!wasActivated) {

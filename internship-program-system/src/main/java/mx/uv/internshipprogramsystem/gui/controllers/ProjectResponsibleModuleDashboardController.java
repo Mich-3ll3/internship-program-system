@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers.ProjectResponsibleManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
@@ -252,6 +253,15 @@ public class ProjectResponsibleModuleDashboardController {
                 "Error al consultar responsables",
                 businessException.getMessage()
             );
+        } catch (DataAccessException dataAccessException) {
+            LOGGER.error(
+                "Error de conexion al consultar responsables",
+                dataAccessException
+            );
+            showErrorAlert(
+                "Error de conexion",
+                "No se pudo conectar con la base de datos para obtener los responsables. Por favor intente mas tarde."
+            );
         }
     }
 
@@ -273,6 +283,15 @@ public class ProjectResponsibleModuleDashboardController {
             showErrorAlert(
                 "Error al buscar responsables",
                 businessException.getMessage()
+            );
+        } catch (DataAccessException dataAccessException) {
+            LOGGER.error(
+                "Error de conexion al buscar responsables",
+                dataAccessException
+            );
+            showErrorAlert(
+                "Error de conexion",
+                "No se pudo conectar con la base de datos para buscar los responsables. Por favor intente mas tarde."
             );
         }
     }

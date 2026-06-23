@@ -6,6 +6,7 @@ public class ProjectActivityDTO {
     private String month;
     private Integer startWeek;
     private Integer endWeek;
+    private Integer plannedHours;
     private Integer projectId;
 
     public ProjectActivityDTO() {
@@ -22,6 +23,7 @@ public class ProjectActivityDTO {
         this.month = month;
         this.startWeek = startWeek;
         this.endWeek = endWeek;
+        this.plannedHours = 0;
         this.projectId = projectId;
     }
 
@@ -38,6 +40,41 @@ public class ProjectActivityDTO {
         this.month = month;
         this.startWeek = startWeek;
         this.endWeek = endWeek;
+        this.plannedHours = 0;
+        this.projectId = projectId;
+    }
+
+    public ProjectActivityDTO(
+            String name,
+            String month,
+            Integer startWeek,
+            Integer endWeek,
+            Integer plannedHours,
+            Integer projectId
+    ) {
+        this.name = name;
+        this.month = month;
+        this.startWeek = startWeek;
+        this.endWeek = endWeek;
+        this.plannedHours = plannedHours;
+        this.projectId = projectId;
+    }
+
+    public ProjectActivityDTO(
+            Integer id,
+            String name,
+            String month,
+            Integer startWeek,
+            Integer endWeek,
+            Integer plannedHours,
+            Integer projectId
+    ) {
+        this.id = id;
+        this.name = name;
+        this.month = month;
+        this.startWeek = startWeek;
+        this.endWeek = endWeek;
+        this.plannedHours = plannedHours;
         this.projectId = projectId;
     }
 
@@ -81,6 +118,14 @@ public class ProjectActivityDTO {
         this.endWeek = endWeek;
     }
 
+    public Integer getPlannedHours() {
+        return plannedHours;
+    }
+
+    public void setPlannedHours(Integer plannedHours) {
+        this.plannedHours = plannedHours;
+    }
+
     public Integer getProjectId() {
         return projectId;
     }
@@ -97,6 +142,7 @@ public class ProjectActivityDTO {
                 + ", month='" + month + '\''
                 + ", startWeek=" + startWeek
                 + ", endWeek=" + endWeek
+                + ", plannedHours=" + plannedHours
                 + ", projectId=" + projectId
                 + '}';
     }

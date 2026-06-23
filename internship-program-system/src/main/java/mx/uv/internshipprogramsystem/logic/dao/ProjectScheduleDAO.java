@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectScheduleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IProjectScheduleDAO;
@@ -45,7 +46,7 @@ public class ProjectScheduleDAO implements IProjectScheduleDAO {
     public boolean create(
             ProjectScheduleDTO schedule,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
 
         InputValidator.validateNotNull(
             schedule,
@@ -110,7 +111,7 @@ public class ProjectScheduleDAO implements IProjectScheduleDAO {
     @Override
     public List<ProjectScheduleDTO> findByProjectId(
             Integer projectId
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
 
         InputValidator.validateNotNull(
             projectId,
@@ -121,7 +122,7 @@ public class ProjectScheduleDAO implements IProjectScheduleDAO {
             new ArrayList<>();
 
         try (Connection connection =
-                DataBaseManager.getConnection();
+                DatabaseManager.getConnection();
 
              PreparedStatement statement =
                 connection.prepareStatement(
@@ -177,7 +178,7 @@ public class ProjectScheduleDAO implements IProjectScheduleDAO {
     public boolean deleteByProjectId(
             Integer projectId,
             Connection connection
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
 
         InputValidator.validateNotNull(
             projectId,

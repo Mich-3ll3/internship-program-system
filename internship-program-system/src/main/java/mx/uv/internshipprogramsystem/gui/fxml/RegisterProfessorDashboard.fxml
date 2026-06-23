@@ -4,13 +4,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -38,35 +39,31 @@
                         mnemonicParsing="false" 
                         prefHeight="40.0" 
                         prefWidth="40.0" 
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" 
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10; -fx-cursor: hand;" 
                         text="⌂" 
-                        textFill="WHITE"
-                        onAction="#goHome"/>
+                        textFill="WHITE"/>
                 <Button fx:id="btnProfessor"
                         mnemonicParsing="false"
                         prefHeight="40.0"
                         prefWidth="40.0"
-                        style="-fx-background-color: transparent;" 
+                        style="-fx-background-color: transparent; -fx-cursor: hand;" 
                         text="🎓"
-                        textFill="WHITE"
-                        onAction = "#goProfessorModule"/>
+                        textFill="WHITE"/>
                 <Button fx:id="btnIntern"
                         mnemonicParsing="false"
                         prefHeight="40.0"
                         prefWidth="40.0"
-                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10; -fx-cursor: hand;"
                         text="👥"
-                        textFill="WHITE"
-                        onAction = "#goInternModule"/>
-                        <Region VBox.vgrow="ALWAYS" />
+                        textFill="WHITE"/>
+                <Region VBox.vgrow="ALWAYS" />
                 <Button  fx:id="btnExit"
                         mnemonicParsing="false"
                         prefHeight="40.0"
                         prefWidth="40.0"
-                        style="-fx-background-color: transparent;"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
                         text="🚪"
-                        textFill="WHITE"
-                        onAction="#logOut">
+                        textFill="WHITE">
                     <VBox.margin>
                         <Insets bottom="20.0" />
                     </VBox.margin>
@@ -82,50 +79,102 @@
             </padding>
             <HBox alignment="CENTER_LEFT">
                 <VBox HBox.hgrow="ALWAYS">
-                    <Label text="Registrar profesor" textFill="#1a2744">
+                    <Label text="Registrar profesor" textFill="#1a2744" style="-fx-font-weight: bold;">
                         <font>
-                            <Font name="System Bold" size="22.0" />
+                            <Font size="22.0" />
                         </font>
                     </Label>
                     <Label text="Capture los datos requeridos para validar el registro del profesor." textFill="#6b7280" />
                 </VBox>
             </HBox>
 
-            <VBox spacing="14.0"
+            <VBox spacing="16.0"
                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 12;">
                 <padding>
                     <Insets bottom="22.0" left="22.0" right="22.0" top="22.0" />
                 </padding>
-                <GridPane hgap="14.0" vgap="12.0">
-                    <Label text="Correo institucional" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                    <TextField fx:id="txtInstitutionalEmail" promptText="ejemplo@uv.mx" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                    <Label text="Nombre" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                    <TextField fx:id="txtName" promptText="Nombre(s)" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                    <Label text="Apellido paterno" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                    <TextField fx:id="txtFirstSurname" promptText="Apellido paterno" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                    <Label text="Apellido materno" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                    <TextField fx:id="txtSecondSurname" promptText="Apellido materno" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                    <Label text="Número de personal" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                    <TextField fx:id="txtStaffNumber" promptText="123456" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                    <Label text="Coordinador" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-                    <CheckBox fx:id="chkCoordinator" text="Asignar rol de coordinador" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                </GridPane>
+                <children>
+                    <GridPane hgap="16.0" vgap="14.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0" />
+                            <ColumnConstraints percentWidth="50.0" />
+                        </columnConstraints>
+                        <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="65.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="65.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="65.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                        </rowConstraints>
+                        <children>
+                            <!-- Row 0: Correo ocupando ambas columnas -->
+                            <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2">
+                                <children>
+                                    <Label text="Correo institucional" textFill="#1a2744" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                                    <TextField fx:id="txtInstitutionalEmail" promptText="ejemplo@uv.mx" prefHeight="38.0" style="-fx-background-color: #f9fafb; -fx-background-radius: 8; -fx-border-color: #d1d5db; -fx-border-radius: 8; -fx-padding: 0 10 0 10; -fx-font-size: 13px;" />
+                                </children>
+                            </VBox>
+                            
+                            <!-- Row 1: Nombre (Col 0) y Apellido Paterno (Col 1) -->
+                            <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Nombre(s)" textFill="#1a2744" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                                    <TextField fx:id="txtName" promptText="Nombre(s)" prefHeight="38.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #d1d5db; -fx-border-radius: 8; -fx-padding: 0 10 0 10; -fx-font-size: 13px;" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Apellido paterno" textFill="#1a2744" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                                    <TextField fx:id="txtFirstSurname" promptText="Apellido paterno" prefHeight="38.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #d1d5db; -fx-border-radius: 8; -fx-padding: 0 10 0 10; -fx-font-size: 13px;" />
+                                </children>
+                            </VBox>
 
-                <Label text="Validaciones: correo institucional, contraseña segura, campos obligatorios y número de personal de 6 dígitos."
-                       textFill="#6b7280"
-                       wrapText="true" />
+                            <!-- Row 2: Apellido Materno (Col 0) y Número de Personal (Col 1) -->
+                            <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <children>
+                                    <Label text="Apellido materno" textFill="#1a2744" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                                    <TextField fx:id="txtSecondSurname" promptText="Apellido materno" prefHeight="38.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #d1d5db; -fx-border-radius: 8; -fx-padding: 0 10 0 10; -fx-font-size: 13px;" />
+                                </children>
+                            </VBox>
+                            <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                <children>
+                                    <Label text="Número de personal" textFill="#1a2744" style="-fx-font-weight: bold; -fx-font-size: 13px;" />
+                                    <TextField fx:id="txtStaffNumber" promptText="123456" prefHeight="38.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: #d1d5db; -fx-border-radius: 8; -fx-padding: 0 10 0 10; -fx-font-size: 13px;" />
+                                </children>
+                            </VBox>
 
-                <HBox alignment="CENTER_RIGHT" spacing="8.0">
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Button mnemonicParsing="false"
-                            onAction="#clearForm"
-                            style="-fx-background-color: #f5f6fa; -fx-background-radius: 8; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 8; -fx-text-fill: #6b7280;"
-                            text="Cancelar" />
-                    <Button mnemonicParsing="false"
-                            onAction="#validateRegisterProfessorForm"
-                            style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white;"
-                            text="Validar registro" />
-                </HBox>
+                            <!-- Row 3: Coordinador y etiqueta de advertencia -->
+                            <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2" alignment="CENTER_LEFT">
+                                <children>
+                                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                        <children>
+                                            <CheckBox fx:id="chkCoordinator" text="Asignar rol de coordinador" textFill="#1a2744" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-cursor: hand;" />
+                                            <Label fx:id="lblCoordinatorWarning" text="Ya existe un coordinador activo en el sistema." textFill="#dc2626" visible="false" managed="false" style="-fx-font-size: 12px; -fx-font-weight: bold;" />
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </children>
+                    </GridPane>
+
+                    <Label text="Validaciones: correo institucional (@uv.mx), campos obligatorios y número de personal de 6 dígitos."
+                           textFill="#6b7280"
+                           wrapText="true"
+                           style="-fx-font-size: 12px;" />
+
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                        <children>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <Button fx:id="btnCancel" mnemonicParsing="false"
+                                    onAction="#clearForm"
+                                    style="-fx-background-color: #f3f4f6; -fx-background-radius: 8; -fx-border-color: #d1d5db; -fx-border-radius: 8; -fx-text-fill: #4b5563; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20 8 20; -fx-font-size: 13px;"
+                                    text="Cancelar" />
+                            <Button fx:id="btnValidate" mnemonicParsing="false"
+                                    onAction="#validateRegisterProfessorForm"
+                                    style="-fx-background-color: #4a90e2; -fx-background-radius: 8; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8 20 8 20; -fx-font-size: 13px;"
+                                    text="Validar registro" />
+                        </children>
+                    </HBox>
+                </children>
             </VBox>
         </VBox>
     </center>

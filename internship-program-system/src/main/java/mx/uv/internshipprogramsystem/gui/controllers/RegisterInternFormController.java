@@ -2,8 +2,8 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +12,26 @@ import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
-
-import mx.uv.internshipprogramsystem.logic.managers.InternRegistrationManager;
-import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
+import mx.uv.internshipprogramsystem.gui.handlers.GlobalNavigationHandler;
+import mx.uv.internshipprogramsystem.gui.util.FormAlertSupport;
+import mx.uv.internshipprogramsystem.gui.util.TextFormatterUtil;
+import mx.uv.internshipprogramsystem.gui.util.InternRegistrationTask;
+import mx.uv.internshipprogramsystem.gui.handlers.InternRegistrationSuccessHandler;
+import mx.uv.internshipprogramsystem.gui.handlers.InternRegistrationFailureHandler;
 import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
 
 public class RegisterInternFormController {
+    
     private static final Logger LOGGER =
-        LoggerFactory.getLogger(RegisterInternFormController.class);
+        LoggerFactory.getLogger(
+            RegisterInternFormController.class
+        );
+
+    private static final int ENROLLMENT_MAX_LENGTH = 9;
+    private static final int NAME_MAX_LENGTH = 60;
+    private static final String STUDENT_EMAIL_DOMAIN =
+        "@estudiantes.uv.mx";
 
     @FXML
     private TextField txtInstitutionalEmail;
@@ -37,114 +49,189 @@ public class RegisterInternFormController {
     private TextField txtEnrollment;
 
     @FXML
-    private void goHome(ActionEvent event) {
-        WindowManagerController.goBack();
+    public void initialize() {
+        txtInstitutionalEmail.setEditable(false);
+        txtInstitutionalEmail.setFocusTraversable(false);
+        configureTextLimits();
+        configureEnrollmentListener();
     }
 
-    @FXML
-    private void goProfessorModule(ActionEvent event) {
-        WindowManagerController.changeView("ProfessorModuleDashboard.fxml");
+    private void configureTextLimits() {
+        limitTextField(txtName, NAME_MAX_LENGTH);
+        limitTextField(txtFirstSurname, NAME_MAX_LENGTH);
+        limitTextField(txtSecondSurname, NAME_MAX_LENGTH);
+        limitTextField(txtEnrollment, ENROLLMENT_MAX_LENGTH);
     }
 
-    @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView("InternModuleDashboard.fxml");
-    }
-
-    @FXML
-    private void logOut(ActionEvent event) {
-        UserSessionManager.clearSession();
-        LOGGER.info("Cierre de sesión realizado correctamente.");
-        WindowManagerController.changeView(
-            "LoginDashboard.fxml"
+    private void limitTextField(
+            TextField textField,
+            int maxLength
+    ) {
+        textField.setTextFormatter(
+            new TextFormatter<String>(
+                new mx.uv.internshipprogramsystem.gui.handlers.LengthFilterTextFormatter(maxLength)
+            )
         );
+    }
+
+    private void configureEnrollmentListener() {
+        txtEnrollment.textProperty().addListener(
+            new mx.uv.internshipprogramsystem.gui.handlers.EnrollmentTextListener(this)
+        );
+    }
+
+    public void handleEnrollmentChanged(String currentValue) {
+        String normalizedEnrollment =
+            normalizeEnrollment(
+                currentValue
+            );
+
+        if (!currentValue.equals(normalizedEnrollment)) {
+            txtEnrollment.setText(
+                normalizedEnrollment
+            );
+        } else {
+            updateInstitutionalEmail();
+        }
+    }
+
+    private String normalizeEnrollment(
+            String enrollment
+        ) {
+        String digits =
+            enrollment.replaceAll("\\D", "");
+        String normalizedEnrollment =
+            "S" + digits;
+
+        if (normalizedEnrollment.length() > ENROLLMENT_MAX_LENGTH) {
+            normalizedEnrollment =
+                normalizedEnrollment.substring(
+                    0,
+                    ENROLLMENT_MAX_LENGTH
+                );
+        }
+
+        return normalizedEnrollment;
+    }
+
+    private void updateInstitutionalEmail() {
+        String enrollment =
+            txtEnrollment.getText().trim();
+
+        if (enrollment.matches("^S\\d{8}$")) {
+            txtInstitutionalEmail.setText(
+                "z" + enrollment + STUDENT_EMAIL_DOMAIN
+            );
+        } else {
+            txtInstitutionalEmail.clear();
+        }
     }
 
     @FXML
     private void validateRegisterInternForm() {
-        if (isFormValid()) {
-            registerIntern();
+        try {
+            if (isFormValid()) {
+                registerIntern();
+            }
+        } catch (Exception exception) {
+            LOGGER.error("Error inesperado en la validacion del formulario de estudiante", exception);
+            String message = exception.getMessage();
+            if (message == null || message.trim().isEmpty()) {
+                message = "Datos de formulario invalidos o incompletos.";
+            }
+            FormAlertSupport.showError(
+                "Error inesperado",
+                message
+            );
         }
     }
 
     private boolean isFormValid() {
-        boolean isValid = true;
-        String email = txtInstitutionalEmail.getText().trim();
-        String name = txtName.getText().trim();
-        String firstSurname = txtFirstSurname.getText().trim();
-        String enrollment = txtEnrollment.getText().trim();
+        String email =
+            txtInstitutionalEmail.getText().trim();
+        String name =
+            txtName.getText().trim();
+        String firstSurname =
+            txtFirstSurname.getText().trim();
+        String enrollment =
+            txtEnrollment.getText().trim();
 
         if (email.isEmpty() || name.isEmpty()
                 || firstSurname.isEmpty() || enrollment.isEmpty()) {
-            showNotification(
-                Alert.AlertType.WARNING,
+            FormAlertSupport.showWarning(
                 "Campos incompletos",
                 "Por favor, llene todos los campos obligatorios."
             );
-            isValid = false;
-        } else if (!email.endsWith("@estudiantes.uv.mx")) {
-            showNotification(
-                Alert.AlertType.ERROR,
-                "Correo inválido",
-                "Debe usar un correo institucional (@estudiantes.uv.mx)."
-            );
-            isValid = false;
-        } else if (!enrollment.matches("^zS\\d{8}$")) {
-            showNotification(
-                Alert.AlertType.ERROR,
-                "Matrícula inválida",
-                "El formato debe ser zS seguido de 8 números."
-            );
-            isValid = false;
+            return false;
         }
 
-        return isValid;
+        if (!enrollment.matches("^S\\d{8}$")) {
+            FormAlertSupport.showError(
+                "Matricula invalida",
+                "El formato debe ser S seguido de 8 numeros."
+            );
+            return false;
+        }
+
+        if (!email.equals("z" + enrollment + STUDENT_EMAIL_DOMAIN)) {
+            FormAlertSupport.showError(
+                "Correo invalido",
+                "El correo debe generarse automaticamente con la matricula."
+            );
+            return false;
+        }
+
+        return true;
     }
 
     private void registerIntern() {
-        try {
-            UserDTO user = buildUser();
+        UserDTO user = buildUser();
+        InternDTO intern = buildIntern(0);
 
-            InternDTO intern = buildIntern(0);
-            InternRegistrationManager internRegistrationManager =
-                new InternRegistrationManager();
-            boolean wasCreated = internRegistrationManager.registerIntern(user, intern);
+        InternRegistrationTask task = new InternRegistrationTask(user, intern);
+        task.setOnSucceeded(new InternRegistrationSuccessHandler(this));
+        task.setOnFailed(new InternRegistrationFailureHandler(this));
 
-            if (wasCreated) {
-                LOGGER.info(
-                    "Estudiante registrado correctamente con correo {}",
-                    user.getInstitutionalEmail()
-                );
+        new Thread(task).start();
+    }
 
-                showNotification(
-                    Alert.AlertType.INFORMATION,
-                    "Registro exitoso",
-                    "El estudiante ha sido registrado. "
-                    + "Se envió un correo de activación."
-                );
+    public void handleRegistrationSuccess() {
+        LOGGER.info("Estudiante registrado correctamente.");
+        FormAlertSupport.showInformation(
+            "Registro exitoso",
+            "El estudiante ha sido registrado. Se envio un correo de activacion."
+        );
+        clearForm();
+    }
 
-                clearForm();
-            }
-        } catch (BusinessException exception) {
-            LOGGER.error(
-                "Error de negocio al registrar estudiante",
-                exception
-            );
-            showNotification(
-                Alert.AlertType.ERROR,
-                "Error de registro",
-                exception.getMessage()
-            );
+    public void handleRegistrationFailure(Throwable exception) {
+        LOGGER.error("Error al registrar estudiante", exception);
+        String message = exception.getMessage();
+        if (message == null || message.trim().isEmpty()) {
+            message = "Ocurrio un error inesperado al registrar el estudiante.";
         }
+        FormAlertSupport.showError(
+            "Error de registro",
+            message
+        );
     }
 
     private UserDTO buildUser() {
-        String cleanEmail = InputCleaner.sanitizeText(txtInstitutionalEmail.getText());
-        String cleanName = InputCleaner.sanitizeText(txtName.getText());
-        String cleanFirstSurname = InputCleaner.sanitizeText(txtFirstSurname.getText());
-        String cleanSecondSurname = InputCleaner.sanitizeText(txtSecondSurname.getText());
+        String cleanEmail =
+            InputCleaner.sanitizeText(
+                txtInstitutionalEmail.getText()
+            );
+        String cleanName = TextFormatterUtil.formatToTitleCase(
+            InputCleaner.sanitizeText(txtName.getText())
+        );
+        String cleanFirstSurname = TextFormatterUtil.formatToTitleCase(
+            InputCleaner.sanitizeText(txtFirstSurname.getText())
+        );
+        String cleanSecondSurname = TextFormatterUtil.formatToTitleCase(
+            InputCleaner.sanitizeText(txtSecondSurname.getText())
+        );
 
-        UserDTO user = new UserDTO(
+        return new UserDTO(
             cleanEmail,
             null,
             cleanName,
@@ -153,13 +240,18 @@ public class RegisterInternFormController {
             false,
             UserRole.STUDENT
         );
-        return user;
     }
 
     private InternDTO buildIntern(int userId) {
-        String cleanEnrollment = InputCleaner.sanitizeText(txtEnrollment.getText());
-        InternDTO intern = new InternDTO(cleanEnrollment, userId);
-        return intern;
+        String cleanEnrollment =
+            InputCleaner.sanitizeText(
+                txtEnrollment.getText()
+            );
+
+        return new InternDTO(
+            cleanEnrollment,
+            userId
+        );
     }
 
     @FXML
@@ -171,16 +263,23 @@ public class RegisterInternFormController {
         txtEnrollment.clear();
     }
 
-    private void showNotification(
-            Alert.AlertType type,
-            String title,
-            String content
-    ) {
-        Alert alert = new Alert(type);
+    @FXML
+    private void goHome(ActionEvent event) {
+        GlobalNavigationHandler.goBack();
+    }
 
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    @FXML
+    private void goProfessorModule(ActionEvent event) {
+        GlobalNavigationHandler.changeView("ProfessorModuleDashboard.fxml");
+    }
+
+    @FXML
+    private void goInternModule(ActionEvent event) {
+        GlobalNavigationHandler.changeView("InternModuleDashboard.fxml");
+    }
+
+    @FXML
+    private void logOut(ActionEvent event) {
+        GlobalNavigationHandler.logOut();
     }
 }

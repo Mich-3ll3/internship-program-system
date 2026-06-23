@@ -7,8 +7,12 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.Parent;
 import javafx.fxml.FXMLLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MainMenuController {
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(MainMenuController.class);
 
     @FXML private Button btnStudents;
     @FXML private Button btnTeachers;
@@ -42,13 +46,13 @@ public class MainMenuController {
     private void onProjects() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProjectsMenu.fxml"));
-            Parent root = loader.load();
+            javafx.scene.Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Submenú de Proyectos - SPP");
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error al abrir submenu de proyectos", e);
         }
     }
 
@@ -56,13 +60,13 @@ public class MainMenuController {
     private void onResponsibles() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ResponsiblesMenu.fxml"));
-            Parent root = loader.load();
+            javafx.scene.Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Submenú de Responsibles - SPP");
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error al abrir submenu de responsables", e);
             showError("No se pudo abrir el submenú de responsables.");
         }
     }
@@ -76,13 +80,13 @@ public class MainMenuController {
     private void onReports() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Report.fxml"));
-            Parent root = loader.load();
+            javafx.scene.Parent root = loader.load();
             Stage stage = new Stage();
             stage.setTitle("Registrar Reporte");
             stage.setScene(new Scene(root));
             stage.show();
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error("Error al abrir vista de reporte", e);
         }
     }
 

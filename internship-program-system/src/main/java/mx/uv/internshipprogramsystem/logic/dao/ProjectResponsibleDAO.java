@@ -1,4 +1,5 @@
 package mx.uv.internshipprogramsystem.logic.dao;
+import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import mx.uv.internshipprogramsystem.dataaccess.DataBaseManager;
+import mx.uv.internshipprogramsystem.dataaccess.DatabaseManager;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.interfaces.IProjectResponsibleDAO;
@@ -32,10 +33,13 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
     private static final String SELECT_RESPONSIBLE_BY_ID_QUERY =
         "SELECT rp.id, rp.nombre, rp.apellido_paterno, "
         + "rp.apellido_materno, rp.correo, rp.cargo, "
-        + "rp.organizacion_id, ov.nombre AS nombre_organizacion "
+        + "rp.organizacion_id, ov.nombre AS nombre_organizacion, "
+        + "p.nombre AS nombre_proyecto "
         + "FROM RESPONSABLE_PROYECTO rp "
         + "INNER JOIN ORGANIZACION_VINCULADA ov "
         + "ON rp.organizacion_id = ov.id "
+        + "LEFT JOIN PROYECTO p "
+        + "ON p.responsable_id = rp.id "
         + "WHERE rp.id = ?";
 
     private static final String SELECT_ALL_RESPONSIBLES_QUERY =
@@ -76,7 +80,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
     @Override
     public boolean insert(
             ProjectResponsibleDTO responsible
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotNull(
             responsible,
             "Los datos del responsable no pueden ser nulos."
@@ -84,7 +88,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
 
         boolean wasInserted;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement =
                     connection.prepareStatement(
                         INSERT_RESPONSIBLE_QUERY
@@ -141,7 +145,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
     @Override
     public Optional<ProjectResponsibleDTO> findById(
             int id
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validatePositive(
             id,
             "El id del responsable debe ser positivo."
@@ -149,7 +153,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
 
         Optional<ProjectResponsibleDTO> responsible;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement =
                     connection.prepareStatement(
                         SELECT_RESPONSIBLE_BY_ID_QUERY
@@ -190,10 +194,10 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
 
     @Override
     public List<ProjectResponsibleDTO> findAll()
-            throws BusinessException {
+            throws BusinessException, DataAccessException {
         List<ProjectResponsibleDTO> responsibles;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement =
                     connection.prepareStatement(
                         SELECT_ALL_RESPONSIBLES_QUERY
@@ -234,7 +238,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
     @Override
     public List<ProjectResponsibleDTO> findBySearchText(
             String searchText
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validateNotEmpty(
             searchText,
             "El texto de búsqueda no puede estar vacío."
@@ -243,7 +247,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
         List<ProjectResponsibleDTO> responsibles;
         String searchPattern = "%" + searchText.trim() + "%";
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement =
                     connection.prepareStatement(
                         SEARCH_RESPONSIBLES_QUERY
@@ -289,7 +293,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
     @Override
     public boolean delete(
             int id
-    ) throws BusinessException {
+    ) throws BusinessException, DataAccessException {
         InputValidator.validatePositive(
             id,
             "El id del responsable debe ser positivo."
@@ -297,7 +301,7 @@ public class ProjectResponsibleDAO implements IProjectResponsibleDAO {
 
         boolean wasDeleted;
 
-        try (Connection connection = DataBaseManager.getConnection();
+        try (Connection connection = DatabaseManager.getConnection();
              PreparedStatement statement =
                     connection.prepareStatement(
                         DELETE_RESPONSIBLE_QUERY
