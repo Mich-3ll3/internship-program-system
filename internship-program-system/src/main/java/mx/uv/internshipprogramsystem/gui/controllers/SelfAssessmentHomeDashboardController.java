@@ -40,7 +40,6 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SelfAssessmentHomeDashboardController.class);
 
-    // Constantes para el manejo de archivos y diseño del PDF
     private static final String PDF_EXTENSION_FILTER = "*.pdf";
     private static final String PDF_EXTENSION_DESC = "Archivos PDF (*.pdf)";
     
@@ -100,10 +99,6 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
             LOGGER.debug("Proceso de carga de autoevaluaciones finalizado.");
         }
     }
-
-    // ==========================================
-    // LÓGICA DE NEGOCIO Y PDF
-    // ==========================================
 
     @FXML
     private void openRegisterSelfAssessment(ActionEvent actionEvent) {
@@ -208,10 +203,6 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
         }
     }
 
-    // ==========================================
-    // BÚSQUEDA Y FILTRADO (SIN LAMBDAS)
-    // ==========================================
-
     @FXML
     private void handleSearchByName(ActionEvent actionEvent) {
         try {
@@ -271,10 +262,6 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
             LOGGER.debug("Limpieza de búsqueda finalizada.");
         }
     }
-
-    // ==========================================
-    // MÉTODOS DE NAVEGACIÓN DEL MÓDULO
-    // ==========================================
 
     @FXML
     private void goHome(ActionEvent actionEvent) {
@@ -348,10 +335,6 @@ public class SelfAssessmentHomeDashboardController implements Initializable {
             LOGGER.debug("Intento de cierre de sesión finalizado.");
         }
     }
-
-    // ==========================================
-    // ALERTAS
-    // ==========================================
 
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
