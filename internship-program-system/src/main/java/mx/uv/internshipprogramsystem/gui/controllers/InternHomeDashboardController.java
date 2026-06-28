@@ -3,6 +3,7 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -16,7 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.managers.ProjectApplicationManager;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO; 
+import mx.uv.internshipprogramsystem.logic.dto.ProjectApplicationDTO;
 
 public class InternHomeDashboardController implements Initializable {
     
@@ -31,35 +34,22 @@ public class InternHomeDashboardController implements Initializable {
     private static final String DEFAULT_MAJOR = "Ingeniería en Software";
     private static final String DETAILS_FORMAT = "%s • Matrícula %s • %s";
 
-    @FXML
-    private Button btnHome;
-
-    @FXML
-    private Button btnProjects;
-
-    @FXML
-    private Button btnDocuments;
-
-    @FXML
-    private Button btnReports;
-
-    @FXML
-    private Button btnExit;
-
-    @FXML
-    private Label lblFecha;
-
-    @FXML
-    private Label lblStudentName;
-
-    @FXML
-    private Label lblStudentDetails;
+    @FXML private Button btnHome;
+    @FXML private Button btnProjects;
+    @FXML private Button btnDocuments;
+    @FXML private Button btnReports;
+    @FXML private Button btnExit;
+    @FXML private Label lblFecha;
+    @FXML private Label lblStudentName;
+    @FXML private Label lblStudentDetails;
+    @FXML private Label lblEstadoProyecto;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         LOGGER.info("Dashboard de estudiante cargado correctamente.");
         configureCurrentDate();
         configureInternData();
+        checkAndSetProjectStatus();
     }
 
     private void configureCurrentDate() {
@@ -78,32 +68,86 @@ public class InternHomeDashboardController implements Initializable {
     }
 
     private void configureInternData() {
+        Optional<InternDTO> currentInternOpt = UserSessionManager.getCurrentIntern();
 
-            Optional<InternDTO> currentInternOpt = UserSessionManager.getCurrentIntern();
+        if (currentInternOpt.isPresent()) {
+            InternDTO currentIntern = currentInternOpt.get();
 
-            if (currentInternOpt.isPresent()) {
-                InternDTO currentIntern = currentInternOpt.get();
+            String fullName = String.format("%s %s %s", 
+                currentIntern.getName(), 
+                currentIntern.getFirstSurname(), 
+                currentIntern.getSecondSurname()
+            ).trim();
 
-                String fullName = String.format("%s %s %s", 
-                    currentIntern.getName(), 
-                    currentIntern.getFirstSurname(), 
-                    currentIntern.getSecondSurname()
-                ).trim();
+            String internDetails = String.format(DETAILS_FORMAT, 
+                DEFAULT_MAJOR, 
+                currentIntern.getEnrollmentNumber(), 
+                currentIntern.getInstitutionalEmail() 
+            );
 
-                String internDetails = String.format(DETAILS_FORMAT, 
-                    DEFAULT_MAJOR, 
-                    currentIntern.getEnrollmentNumber(), 
-                    currentIntern.getInstitutionalEmail() 
-                );
-
-                lblStudentName.setText(fullName);
-                lblStudentDetails.setText(internDetails);
-            } else {
-                LOGGER.warn("No se encontró información del practicante en la sesión activa.");
-                lblStudentName.setText("Usuario Desconocido");
-                lblStudentDetails.setText("Información no disponible");
-            }
+            lblStudentName.setText(fullName);
+            lblStudentDetails.setText(internDetails);
+        } else {
+            LOGGER.warn("No se encontró información del practicante en la sesión activa.");
+            lblStudentName.setText("Usuario Desconocido");
+            lblStudentDetails.setText("Información no disponible");
         }
+    }
+
+    private void checkAndSetProjectStatus() {
+        try {
+            Optional<InternDTO> currentInternOpt = UserSessionManager.getCurrentIntern();
+            
+            if (currentInternOpt.isPresent()) {
+                int estudianteIdActual = currentInternOpt.get().getId();
+                ProjectApplicationManager applicationManager = new ProjectApplicationManager();
+                List<ProjectApplicationDTO> applications = applicationManager.getActiveApplications(estudianteIdActual);
+                
+                boolean isAccepted = false;
+                int pendingCount = 0;
+
+                for (ProjectApplicationDTO app : applications) {
+                    if ("ACEPTADA".equalsIgnoreCase(app.getStatus())) {
+                        isAccepted = true;
+                        break; 
+                    } else if ("PENDIENTE".equalsIgnoreCase(app.getStatus())) {
+                        pendingCount++;
+                    }
+                }
+
+                if (isAccepted) {
+                    lblEstadoProyecto.setText("Activo");
+                    lblEstadoProyecto.setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724; -fx-padding: 3 10; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 16;");
+                    
+                } else if (pendingCount == 1) {
+                    lblEstadoProyecto.setText("Postulación pendiente");
+                    lblEstadoProyecto.setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-padding: 3 10; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 13;");
+                    
+                } else if (pendingCount > 1) {
+                    lblEstadoProyecto.setText("Postulaciones pendientes");
+                    lblEstadoProyecto.setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404; -fx-padding: 3 10; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 13;");
+                    
+                } else {
+                    setProjectStatusInactive();
+                }
+            } else {
+                setProjectStatusInactive();
+            }
+
+        } catch (Exception ex) {
+            LOGGER.error("Error al cargar el estado de las postulaciones: {}", ex.getMessage());
+            setProjectStatusInactive();
+        } finally {
+            LOGGER.debug("Proceso de validación de estado de proyecto finalizado.");
+        }
+    }
+
+    private void setProjectStatusInactive() {
+        if (lblEstadoProyecto != null) {
+            lblEstadoProyecto.setText("Inactivo");
+            lblEstadoProyecto.setStyle("-fx-background-color: #e2e3e5; -fx-text-fill: #383d41; -fx-padding: 3 10; -fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 16;");
+        }
+    }
 
     @FXML
     private void goHome(ActionEvent event) {
@@ -120,6 +164,7 @@ public class InternHomeDashboardController implements Initializable {
     @FXML
     private void goDocumentsModule(ActionEvent event) {
         LOGGER.info("Acceso al módulo de documentos.");
+        WindowManagerController.changeView("DocumentHomeDashboard.fxml"); // ¡Ya puedes descomentarlo!
     }
     
     @FXML
@@ -129,59 +174,15 @@ public class InternHomeDashboardController implements Initializable {
     }
 
     @FXML
-    private void logOut(ActionEvent event) {
-        UserSessionManager.clearSession();
-        LOGGER.info("Cierre de sesión realizado.");
-        WindowManagerController.changeView("LoginDashboard.fxml");
-    }
-
-    @FXML
-    private void abrirProyecto(ActionEvent event) {
-        LOGGER.info("Apertura de detalle de proyecto.");
-    }
-
-    @FXML
-    private void abrirDocumentos(ActionEvent event) {
-        LOGGER.info("Acceso a documentos del practicante.");
-    }
-
-    @FXML
-    private void subirDocumento(ActionEvent event) {
-        LOGGER.info("Carga de documento iniciada.");
-    }
-    
-    @FXML
     private void goSelfAssessmentsModule(ActionEvent event) {
+        LOGGER.info("Acceso al módulo de autoevaluaciones.");
         WindowManagerController.changeView("SelfAssessmentHomeDashboard.fxml");
     }
 
     @FXML
-    private void registrarAutoevaluacion(ActionEvent event) {
-        WindowManagerController.changeView("RegisterSelfAssessment.fxml");
-    }
-
-    @FXML
-    private void verComentariosDocumento(ActionEvent event) {
-        LOGGER.info("Consulta de comentarios del documento.");
-    }
-
-    @FXML
-    private void abrirReportes(ActionEvent event) {
-        LOGGER.info("Consulta de historial de reportes.");
-    }
-
-    @FXML
-    private void abrirReporte(ActionEvent event) {
-        LOGGER.info("Apertura de reporte individual.");
-    }
-
-    @FXML
-    private void generarReporte(ActionEvent event) {
-        LOGGER.info("Generación de reporte iniciada.");
-    }
-
-    @FXML
-    private void enviarReporte(ActionEvent event) {
-        LOGGER.info("Envío de reporte realizado.");
+    private void logOut(ActionEvent event) {
+        UserSessionManager.clearSession();
+        LOGGER.info("Cierre de sesión realizado.");
+        WindowManagerController.changeView("LoginDashboard.fxml");
     }
 }

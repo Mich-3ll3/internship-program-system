@@ -198,10 +198,7 @@ public class ProjectRegisterManager {
                 sqlException
             );
 
-            throw new BusinessException(
-                "No se pudo revertir el registro del proyecto.",
-                sqlException
-            );
+            throw new BusinessException("No se pudo revertir el registro del proyecto.", sqlException);
         }
     }
 }
