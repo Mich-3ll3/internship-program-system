@@ -36,7 +36,6 @@ public class ProjectHomeDashboardController implements Initializable {
     private static final int PRIORITY_ONE = 1;
     private static final int PRIORITY_TWO = 2;
     private static final int PRIORITY_THREE = 3;
-    private static final int TEST_INTERN_ID = 3;
     private static final int FIRST_INDEX = 0;
 
     private static final String CRITERIA_NAME = "Nombre del Proyecto";
@@ -116,7 +115,10 @@ public class ProjectHomeDashboardController implements Initializable {
 
     private void loadActiveApplications() {
         try {
-            List<ProjectApplicationDTO> activeApps = applicationManager.getActiveApplications(TEST_INTERN_ID);
+            // Obtenemos dinámicamente el ID del usuario en sesión
+            int estudianteIdActual = UserSessionManager.getCurrentUser().getId();
+            
+            List<ProjectApplicationDTO> activeApps = applicationManager.getActiveApplications(estudianteIdActual);
             tblApplications.setItems(FXCollections.observableArrayList(activeApps));
             LOGGER.info("Se cargaron {} postulaciones activas en la tabla superior.", activeApps.size());
         } catch (BusinessException ex) {
@@ -133,7 +135,10 @@ public class ProjectHomeDashboardController implements Initializable {
             try {
                 LOGGER.info("Cancelando postulación para el proyecto ID: {}", selectedApp.getProjectId());
                 
-                boolean success = applicationManager.cancelApplication(TEST_INTERN_ID, selectedApp.getProjectId());
+                // Obtenemos dinámicamente el ID del usuario en sesión
+                int estudianteIdActual = UserSessionManager.getCurrentUser().getId();
+                
+                boolean success = applicationManager.cancelApplication(estudianteIdActual, selectedApp.getProjectId());
                 
                 if (success) {
                     showSuccess("La postulación ha sido cancelada correctamente.");
@@ -330,11 +335,14 @@ public class ProjectHomeDashboardController implements Initializable {
 
     private void processApplication(ProjectDTO selectedProject, int chosenPriority) {
         try {
+            // Obtenemos dinámicamente el ID del usuario en sesión
+            int estudianteIdActual = UserSessionManager.getCurrentUser().getId();
+            
             LOGGER.info("Iniciando solicitud para el proyecto ID: {} con prioridad: {}", 
                     selectedProject.getId(), chosenPriority);
             
             boolean success = applicationManager.registerApplication(
-                TEST_INTERN_ID, 
+                estudianteIdActual, 
                 selectedProject.getId(), 
                 chosenPriority
             );
@@ -360,7 +368,14 @@ public class ProjectHomeDashboardController implements Initializable {
 
     @FXML
     private void goDocumentsModule(ActionEvent event) {
-        WindowManagerController.changeView("DocumentsDashboard.fxml");
+        try {
+            LOGGER.info("Navegando al módulo de Documentos.");
+            WindowManagerController.changeView("DocumentHomeDashboard.fxml");
+        } catch (RuntimeException runtimeException) {
+            LOGGER.error("Error al navegar al módulo de Documentos: {}", runtimeException.getMessage());
+        } finally {
+            LOGGER.debug("Intento de navegación al módulo de Documentos finalizado.");
+        }
     }
 
     @FXML
