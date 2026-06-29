@@ -17,6 +17,7 @@ public class ProjectActivityDTO {
             String month,
             Integer startWeek,
             Integer endWeek,
+            Integer plannedHours,
             Integer projectId
     ) {
         this.name = name;
@@ -33,6 +34,7 @@ public class ProjectActivityDTO {
             String month,
             Integer startWeek,
             Integer endWeek,
+            Integer plannedHours,
             Integer projectId
     ) {
         this.id = id;

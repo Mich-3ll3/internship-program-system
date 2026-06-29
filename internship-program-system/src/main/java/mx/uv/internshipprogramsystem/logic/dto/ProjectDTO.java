@@ -1,5 +1,8 @@
 package mx.uv.internshipprogramsystem.logic.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ProjectDTO {
     private Integer id;
     private String name;
@@ -13,6 +16,13 @@ public class ProjectDTO {
     private Integer linkedOrganizationId;
     private Integer projectResponsibleId;
     private Boolean isActive;
+    
+    private String organizationName;
+    private String area;
+    private Integer availableSpots;
+
+    // --- NUEVO ATRIBUTO: Lista de actividades planeadas ---
+    private List<ProjectActivityDTO> plannedActivities = new ArrayList<>();
 
     public ProjectDTO() {
     }

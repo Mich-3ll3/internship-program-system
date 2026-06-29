@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
@@ -25,6 +26,7 @@ import org.mockito.MockedStatic;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO;
 
 class ProjectActivityDAOTest {
+
     @Test
     void createWithConnectionWhenActivityIsValidReturnsTrue() throws Exception {
 
@@ -36,9 +38,7 @@ class ProjectActivityDAOTest {
         mockPreparedStatement(connection, statement);
         when(statement.executeUpdate()).thenReturn(1);
 
-
         boolean wasCreated = dao.create(activity, connection);
-
 
         assertTrue(wasCreated);
         verify(statement).setString(1, "Analisis");
@@ -53,6 +53,7 @@ class ProjectActivityDAOTest {
         PreparedStatement statement = mock(PreparedStatement.class);
         ProjectActivityDAO dao = new ProjectActivityDAO();
         mockPreparedStatement(connection, statement);
+        
         when(statement.executeQuery()).thenReturn(resultSet(row(
             "id", 1,
             "nombre", "Analisis",
@@ -66,7 +67,6 @@ class ProjectActivityDAOTest {
         try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
 
             List<ProjectActivityDTO> activities = dao.findByProjectId(7);
-
 
             assertEquals(1, activities.size());
             assertEquals("Analisis", activities.get(0).getName());
@@ -84,9 +84,7 @@ class ProjectActivityDAOTest {
         mockPreparedStatement(connection, statement);
         when(statement.executeUpdate()).thenReturn(0);
 
-
         boolean wasDeleted = dao.deleteByProjectId(7, connection);
-
 
         assertTrue(wasDeleted);
         verify(statement).setInt(1, 7);

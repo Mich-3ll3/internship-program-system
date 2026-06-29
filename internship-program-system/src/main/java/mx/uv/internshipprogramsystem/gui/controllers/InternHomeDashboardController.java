@@ -3,20 +3,23 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.managers.ProjectApplicationManager;
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO; 
+import mx.uv.internshipprogramsystem.logic.dto.ProjectApplicationDTO;
 
 public class InternHomeDashboardController implements Initializable {
     
@@ -41,6 +44,7 @@ public class InternHomeDashboardController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         LOGGER.info("Dashboard de estudiante cargado correctamente.");
         configureInternData();
+        checkAndSetProjectStatus();
     }
 
     private void configureInternData() {
@@ -79,22 +83,31 @@ public class InternHomeDashboardController implements Initializable {
     @FXML
     private void goProjectsModule(ActionEvent event) {
         LOGGER.info("Acceso al módulo de proyectos.");
+        WindowManagerController.changeView("ProjectHomeDashboard.fxml");
     }
 
     @FXML
     private void goDocumentsModule(ActionEvent event) {
         LOGGER.info("Acceso al módulo de documentos.");
+        WindowManagerController.changeView("DocumentHomeDashboard.fxml"); // ¡Ya puedes descomentarlo!
     }
     
     @FXML
     private void goReportsModule(ActionEvent event) {
+        LOGGER.info("Acceso al módulo de reportes.");
         WindowManagerController.changeView("ReportHomeDashboard.fxml");
+    }
+
+    @FXML
+    private void goSelfAssessmentsModule(ActionEvent event) {
+        LOGGER.info("Acceso al módulo de autoevaluaciones.");
+        WindowManagerController.changeView("SelfAssessmentHomeDashboard.fxml");
     }
 
     @FXML
     private void logOut(ActionEvent event) {
         UserSessionManager.clearSession();
-        LOGGER.info("Cierre de sesión realizado correctamente.");
+        LOGGER.info("Cierre de sesión realizado.");
         WindowManagerController.changeView("LoginDashboard.fxml");
     }
 

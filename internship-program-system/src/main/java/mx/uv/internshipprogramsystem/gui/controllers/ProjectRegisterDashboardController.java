@@ -31,6 +31,7 @@ import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.gui.util.FormAlertSupport;
 
 public class ProjectRegisterDashboardController implements Initializable {
+
     private static final Logger LOGGER =
         LoggerFactory.getLogger(
             ProjectRegisterDashboardController.class
@@ -73,9 +74,13 @@ public class ProjectRegisterDashboardController implements Initializable {
     private ComboBox<String> cmbResponsible;
 
     private ProjectRegisterManager projectRegisterManager;
+
     private LinkedOrganizationDAO linkedOrganizationDAO;
+
     private ProjectResponsibleDAO projectResponsibleDAO;
+
     private List<LinkedOrganizationDTO> linkedOrganizations;
+
     private List<ProjectResponsibleDTO> projectResponsibles;
 
     @Override
@@ -96,7 +101,12 @@ public class ProjectRegisterDashboardController implements Initializable {
         FormAlertSupport.clearFieldErrorsFromActiveWindow();
 
         try {
-            ProjectDTO project = buildProjectFromForm();
+            validatePermission(
+                Permission.REGISTER_PROJECT
+            );
+
+            ProjectDTO project =
+                buildProjectFromForm();
 
             projectRegisterManager.registerProject(
                 project,
@@ -117,7 +127,7 @@ public class ProjectRegisterDashboardController implements Initializable {
             );
         } catch (BusinessException businessException) {
             LOGGER.error(
-                "Error registrando proyecto",
+                "Error registrando proyecto.",
                 businessException
             );
 
@@ -139,65 +149,95 @@ public class ProjectRegisterDashboardController implements Initializable {
     }
 
     @FXML
-    private void handleBtnCancel(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectsModuleDashboard.fxml"
+    private void handleBtnCancel(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos."
         );
     }
 
 
 
     @FXML
-    private void goHome(ActionEvent event) {
+    private void goHome(
+            ActionEvent event
+    ) {
         WindowManagerController.changeView(
             "CoordinatorProfessorHomeDashboard.fxml"
         );
     }
 
     @FXML
-    private void goEducationalExperienceModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "EducationalExperienceRegisterDashboard.fxml"
+    private void goEducationalExperienceModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.REGISTER_EDUCATIONAL_EXPERIENCE,
+            "EducationalExperienceRegisterDashboard.fxml",
+            "Acceso denegado al módulo de experiencia educativa."
         );
     }
 
     @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
+    private void goInternModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes."
         );
     }
 
     @FXML
-    private void goLinkedOrganizationModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "LinkedOrganizationManagementGUI.fxml"
+    private void goLinkedOrganizationModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_ORGANIZATION,
+            "LinkedOrganizationManagementGUI.fxml",
+            "Acceso denegado al módulo de organizaciones vinculadas."
         );
     }
 
     @FXML
-    private void goProjectsModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectsModuleDashboard.fxml"
+    private void goProjectsModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos."
         );
     }
 
     @FXML
-    private void goDocumentsModule(ActionEvent event) {
+    private void goDocumentsModule(
+            ActionEvent event
+    ) {
         LOGGER.info(
             "Acceso al módulo de documentos."
         );
     }
 
     @FXML
-    private void goReportsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
+    private void goReportsModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_REPORT,
+            "ReportHomeDashboard.fxml",
+            "Acceso denegado al módulo de reportes."
         );
     }
 
     @FXML
-    private void logOut(ActionEvent event) {
+    private void logOut(
+            ActionEvent event
+    ) {
         UserSessionManager.clearSession();
 
         LOGGER.info(
@@ -211,14 +251,18 @@ public class ProjectRegisterDashboardController implements Initializable {
 
     private void loadComboBoxData() {
         try {
-            linkedOrganizations = linkedOrganizationDAO.findAll();
-            projectResponsibles = projectResponsibleDAO.findAll();
+            linkedOrganizations =
+                linkedOrganizationDAO.findAll();
+
+            projectResponsibles =
+                projectResponsibleDAO.findAll();
 
             loadOrganizations();
+
             loadResponsibles();
         } catch (BusinessException businessException) {
             LOGGER.error(
-                "Error cargando datos para registrar proyecto",
+                "Error cargando datos para registrar proyecto.",
                 businessException
             );
 
@@ -380,11 +424,20 @@ public class ProjectRegisterDashboardController implements Initializable {
         Integer id;
 
         if (selectedValue == null || selectedValue.trim().isEmpty()) {
-            throw new BusinessException(emptyMessage);
+            throw new BusinessException(
+                emptyMessage
+            );
         }
 
-        String[] parts = selectedValue.split(" - ");
-        id = Integer.valueOf(parts[0]);
+        String[] parts =
+            selectedValue.split(
+                " - "
+            );
+
+        id =
+            Integer.valueOf(
+                parts[0]
+            );
 
         return id;
     }

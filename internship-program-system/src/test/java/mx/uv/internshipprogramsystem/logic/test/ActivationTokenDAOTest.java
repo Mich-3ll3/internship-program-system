@@ -142,6 +142,89 @@ class ActivationTokenDAOTest {
         assertThrows(BusinessException.class, () -> dao.markAsUsed(0));
     }
 
+    @Test
+    void createWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        ActivationTokenDTO token = buildToken();
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ActivationTokenDAO dao = new ActivationTokenDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasCreated = dao.create(token);
+
+
+            assertFalse(wasCreated);
+        }
+    }
+
+    @Test
+    void markAsUsedWhenNoRowsAreAffectedReturnsFalse() throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ActivationTokenDAO dao = new ActivationTokenDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wasMarked = dao.markAsUsed(4);
+
+
+            assertFalse(wasMarked);
+        }
+    }
+
+    @Test
+    void invalidateTokensByUserIdWhenNoRowsAreAffectedReturnsFalse()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ActivationTokenDAO dao = new ActivationTokenDAO();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        try (MockedStatic<?> ignored = mockDataBaseConnection(connection)) {
+
+            boolean wereInvalidated = dao.invalidateTokensByUserId(7);
+
+
+            assertFalse(wereInvalidated);
+        }
+    }
+
+    @Test
+    void createWhenTokenIsNullThrowsBusinessException() {
+
+        ActivationTokenDAO dao = new ActivationTokenDAO();
+
+
+        assertThrows(BusinessException.class, () -> dao.create(null));
+    }
+
+    @Test
+    void findByTokenHashWhenHashIsBlankThrowsBusinessException() {
+
+        ActivationTokenDAO dao = new ActivationTokenDAO();
+
+
+        assertThrows(BusinessException.class, () -> dao.findByTokenHash(" "));
+    }
+
+    @Test
+    void invalidateTokensByUserIdWhenUserIdIsInvalidThrowsBusinessException() {
+
+        ActivationTokenDAO dao = new ActivationTokenDAO();
+
+
+        assertThrows(BusinessException.class, () -> dao.invalidateTokensByUserId(0));
+    }
+
     private ActivationTokenDTO buildToken() {
         ActivationTokenDTO token = new ActivationTokenDTO();
         token.setUserId(9);

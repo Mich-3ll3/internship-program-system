@@ -5,6 +5,7 @@ import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.mockPrepar
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.resultSet;
 import static mx.uv.internshipprogramsystem.logic.test.DaoTestSupport.row;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -83,6 +84,22 @@ class ProjectScheduleDAOTest {
 
         assertTrue(wasDeleted);
         verify(statement).setInt(1, 7);
+    }
+
+    @Test
+    void createWithConnectionWhenNoRowsAreAffectedReturnsFalse()
+            throws Exception {
+
+        Connection connection = mock(Connection.class);
+        PreparedStatement statement = mock(PreparedStatement.class);
+        ProjectScheduleDAO dao = new ProjectScheduleDAO();
+        ProjectScheduleDTO schedule = buildSchedule();
+        mockPreparedStatement(connection, statement);
+        when(statement.executeUpdate()).thenReturn(0);
+
+        boolean wasCreated = dao.create(schedule, connection);
+
+        assertFalse(wasCreated);
     }
 
     private ProjectScheduleDTO buildSchedule() {

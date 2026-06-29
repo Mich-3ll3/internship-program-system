@@ -4,7 +4,6 @@ import java.net.URL;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -32,8 +31,11 @@ import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.gui.util.FormAlertSupport;
 
 public class ProjectUpdateDashboardController implements Initializable {
+
     private static final Logger LOGGER =
-        LoggerFactory.getLogger(ProjectUpdateDashboardController.class);
+        LoggerFactory.getLogger(
+            ProjectUpdateDashboardController.class
+        );
 
     @FXML
     private TextField txtProjectName;
@@ -67,9 +69,11 @@ public class ProjectUpdateDashboardController implements Initializable {
 
     private mx.uv.internshipprogramsystem.logic.managers.ProjectManager projectManager;
     private LinkedOrganizationDAO linkedOrganizationDAO;
+
     private ProjectResponsibleDAO projectResponsibleDAO;
 
     private List<LinkedOrganizationDTO> linkedOrganizations;
+
     private List<ProjectResponsibleDTO> projectResponsibles;
 
     private ProjectDTO selectedProject;
@@ -97,7 +101,12 @@ public class ProjectUpdateDashboardController implements Initializable {
         FormAlertSupport.clearFieldErrorsFromActiveWindow();
 
         try {
-            ProjectDTO project = buildProjectFromForm();
+            validatePermission(
+                Permission.UPDATE_PROJECT
+            );
+
+            ProjectDTO project =
+                buildProjectFromForm();
 
             projectManager.updateProject(project);
 
@@ -111,7 +120,7 @@ public class ProjectUpdateDashboardController implements Initializable {
             );
         } catch (BusinessException businessException) {
             LOGGER.error(
-                "Error actualizando proyecto",
+                "Error actualizando proyecto.",
                 businessException
             );
 
@@ -133,48 +142,66 @@ public class ProjectUpdateDashboardController implements Initializable {
     }
 
     @FXML
-    private void handleBtnCancel(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectsModuleDashboard.fxml"
+    private void handleBtnCancel(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos."
         );
     }
 
 
 
     private void fillProjectFields() {
-        txtProjectName.setText(selectedProject.getName());
+        txtProjectName.setText(
+            selectedProject.getName()
+        );
+
         txaGeneralDescription.setText(
             selectedProject.getGeneralDescription()
         );
+
         txaGeneralObjective.setText(
             selectedProject.getGeneralObjective()
         );
+
         txaImmediateObjectives.setText(
             selectedProject.getImmediateObjectives()
         );
+
         txaMediateObjectives.setText(
             selectedProject.getMediateObjective()
         );
+
         txtMethodology.setText(
             selectedProject.getMethodology()
         );
+
         txaResources.setText(
             selectedProject.getResources()
         );
+
         txtResponsibilities.setText(
             selectedProject.getResponsibilities()
         );
 
         selectOrganization();
+
         selectResponsible();
     }
 
     private void loadComboBoxData() {
         try {
-            linkedOrganizations = linkedOrganizationDAO.findAll();
-            projectResponsibles = projectResponsibleDAO.findAll();
+            linkedOrganizations =
+                linkedOrganizationDAO.findAll();
+
+            projectResponsibles =
+                projectResponsibleDAO.findAll();
 
             loadOrganizations();
+
             loadResponsibles();
         } catch (BusinessException businessException) {
             FormAlertSupport.showError(
@@ -271,7 +298,9 @@ public class ProjectUpdateDashboardController implements Initializable {
                     selectedProject.getLinkedOrganizationId()
                         + " - "
             )) {
-                cmbOrganization.setValue(organization);
+                cmbOrganization.setValue(
+                    organization
+                );
             }
         }
     }
@@ -282,7 +311,9 @@ public class ProjectUpdateDashboardController implements Initializable {
                     selectedProject.getProjectResponsibleId()
                         + " - "
             )) {
-                cmbResponsible.setValue(responsible);
+                cmbResponsible.setValue(
+                    responsible
+                );
             }
         }
     }
@@ -322,20 +353,22 @@ public class ProjectUpdateDashboardController implements Initializable {
 
     private Integer getSelectedOrganizationId()
             throws BusinessException {
-        Integer organizationId = getIdFromComboValue(
-            cmbOrganization.getValue(),
-            "Debe seleccionar una organización."
-        );
+        Integer organizationId =
+            getIdFromComboValue(
+                cmbOrganization.getValue(),
+                "Debe seleccionar una organización."
+            );
 
         return organizationId;
     }
 
     private Integer getSelectedResponsibleId()
             throws BusinessException {
-        Integer responsibleId = getIdFromComboValue(
-            cmbResponsible.getValue(),
-            "Debe seleccionar un responsable."
-        );
+        Integer responsibleId =
+            getIdFromComboValue(
+                cmbResponsible.getValue(),
+                "Debe seleccionar un responsable."
+            );
 
         return responsibleId;
     }
@@ -347,67 +380,106 @@ public class ProjectUpdateDashboardController implements Initializable {
         Integer id;
 
         if (selectedValue == null || selectedValue.trim().isEmpty()) {
-            throw new BusinessException(emptyMessage);
+            throw new BusinessException(
+                emptyMessage
+            );
         }
 
-        String[] parts = selectedValue.split(" - ");
-        id = Integer.valueOf(parts[0]);
+        String[] parts =
+            selectedValue.split(
+                " - "
+            );
+
+        id =
+            Integer.valueOf(
+                parts[0]
+            );
 
         return id;
     }
 
     @FXML
-    private void goHome(ActionEvent event) {
+    private void goHome(
+            ActionEvent event
+    ) {
         WindowManagerController.changeView(
             "CoordinatorProfessorHomeDashboard.fxml"
         );
     }
 
     @FXML
-    private void goEducationalExperienceModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "EducationalExperienceRegisterDashboard.fxml"
+    private void goEducationalExperienceModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.REGISTER_EDUCATIONAL_EXPERIENCE,
+            "EducationalExperienceRegisterDashboard.fxml",
+            "Acceso denegado al módulo de experiencia educativa."
         );
     }
 
     @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
+    private void goInternModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes."
         );
     }
 
     @FXML
-    private void goLinkedOrganizationModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "LinkedOrganizationManagementGUI.fxml"
+    private void goLinkedOrganizationModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_ORGANIZATION,
+            "LinkedOrganizationManagementGUI.fxml",
+            "Acceso denegado al módulo de organizaciones vinculadas."
         );
     }
 
     @FXML
-    private void goProjectsModule(ActionEvent event) {
-        WindowManagerController.changeView(
-            "ProjectsModuleDashboard.fxml"
+    private void goProjectsModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos."
         );
     }
 
     @FXML
-    private void goDocumentsModule(ActionEvent event) {
+    private void goDocumentsModule(
+            ActionEvent event
+    ) {
         LOGGER.info(
             "Acceso al módulo de documentos."
         );
     }
 
     @FXML
-    private void goReportsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
+    private void goReportsModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_REPORT,
+            "ReportHomeDashboard.fxml",
+            "Acceso denegado al módulo de reportes."
         );
     }
 
     @FXML
-    private void logOut(ActionEvent event) {
+    private void logOut(
+            ActionEvent event
+    ) {
         UserSessionManager.clearSession();
+
+        LOGGER.info(
+            "Cierre de sesión realizado correctamente."
+        );
 
         WindowManagerController.changeView(
             "LoginDashboard.fxml"

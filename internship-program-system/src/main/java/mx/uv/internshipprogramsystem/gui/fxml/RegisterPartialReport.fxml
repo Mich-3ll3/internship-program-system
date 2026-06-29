@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="800.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uv.internshipprogramsystem.gui.controllers.RegisterPartialReportController">
+    
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#4a90e2;" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin><Insets top="20.0" /></VBox.margin>
+                    <children>
+                        <Label text="ES" textFill="WHITE">
+                            <font><Font name="System Bold" size="12.0" /></font>
+                        </Label>
+                    </children>
+                </StackPane>
+                <Button fx:id="btnHome" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="⌂" textFill="WHITE" />
+                <Button fx:id="btnProjects" onAction="#goProjectsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🛠️" textFill="WHITE" />
+                <Button fx:id="btnDocuments" onAction="#goDocumentsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📑" textFill="WHITE" />
+                <Button fx:id="btnReports" onAction="#goReportsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(255,255,255,0.1);" text="📋" textFill="WHITE" />
+                <Button fx:id="btnSelfAssessments" onAction="#goSelfAssessmentsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📝" textFill="WHITE" />
+                <Region VBox.vgrow="ALWAYS" />
+                <Button fx:id="btnExit" onAction="#logOut" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🚪" textFill="WHITE">
+                    <VBox.margin><Insets bottom="20.0" /></VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
+            <content>
+                <VBox spacing="20.0">
+                    <padding><Insets bottom="24.0" left="24.0" right="24.0" top="20.0" /></padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Nuevo Reporte Parcial" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="22.0" /></font>
+                                        </Label>
+                                        <Label fx:id="lblDate" text="Cargando fecha..." textFill="#6b7280" />
+                                    </children>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="lblReportNumber" style="-fx-background-color: #e8a020; -fx-background-radius: 5; -fx-padding: 5 10;" text="Reporte Parcial" textFill="WHITE">
+                                    <font><Font name="System Bold" size="14.0" /></font>
+                                </Label>
+                            </children>
+                        </HBox>
+
+                        <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;">
+                            <Label text="Datos Generales de la EE" textFill="#4a90e2"><font><Font name="System Bold" size="16.0" /></font></Label>
+                            <Separator />
+                            <GridPane hgap="20.0" vgap="15.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="15.0" /><ColumnConstraints percentWidth="35.0" /><ColumnConstraints percentWidth="15.0" /><ColumnConstraints percentWidth="35.0" />
+                                </columnConstraints>
+                                <children>
+                                    <Label text="Carrera:" textFill="#6b7280" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <Label fx:id="lblMajor" text="Cargando..." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <Label text="NRC:" textFill="#6b7280" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                    <Label fx:id="lblNrc" text="Cargando..." GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                                    <Label text="Profesor:" textFill="#6b7280" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <Label fx:id="lblProfessor" text="Cargando..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label text="Periodo:" textFill="#6b7280" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <Label fx:id="lblSchoolPeriod" text="Cargando..." GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                </children>
+                            </GridPane>
+                        </VBox>
+
+                        <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;">
+                            <Label text="Datos del Proyecto" textFill="#4a90e2"><font><Font name="System Bold" size="16.0" /></font></Label>
+                            <Separator />
+                            <GridPane hgap="20.0" vgap="15.0">
+                                <columnConstraints>
+                                    <ColumnConstraints percentWidth="20.0" /><ColumnConstraints percentWidth="30.0" /><ColumnConstraints percentWidth="20.0" /><ColumnConstraints percentWidth="30.0" />
+                                </columnConstraints>
+                                <children>
+                                    <Label text="Alumno(s):" textFill="#6b7280" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <Label fx:id="lblInterns" text="Cargando..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    <Label text="Organización:" textFill="#6b7280" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                    <Label fx:id="lblOrganization" text="Cargando..." wrapText="true" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                                    <Label text="Proyecto:" textFill="#6b7280" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <Label fx:id="lblProject" text="Cargando..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <Label text="Horas previas:" textFill="#6b7280" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <Label fx:id="lblAccumulatedHours" text="Cargando..." GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                                </children>
+                            </GridPane>
+                            <VBox spacing="5.0" style="-fx-padding: 10 0 0 0;">
+                                <Label text="Objetivo General:" textFill="#6b7280" />
+                                <Label fx:id="lblGeneralObjective" text="Cargando..." wrapText="true" />
+                                <Label text="Metodología:" textFill="#6b7280" style="-fx-padding: 10 0 0 0;" />
+                                <Label fx:id="lblMethodology" text="Cargando..." wrapText="true" />
+                            </VBox>
+                        </VBox>
+
+                        <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;">
+                            <Label text="Avance acumulado de actividades" textFill="#4a90e2"><font><Font name="System Bold" size="16.0" /></font></Label>
+                            <TableView fx:id="tblActivities" prefHeight="250.0" style="-fx-background-color: transparent;">
+                                <columns>
+                                    <TableColumn fx:id="colActivity" prefWidth="500.0" text="Actividades" />
+                                    <TableColumn fx:id="colType" prefWidth="150.0" text="Tiempo" />
+                                    <TableColumn fx:id="colTotal" prefWidth="150.0" text="Total Horas" />
+                                </columns>
+                            </TableView>
+                        </VBox>
+
+                        <VBox spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 20; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 10;">
+                            <VBox spacing="5.0">
+                                <Label text="Resultados obtenidos al momento:" textFill="#1a2744"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <TextArea fx:id="txtResults" prefRowCount="4" promptText="Describe brevemente los resultados alcanzados hasta el parcial..." wrapText="true" />
+                                        <Label text="* Máximo 240 caracteres" textFill="#6b7280">
+                                            <font><Font size="11.0" /></font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </VBox>
+                            <VBox spacing="5.0">
+                                <Label text="Observaciones:" textFill="#1a2744"><font><Font name="System Bold" size="14.0" /></font></Label>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <TextArea fx:id="txtObservations" prefRowCount="3" promptText="Si hubo incidencias, retrasos o notas adicionales, regístralas aquí." wrapText="true" />
+                                        <Label text="* Máximo 240 caracteres" textFill="#6b7280">
+                                            <font><Font size="11.0" /></font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+
+                        <HBox alignment="CENTER_RIGHT" spacing="15.0">
+                            <Button fx:id="btnCancel" onAction="#handleBtnCancelClick" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: white; -fx-border-color: #d1d5db; -fx-border-radius: 8;" text="Cancelar" textFill="#4b5563" />
+                            <Button fx:id="btnSubmit" onAction="#handleBtnSubmitClick" prefHeight="40.0" prefWidth="160.0" style="-fx-background-color: #4a90e2; -fx-background-radius: 8;" text="Enviar Reporte" textFill="WHITE">
+                                <font><Font name="System Bold" size="14.0" /></font>
+                            </Button>
+                        </HBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

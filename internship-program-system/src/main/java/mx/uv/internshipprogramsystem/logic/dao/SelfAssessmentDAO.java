@@ -31,6 +31,7 @@ public class SelfAssessmentDAO {
         "JOIN RESPONSABLE_PROYECTO r ON a.responsable_id = r.id " +
         "JOIN ORGANIZACION_VINCULADA o ON a.organizacion_id = o.id";
 
+    private static final String GET_BY_STUDENT_ID = GET_ALL + " WHERE a.estudiante_id = ?";
 
     private static final String INSERT =
         "INSERT INTO AUTOEVALUACION (" +
@@ -49,36 +50,7 @@ public class SelfAssessmentDAO {
              ResultSet resultSet = preparedStatement.executeQuery()) {
 
             while (resultSet.next()) {
-                SelfAssessmentDTO dto = new SelfAssessmentDTO();
-
-                dto.setId(resultSet.getInt("id"));
-                dto.setStudentId(resultSet.getInt("estudiante_id"));
-                dto.setProjectId(resultSet.getInt("proyecto_id"));
-                dto.setOrganizationId(resultSet.getInt("organizacion_id"));
-                dto.setResponsibleId(resultSet.getInt("responsable_id"));
-
-                dto.setDate(resultSet.getDate("fecha").toLocalDate());
-                dto.setDepartment(resultSet.getString("departamento"));
-                dto.setPlace(resultSet.getString("lugar"));
-                dto.setObservations(resultSet.getString("observaciones"));
-
-                dto.setAfirmacion1(resultSet.getInt("afirmacion1"));
-                dto.setAfirmacion2(resultSet.getInt("afirmacion2"));
-                dto.setAfirmacion3(resultSet.getInt("afirmacion3"));
-                dto.setAfirmacion4(resultSet.getInt("afirmacion4"));
-                dto.setAfirmacion5(resultSet.getInt("afirmacion5"));
-                dto.setAfirmacion6(resultSet.getInt("afirmacion6"));
-                dto.setAfirmacion7(resultSet.getInt("afirmacion7"));
-                dto.setAfirmacion8(resultSet.getInt("afirmacion8"));
-                dto.setAfirmacion9(resultSet.getInt("afirmacion9"));
-                dto.setAfirmacion10(resultSet.getInt("afirmacion10"));
-
-                dto.setStudentName(resultSet.getString("studentName"));
-                dto.setProjectName(resultSet.getString("projectName"));
-                dto.setResponsibleName(resultSet.getString("responsibleName"));
-                dto.setOrganizationName(resultSet.getString("organizationName"));
-
-                assessments.add(dto);
+                assessments.add(mapResultSetToDTO(resultSet));
             }
 
         } catch (SQLException sqlException) {
@@ -88,6 +60,28 @@ public class SelfAssessmentDAO {
         return assessments;
     }
 
+    public List<SelfAssessmentDTO> getSelfAssessmentsByStudentId(int studentId) throws BusinessException {
+        List<SelfAssessmentDTO> assessments = new ArrayList<>();
+        
+        final int PARAM_STUDENT_ID = 1;
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_BY_STUDENT_ID)) {
+             
+            preparedStatement.setInt(PARAM_STUDENT_ID, studentId);
+            
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    assessments.add(mapResultSetToDTO(resultSet));
+                }
+            }
+
+        } catch (SQLException sqlException) {
+            throw new BusinessException("Error al obtener autoevaluaciones del estudiante: " + sqlException.getMessage());
+        }
+
+        return assessments;
+    }
 
     public void insert(SelfAssessmentDTO dto) throws BusinessException, DataAccessException {
         try (Connection connection = DatabaseManager.getConnection();

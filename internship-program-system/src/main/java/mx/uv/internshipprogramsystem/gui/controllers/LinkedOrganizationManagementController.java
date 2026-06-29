@@ -10,6 +10,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import mx.uv.internshipprogramsystem.logic.dao.LinkedOrganizationDAO;
 import mx.uv.internshipprogramsystem.logic.dto.LinkedOrganizationDTO;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
@@ -124,6 +128,25 @@ public class LinkedOrganizationManagementController {
         filteredOrganizations.setPredicate(new OrganizationPredicate(query));
     }
 
+    private void filterOrganizationsByName(
+            String query
+    ) {
+        ObservableList<LinkedOrganizationDTO> filteredData =
+            FXCollections.observableArrayList();
+
+        for (LinkedOrganizationDTO organization : masterData) {
+            if (organization.getName().toLowerCase().contains(query)) {
+                filteredData.add(
+                    organization
+                );
+            }
+        }
+
+        tblOrganizations.setItems(
+            filteredData
+        );
+    }
+
     @FXML
     private void goRegisterOrganization(ActionEvent event) {
         WindowManagerController.changeView(
@@ -154,7 +177,11 @@ public class LinkedOrganizationManagementController {
 
     @FXML
     private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView("InternModuleDashboard.fxml");
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes."
+        );
     }
 
     @FXML
@@ -165,5 +192,17 @@ public class LinkedOrganizationManagementController {
     @FXML
     private void goProjectsModule(ActionEvent event) {
         WindowManagerController.changeView("ProjectModuleDashboard.fxml");
+    }
+
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
     }
 }

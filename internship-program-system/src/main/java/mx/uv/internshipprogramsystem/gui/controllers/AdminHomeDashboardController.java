@@ -88,4 +88,16 @@ public class AdminHomeDashboardController {
             new ShowErrorAlertRunnable(title, message)
         );
     }
+
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
+    }
 }

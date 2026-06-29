@@ -257,7 +257,6 @@ public class ProfessorManagementController {
     private void goUpdateProfessor() {
         ProfessorDTO selectedProfessor = tblProfessors.getSelectionModel().getSelectedItem();
 
-        if (selectedProfessor != null) {
             WindowManagerController.changeViewToUpdateProfessor(
                     "UpdateProfessorDashboard.fxml",
                     selectedProfessor);
@@ -270,31 +269,75 @@ public class ProfessorManagementController {
     }
 
     @FXML
-    private void goHome(ActionEvent event) {
-        WindowManagerController.changeView("AdminHomeDashboard.fxml");
+    private void goHome(
+            ActionEvent event
+    ) {
+        WindowManagerController.changeView(
+            "AdminHomeDashboard.fxml"
+        );
     }
 
     @FXML
-    private void goProfessorModule(ActionEvent event) {
-        WindowManagerController.changeView("ProfessorModuleDashboard.fxml");
+    private void goProfessorModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROFESSOR,
+            "ProfessorModuleDashboard.fxml",
+            "Acceso denegado al módulo de profesores."
+        );
     }
 
     @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView("InternModuleDashboard.fxml");
+    private void goRegisterProfessor(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.REGISTER_PROFESSOR,
+            "RegisterProfessorDashboard.fxml",
+            "Acceso denegado al registro de profesores."
+        );
     }
 
     @FXML
-    private void logOut(ActionEvent event) {
+    private void logOut(
+            ActionEvent event
+    ) {
         UserSessionManager.clearSession();
         LOGGER.info("Cierre de sesion realizado correctamente.");
         WindowManagerController.changeView(
                 "LoginDashboard.fxml");
     }
 
-    @FXML
-    private void goRegisterProfessor(ActionEvent event) {
-        WindowManagerController.changeView("RegisterProfessorDashboard.fxml");
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
+    ) {
+        try {
+            validatePermission(
+                permission
+            );
+
+            WindowManagerController.changeView(
+                fxmlName
+            );
+
+            LOGGER.info(
+                "Acceso permitido a la vista {}.",
+                fxmlName
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                logMessage,
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+        }
     }
 
     private void showNotification(

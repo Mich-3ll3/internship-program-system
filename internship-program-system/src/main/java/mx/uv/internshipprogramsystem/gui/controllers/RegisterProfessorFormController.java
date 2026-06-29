@@ -1,5 +1,8 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -30,24 +33,33 @@ import mx.uv.internshipprogramsystem.logic.dto.UserRole;
 import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.exceptions.ValidationException;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
 import mx.uv.internshipprogramsystem.logic.validations.ProfessorValidator;
 
 public class RegisterProfessorFormController implements Initializable {
+
     private static final Logger LOGGER =
-        LoggerFactory.getLogger(RegisterProfessorFormController.class);
+        LoggerFactory.getLogger(
+            RegisterProfessorFormController.class
+        );
 
     @FXML
     private TextField txtInstitutionalEmail;
+
     @FXML
     private TextField txtName;
+
     @FXML
     private TextField txtFirstSurname;
+
     @FXML
     private TextField txtSecondSurname;
+
     @FXML
     private TextField txtStaffNumber;
+
     @FXML
     private CheckBox chkCoordinator;
     @FXML
@@ -295,9 +307,13 @@ public class RegisterProfessorFormController implements Initializable {
     @FXML
     private void clearForm() {
         txtInstitutionalEmail.clear();
+
         txtName.clear();
+
         txtFirstSurname.clear();
+
         txtSecondSurname.clear();
+
         txtStaffNumber.clear();
         chkCoordinator.setSelected(false);
         checkCoordinatorStatus();

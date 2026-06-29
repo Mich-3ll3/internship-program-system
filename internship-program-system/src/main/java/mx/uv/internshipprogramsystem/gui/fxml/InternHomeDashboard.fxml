@@ -2,13 +2,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -42,23 +38,18 @@
                                         <Label fx:id="lblStudentDetails" style="-fx-text-fill: #E5E7EB; -fx-font-size: 12;" text="Cargando detalles..." />
                                     </children>
                                 </VBox>
+                                
                                 <VBox alignment="CENTER" maxHeight="45.0" prefWidth="120.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 8;">
                                     <children>
-                                        <Label fx:id="lblPromedio" style="-fx-font-size: 25; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="9.2" />
-                                        <Label style="-fx-font-size: 12; -fx-text-fill: #6b7280;" text="Promedio" />
-                                    </children>
-                                </VBox>
-                                <VBox alignment="CENTER" maxHeight="45.0" prefWidth="120.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 8;">
-                                    <children>
-                                        <Label fx:id="lblDiasEntrega" style="-fx-font-size: 25; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="12" />
+                                        <Label fx:id="lblDiasEntrega" style="-fx-font-size: 25; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="-" />
                                         <Label style="-fx-font-size: 12; -fx-text-fill: #6b7280;" text="Días p. entrega" />
                                     </children>
                                 </VBox>
                                 <VBox alignment="CENTER_LEFT" maxHeight="75.0" prefWidth="170.0" style="-fx-background-color: #ffffff; -fx-background-radius: 8; -fx-padding: 10;">
                                     <children>
                                         <Label style="-fx-font-size: 12; -fx-text-fill: #6b7280;" text="Avance del proyecto" />
-                                        <Label fx:id="lblAvanceProyecto" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="62% completado" />
-                                        <ProgressBar fx:id="progressProyecto" prefWidth="160.0" progress="0.62" />
+                                        <Label fx:id="lblAvanceProyecto" style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #1E3A8A;" text="0% completado" />
+                                        <ProgressBar fx:id="progressProyecto" prefWidth="160.0" progress="0.0" />
                                     </children>
                                 </VBox>
                             </children>
@@ -75,8 +66,8 @@
                                         <VBox alignment="CENTER_LEFT">
                                             <children>
                                                 <Label style="-fx-font-size: 10;" text="MI PROYECTO" textFill="#6b7280" />
-                                                <Label fx:id="lblEstadoProyecto" style="-fx-font-weight: bold; -fx-font-size: 21;" text="ACTIVO" />
-                                                <Label style="-fx-font-size: 11;" text="Etapa 3 de 5" textFill="#22c55e" />
+                                                <Label fx:id="lblEstadoProyecto" style="-fx-font-weight: bold; -fx-font-size: 21;" text="-" />
+                                                <Label style="-fx-font-size: 11;" text=" " />
                                             </children>
                                         </VBox>
                                     </children>
@@ -90,8 +81,8 @@
                                         <VBox alignment="CENTER_LEFT">
                                             <children>
                                                 <Label style="-fx-font-size: 10;" text="DOCUMENTOS" textFill="#6b7280" />
-                                                <Label fx:id="lblDocumentos" style="-fx-font-weight: bold; -fx-font-size: 21;" text="6/8" />
-                                                <Label style="-fx-font-size: 11;" text="2 pendientes" textFill="#e8a020" />
+                                                <Label fx:id="lblDocumentos" style="-fx-font-weight: bold; -fx-font-size: 21;" text="-" />
+                                                <Label style="-fx-font-size: 11;" text="Archivos subidos" textFill="#e8a020" />
                                             </children>
                                         </VBox>
                                     </children>
@@ -105,8 +96,8 @@
                                         <VBox alignment="CENTER_LEFT">
                                             <children>
                                                 <Label style="-fx-font-size: 10;" text="REPORTES" textFill="#6b7280" />
-                                                <Label fx:id="lblReportes" style="-fx-font-weight: bold; -fx-font-size: 21;" text="3" />
-                                                <Label style="-fx-font-size: 11;" text="2 aprobados" textFill="#22c55e" />
+                                                <Label fx:id="lblReportes" style="-fx-font-weight: bold; -fx-font-size: 21;" text="-" />
+                                                <Label style="-fx-font-size: 11;" text="En el sistema" textFill="#22c55e" />
                                             </children>
                                         </VBox>
                                     </children>
@@ -126,196 +117,65 @@
                             <children>
                                 
                                 <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                    <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                                    <padding>
+                                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
                                     <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
-                                            <children>
-                                                <StackPane prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #FEF3E7; -fx-background-radius: 9;">
-                                                    <children><Label text="P" textFill="#e8a020" /></children>
-                                                </StackPane>
-                                                <Label text="PROYECTO" textFill="#1a2744">
-                                                    <font><Font name="System Bold" size="14.0" /></font>
-                                                </Label>
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Hyperlink fx:id="lnkVerProyecto" onAction="#abrirProyecto" style="-fx-font-size: 12;" text="Ver detalle ↗" textFill="#4a90e2" />
-                                            </children>
-                                        </HBox>
-                                        <VBox spacing="4.0" style="-fx-background-color: #f5f6fa; -fx-background-radius: 9; -fx-padding: 10;">
-                                            <children>
-                                                <Label text="Sistema de gestión de inventarios con QR" textFill="#1a2744">
-                                                    <font><Font name="System Bold" size="13.0" /></font>
-                                                </Label>
-                                                <Label text="Asesor: Dr. Miguel Ramírez • Organización: TecnoSoft" textFill="#6b7280" wrapText="true" />
-                                                <HBox alignment="CENTER_LEFT" spacing="8.0">
-                                                    <children>
-                                                        <Label text="Avance" textFill="#6b7280" />
-                                                        <Region HBox.hgrow="ALWAYS" />
-                                                        <Label text="62%" textFill="#1a2744">
-                                                            <font><Font name="System Bold" size="12.0" /></font>
-                                                        </Label>
-                                                    </children>
-                                                </HBox>
-                                                <ProgressBar fx:id="progressProyectoCard" maxWidth="Infinity" progress="0.62" />
-                                            </children>
-                                        </VBox>
-                                        <GridPane hgap="8.0" vgap="6.0">
-                                            <children>
-                                                <Label style="-fx-background-color:#EAF5EE; -fx-background-radius:4; -fx-padding:4 7;" text="✓ Formatos iniciales" textFill="#16a34a" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                                <Label style="-fx-background-color:#EAF5EE; -fx-background-radius:4; -fx-padding:4 7;" text="✓ Reporte 1" textFill="#16a34a" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                                                <Label style="-fx-background-color:#EBF3FF; -fx-background-radius:4; -fx-padding:4 7;" text="• Reporte 3" textFill="#1d4ed8" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                                                <Label style="-fx-background-color:#FEF3E7; -fx-background-radius:4; -fx-padding:4 7;" text="• Autoevaluación" textFill="#b45309" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                            </children>
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="ALWAYS" />
-                                                <ColumnConstraints hgrow="ALWAYS" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints />
-                                                <RowConstraints />
-                                            </rowConstraints>
-                                        </GridPane>
+                                        <Label text="🛠️" style="-fx-font-size: 24;" />
+                                        <Label text="Proyectos" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="15.0" /></font>
+                                        </Label>
+                                        <Label text="Consulta tu proyecto asignado, aplica a nuevas opciones y revisa tu plan de trabajo." textFill="#6b7280" wrapText="true" />
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goProjectsModule" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Abrir módulo" />
                                     </children>
                                 </VBox>
 
                                 <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                    <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                                    <padding>
+                                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
                                     <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
-                                            <children>
-                                                <StackPane prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #EBF3FF; -fx-background-radius: 9;">
-                                                    <children><Label text="D" textFill="#4a90e2" /></children>
-                                                </StackPane>
-                                                <Label text="DOCUMENTOS" textFill="#1a2744">
-                                                    <font><Font name="System Bold" size="14.0" /></font>
-                                                </Label>
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Hyperlink fx:id="lnkVerDocumentos" onAction="#abrirDocumentos" style="-fx-font-size: 12;" text="Gestionar ↗" textFill="#4a90e2" />
-                                            </children>
-                                        </HBox>
-                                        <GridPane hgap="8.0" vgap="7.0">
-                                            <children>
-                                                <Label text="F01 - Solicitud de proyecto" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                                                <Label alignment="CENTER" style="-fx-background-color:#EAF5EE; -fx-background-radius:4; -fx-padding:3 6;" text="Aprobado" textFill="#16a34a" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                                                <Label text="F03 - Horario" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                                                <Label alignment="CENTER" style="-fx-background-color:#EBF3FF; -fx-background-radius:4; -fx-padding:3 6;" text="Revisión" textFill="#1d4ed8" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <Label text="Carta de Asignación" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                                                <Label alignment="CENTER" style="-fx-background-color:#FDECEC; -fx-background-radius:4; -fx-padding:3 6;" text="Rechazado" textFill="#dc2626" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                <Label text="Plan de Actividades" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                                                <Label alignment="CENTER" style="-fx-background-color:#FEF3E7; -fx-background-radius:4; -fx-padding:3 6;" text="Pendiente" textFill="#b45309" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                <Label text="Carta de aceptación" textFill="#1a2744" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                                                <Label alignment="CENTER" style="-fx-background-color:#f5f6fa; -fx-background-radius:4; -fx-padding:3 6;" text="Falta" textFill="#6b7280" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                            </children>
-                                            <columnConstraints>
-                                                <ColumnConstraints hgrow="ALWAYS" />
-                                                <ColumnConstraints halignment="RIGHT" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints />
-                                                <RowConstraints />
-                                                <RowConstraints />
-                                                <RowConstraints />
-                                                <RowConstraints />
-                                            </rowConstraints>
-                                        </GridPane>
-                                        <Separator />
-                                        <ComboBox fx:id="cmbTipoDocumento" maxWidth="Infinity" promptText="Tipo de documento a subir" />
-                                        <HBox spacing="8.0">
-                                            <children>
-                                                <Button fx:id="btnSubirDocumento" maxWidth="Infinity" mnemonicParsing="false" onAction="#subirDocumento" style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;" text="Subir documento" HBox.hgrow="ALWAYS" />
-                                                <Button fx:id="btnVerComentariosDoc" maxWidth="Infinity" mnemonicParsing="false" onAction="#verComentariosDocumento" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Comentarios" HBox.hgrow="ALWAYS" />
-                                            </children>
-                                        </HBox>
+                                        <Label text="📑" style="-fx-font-size: 24;" />
+                                        <Label text="Documentos" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="15.0" /></font>
+                                        </Label>
+                                        <Label text="Sube tus archivos obligatorios, gestiona tus entregas y revisa los comentarios de los profesores." textFill="#6b7280" wrapText="true" />
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goDocumentsModule" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Abrir módulo" />
                                     </children>
                                 </VBox>
 
                                 <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                    <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                                    <padding>
+                                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
                                     <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
-                                            <children>
-                                                <StackPane prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #EEEDFE; -fx-background-radius: 9;">
-                                                    <children><Label text="R" textFill="#7c3aed" /></children>
-                                                </StackPane>
-                                                <Label text="REPORTES" textFill="#1a2744">
-                                                    <font><Font name="System Bold" size="14.0" /></font>
-                                                </Label>
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Hyperlink fx:id="lnkVerReportes" onAction="#goReportsModule" style="-fx-font-size: 12;" text="Entrar ↗" textFill="#4a90e2" />
-                                            </children>
-                                        </HBox>
-                                        <VBox spacing="6.0">
-                                            <children>
-                                                <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-background-color: #EAF5EE; -fx-background-radius: 8; -fx-padding: 8;">
-                                                    <children>
-                                                        <VBox HBox.hgrow="ALWAYS">
-                                                            <children>
-                                                                <Label text="Reporte 1 - Análisis" textFill="#1a2744" />
-                                                                <Label text="Aprobado • 3 mar 2026" textFill="#16a34a" />
-                                                            </children>
-                                                        </VBox>
-                                                        <Button fx:id="btnAbrirReporte1" mnemonicParsing="false" onAction="#abrirReporte" style="-fx-background-color: white; -fx-background-radius: 7; -fx-text-fill: #1d4ed8;" text="Abrir" />
-                                                    </children>
-                                                </HBox>
-                                                <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-padding: 8;">
-                                                    <children>
-                                                        <VBox HBox.hgrow="ALWAYS">
-                                                            <children>
-                                                                <Label text="Reporte 3 - Módulo QR" textFill="#1a2744" />
-                                                                <Label text="En revisión • 29 abr 2026" textFill="#1d4ed8" />
-                                                            </children>
-                                                        </VBox>
-                                                        <Button fx:id="btnAbrirReporte3" mnemonicParsing="false" onAction="#abrirReporte" style="-fx-background-color: white; -fx-background-radius: 7; -fx-text-fill: #1d4ed8;" text="Abrir" />
-                                                    </children>
-                                                </HBox>
-                                                <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-background-color: transparent; -fx-border-color: rgba(0,0,0,0.12); -fx-border-style: dashed; -fx-border-radius: 8; -fx-padding: 8;">
-                                                    <children>
-                                                        <VBox HBox.hgrow="ALWAYS">
-                                                            <children>
-                                                                <Label text="Reporte 4 - pendiente" textFill="#6b7280" />
-                                                                <Label text="Vence 15 may 2026" textFill="#dc2626" />
-                                                            </children>
-                                                        </VBox>
-                                                        <Button fx:id="btnGenerarReporte4" mnemonicParsing="false" onAction="#generarReporte" style="-fx-background-color: #e8a020; -fx-background-radius: 7; -fx-text-fill: white;" text="Generar" />
-                                                    </children>
-                                                </HBox>
-                                            </children>
-                                        </VBox>
-                                        <TextArea fx:id="txtNotasReporte" prefRowCount="2" promptText="Notas rápidas para tu próximo reporte..." wrapText="true" />
-                                        <Button fx:id="btnEnviarReporte" maxWidth="Infinity" mnemonicParsing="false" onAction="#enviarReporte" style="-fx-background-color: #1a2744; -fx-background-radius: 8; -fx-text-fill: white;" text="Enviar reporte" />
+                                        <Label text="📋" style="-fx-font-size: 24;" />
+                                        <Label text="Reportes" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="15.0" /></font>
+                                        </Label>
+                                        <Label text="Genera y envía tus reportes de actividades mensuales y parciales para validación." textFill="#6b7280" wrapText="true" />
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goReportsModule" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Abrir módulo" />
                                     </children>
                                 </VBox>
 
                                 <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 13; -fx-border-color: rgba(0,0,0,0.07); -fx-border-radius: 13;" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                    <padding><Insets bottom="14.0" left="14.0" right="14.0" top="14.0" /></padding>
+                                    <padding>
+                                        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
+                                    </padding>
                                     <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
-                                            <children>
-                                                <StackPane prefHeight="32.0" prefWidth="32.0" style="-fx-background-color: #FCE8E6; -fx-background-radius: 9;">
-                                                    <children><Label text="A" textFill="#db2777" /></children>
-                                                </StackPane>
-                                                <Label text="AUTOEVALUACIÓN" textFill="#1a2744">
-                                                    <font><Font name="System Bold" size="14.0" /></font>
-                                                </Label>
-                                                <Region HBox.hgrow="ALWAYS" />
-                                                <Hyperlink fx:id="lnkVerAutoevaluaciones" onAction="#goSelfAssessmentsModule" style="-fx-font-size: 12;" text="Entrar ↗" textFill="#4a90e2" />
-                                            </children>
-                                        </HBox>
-                                        <VBox spacing="6.0">
-                                            <children>
-                                                <HBox alignment="CENTER_LEFT" spacing="8.0" style="-fx-background-color: #FDF2F8; -fx-background-radius: 8; -fx-padding: 8;">
-                                                    <children>
-                                                        <VBox HBox.hgrow="ALWAYS">
-                                                            <children>
-                                                                <Label text="Autoevaluación Parcial 1" textFill="#1a2744" />
-                                                                <Label text="Respondido • Nota: 9.5" textFill="#db2777" />
-                                                            </children>
-                                                        </VBox>
-                                                    </children>
-                                                </HBox>
-                                            </children>
-                                        </VBox>
+                                        <Label text="📝" style="-fx-font-size: 24;" />
+                                        <Label text="Autoevaluación" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="15.0" /></font>
+                                        </Label>
+                                        <Label text="Completa el formulario sobre tu desempeño en la organización vinculada." textFill="#6b7280" wrapText="true" />
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goSelfAssessmentsModule" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Abrir módulo" />
                                     </children>
                                 </VBox>
+
                             </children>
                         </GridPane>
                     </children>

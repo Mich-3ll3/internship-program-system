@@ -31,4 +31,7 @@ public interface IReportDAO {
     int getReportCount(int internId, String reportType);
 
     int getAccumulatedHours(int internId);
+    
+    int getSumOfHoursForActivity(int studentId, int activityId);
+    
 }

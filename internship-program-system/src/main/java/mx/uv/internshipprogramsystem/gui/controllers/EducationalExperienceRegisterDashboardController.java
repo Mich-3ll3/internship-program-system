@@ -66,8 +66,10 @@ public class EducationalExperienceRegisterDashboardController
             URL url,
             ResourceBundle resourceBundle
     ) {
-        educationalExperienceRegistrationManager =
-            new EducationalExperienceRegistrationManager();
+        try {
+            validatePermission(
+                Permission.REGISTER_EDUCATIONAL_EXPERIENCE
+            );
 
         configureInputs();
         loadProfessors();
@@ -99,6 +101,10 @@ public class EducationalExperienceRegisterDashboardController
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.REGISTER_EDUCATIONAL_EXPERIENCE
+            );
+
             EducationalExperienceDTO educationalExperience =
                 buildEducationalExperience();
 
@@ -113,7 +119,8 @@ public class EducationalExperienceRegisterDashboardController
                     );
 
             if (wasRegistered) {
-                showInformationAlert(
+                FormAlertSupport.showInformation(
+                    "Registro exitoso",
                     "Experiencia educativa registrada correctamente."
                 );
 
@@ -125,7 +132,8 @@ public class EducationalExperienceRegisterDashboardController
                 businessException
             );
 
-            showErrorAlert(
+            FormAlertSupport.showError(
+                "Error",
                 businessException.getMessage()
             );
         } catch (DataAccessException exception) {
@@ -310,22 +318,38 @@ public class EducationalExperienceRegisterDashboardController
         cmbProfessor.getSelectionModel().clearSelection();
     }
 
-    private void loadProfessors() {
-        try {
-            ProfessorDAO professorDAO =
-                new ProfessorDAO();
+    private void loadProfessors()
+            throws BusinessException {
+        ProfessorDAO professorDAO =
+            new ProfessorDAO();
 
-            cmbProfessor.getItems().setAll(
-                professorDAO.findAll()
+        cmbProfessor.getItems().setAll(
+            professorDAO.findAll()
+        );
+    }
+
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
+    ) {
+        try {
+            validatePermission(
+                permission
+            );
+
+            WindowManagerController.changeView(
+                fxmlName
             );
         } catch (BusinessException businessException) {
-            LOGGER.error(
-                "No se pudieron cargar los profesores",
+            LOGGER.warn(
+                logMessage,
                 businessException
             );
 
-            showErrorAlert(
-                "No se pudieron cargar los profesores."
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
             );
         } catch (DataAccessException exception) {
             LOGGER.error(
@@ -381,8 +405,9 @@ public class EducationalExperienceRegisterDashboardController
         Alert informationAlert =
             new Alert(Alert.AlertType.INFORMATION);
 
-        informationAlert.setTitle(
-            "Registro exitoso"
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
         );
         informationAlert.setHeaderText(null);
         informationAlert.setContentText(message);

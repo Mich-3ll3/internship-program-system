@@ -96,8 +96,24 @@ public class UpdateInternDashboardController {
 
     @FXML
     private void handleUpdateAction() {
-        if (isFormValid()) {
-            updateIntern();
+        try {
+            validatePermission(
+                Permission.UPDATE_INTERN
+            );
+
+            if (isFormValid()) {
+                updateIntern();
+            }
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado a la actualización de estudiante.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
         }
     }
 
@@ -243,5 +259,17 @@ public class UpdateInternDashboardController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
     }
 }

@@ -6,7 +6,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -21,8 +20,10 @@ import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 import mx.uv.internshipprogramsystem.logic.exceptions.DataAccessException;
 import mx.uv.internshipprogramsystem.logic.managers.ProjectResponsibleManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class ProjectResponsibleModuleDashboardController {
+
     private static final Logger LOGGER =
         LoggerFactory.getLogger(
             ProjectResponsibleModuleDashboardController.class
@@ -62,12 +63,38 @@ public class ProjectResponsibleModuleDashboardController {
 
     @FXML
     private void initialize() {
-        projectResponsibleManager =
-            new ProjectResponsibleManager();
+        try {
+            validatePermission(
+                Permission.CONSULT_PROJECT_RESPONSIBLE
+            );
 
-        configureTable();
-        configureTableSize();
-        loadProjectResponsibles();
+            projectResponsibleManager =
+                new ProjectResponsibleManager();
+
+            configureTable();
+
+            configureTableSize();
+
+            loadProjectResponsibles();
+
+            LOGGER.info(
+                "Módulo de responsables de proyecto cargado correctamente."
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado al módulo de responsables de proyecto.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+
+            WindowManagerController.changeView(
+                "CoordinatorProfessorHomeDashboard.fxml"
+            );
+        }
     }
 
     @FXML
@@ -83,8 +110,10 @@ public class ProjectResponsibleModuleDashboardController {
     private void goEducationalExperienceModule(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "EducationalExperienceRegisterDashboard.fxml"
+        openViewWithPermission(
+            Permission.REGISTER_EDUCATIONAL_EXPERIENCE,
+            "EducationalExperienceRegisterDashboard.fxml",
+            "Acceso denegado al módulo de experiencia educativa."
         );
     }
 
@@ -92,8 +121,10 @@ public class ProjectResponsibleModuleDashboardController {
     private void goInternModule(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "InternModuleDashboard.fxml"
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes."
         );
     }
 
@@ -101,8 +132,10 @@ public class ProjectResponsibleModuleDashboardController {
     private void goLinkedOrganizationModule(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "LinkedOrganizationManagementGUI.fxml"
+        openViewWithPermission(
+            Permission.CONSULT_ORGANIZATION,
+            "LinkedOrganizationManagementGUI.fxml",
+            "Acceso denegado al módulo de organizaciones vinculadas."
         );
     }
 
@@ -110,8 +143,10 @@ public class ProjectResponsibleModuleDashboardController {
     private void goProjectsModule(
             ActionEvent event
     ) {
-        LOGGER.info(
-            "Acceso al módulo de proyectos."
+        openViewWithPermission(
+            Permission.CONSULT_PROJECT,
+            "ProjectsModuleDashboard.fxml",
+            "Acceso denegado al módulo de proyectos."
         );
     }
 
@@ -128,8 +163,10 @@ public class ProjectResponsibleModuleDashboardController {
     private void goReportsModule(
             ActionEvent event
     ) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
+        openViewWithPermission(
+            Permission.CONSULT_REPORT,
+            "ReportHomeDashboard.fxml",
+            "Acceso denegado al módulo de reportes."
         );
     }
 
@@ -170,14 +207,30 @@ public class ProjectResponsibleModuleDashboardController {
     private void handleSearchResponsible(
             ActionEvent event
     ) {
-        String searchText =
-            txtSearch.getText().trim();
+        try {
+            validatePermission(
+                Permission.CONSULT_PROJECT_RESPONSIBLE
+            );
 
-        if (searchText.isEmpty()) {
-            loadProjectResponsibles();
-        } else {
-            searchProjectResponsibles(
-                searchText
+            String searchText =
+                txtSearch.getText().trim();
+
+            if (searchText.isEmpty()) {
+                loadProjectResponsibles();
+            } else {
+                searchProjectResponsibles(
+                    searchText
+                );
+            }
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                "Acceso denegado a la búsqueda de responsables.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
             );
         }
     }
@@ -193,8 +246,10 @@ public class ProjectResponsibleModuleDashboardController {
     private void handleRegisterResponsible(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "ProjectResponsibleRegisterDashboard.fxml"
+        openViewWithPermission(
+            Permission.REGISTER_PROJECT_RESPONSIBLE,
+            "ProjectResponsibleRegisterDashboard.fxml",
+            "Acceso denegado al registro de responsables."
         );
     }
 
@@ -237,10 +292,12 @@ public class ProjectResponsibleModuleDashboardController {
     }
 
     private void loadProjectResponsibles() {
-        List<ProjectResponsibleDTO> projectResponsibles;
-
         try {
-            projectResponsibles =
+            validatePermission(
+                Permission.CONSULT_PROJECT_RESPONSIBLE
+            );
+
+            List<ProjectResponsibleDTO> projectResponsibles =
                 projectResponsibleManager.getAllProjectResponsibles();
 
             showProjectResponsiblesInTable(
@@ -249,7 +306,12 @@ public class ProjectResponsibleModuleDashboardController {
 
             txtSearch.clear();
         } catch (BusinessException businessException) {
-            showErrorAlert(
+            LOGGER.error(
+                "Error al consultar responsables.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
                 "Error al consultar responsables",
                 businessException.getMessage()
             );
@@ -268,10 +330,12 @@ public class ProjectResponsibleModuleDashboardController {
     private void searchProjectResponsibles(
             String searchText
     ) {
-        List<ProjectResponsibleDTO> projectResponsibles;
-
         try {
-            projectResponsibles =
+            validatePermission(
+                Permission.CONSULT_PROJECT_RESPONSIBLE
+            );
+
+            List<ProjectResponsibleDTO> projectResponsibles =
                 projectResponsibleManager.searchProjectResponsibles(
                     searchText
                 );
@@ -280,7 +344,12 @@ public class ProjectResponsibleModuleDashboardController {
                 projectResponsibles
             );
         } catch (BusinessException businessException) {
-            showErrorAlert(
+            LOGGER.error(
+                "Error al buscar responsables.",
+                businessException
+            );
+
+            FormAlertSupport.showError(
                 "Error al buscar responsables",
                 businessException.getMessage()
             );
@@ -309,27 +378,46 @@ public class ProjectResponsibleModuleDashboardController {
         );
     }
 
-    private void showErrorAlert(
-            String title,
-            String message
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
     ) {
-        Alert alert =
-            new Alert(
-                Alert.AlertType.ERROR
+        try {
+            validatePermission(
+                permission
             );
 
-        alert.setTitle(
-            title
-        );
+            WindowManagerController.changeView(
+                fxmlName
+            );
 
-        alert.setHeaderText(
-            null
-        );
+            LOGGER.info(
+                "Acceso permitido a la vista {}.",
+                fxmlName
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                logMessage,
+                businessException
+            );
 
-        alert.setContentText(
-            message
-        );
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+        }
+    }
 
-        alert.showAndWait();
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
     }
 }

@@ -3,13 +3,11 @@ package mx.uv.internshipprogramsystem.gui.controllers;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceDialog;
@@ -188,6 +186,10 @@ public class InternManagementController {
 
     private void loadInternsData() {
         try {
+            validatePermission(
+                Permission.CONSULT_INTERN
+            );
+
             List<InternDTO> interns =
                 internDAO.findAll();
 
@@ -208,8 +210,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de carga",
                 "No se pudo cargar la lista de estudiantes."
             );
@@ -229,6 +230,10 @@ public class InternManagementController {
 
     private void loadEducationalExperiences() {
         try {
+            validatePermission(
+                Permission.ASSIGN_EDUCATIONAL_EXPERIENCE
+            );
+
             List<EducationalExperienceDTO> activeExperiences =
                 getActiveEducationalExperiences();
 
@@ -245,8 +250,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error de carga",
                 "No se pudieron cargar las experiencias educativas."
             );
@@ -303,7 +307,6 @@ public class InternManagementController {
                 searchValue
             );
         }
-    }
 
     private void filterInterns(
             String searchValue
@@ -381,6 +384,7 @@ public class InternManagementController {
             disableActionButtons();
         } else {
             enableActionButtons();
+
             updateStatusButtonText(
                 selectedIntern
             );
@@ -721,6 +725,10 @@ public class InternManagementController {
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.ASSIGN_EDUCATIONAL_EXPERIENCE
+            );
+
             InternDTO selectedIntern =
                 getSelectedIntern();
 
@@ -836,6 +844,10 @@ public class InternManagementController {
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.CHANGE_INTERN_STATUS
+            );
+
             InternDTO selectedIntern =
                 getSelectedIntern();
 
@@ -850,6 +862,7 @@ public class InternManagementController {
             );
 
             loadInternsData();
+
             disableActionButtons();
         } catch (BusinessException businessException) {
             LOGGER.error(
@@ -857,8 +870,7 @@ public class InternManagementController {
                 businessException
             );
 
-            showNotification(
-                Alert.AlertType.ERROR,
+            FormAlertSupport.showError(
                 "Error",
                 businessException.getMessage()
             );
@@ -962,6 +974,10 @@ public class InternManagementController {
             ActionEvent event
     ) {
         try {
+            validatePermission(
+                Permission.UPDATE_INTERN
+            );
+
             InternDTO selectedIntern =
                 getSelectedIntern();
 
@@ -1102,12 +1118,10 @@ public class InternManagementController {
     private void handleGoRegisterIntern(
             ActionEvent event
     ) {
-        WindowManagerController.changeView(
-            "RegisterInternDashboard.fxml"
-        );
-
-        LOGGER.info(
-            "Acceso al registro de estudiantes."
+        openViewWithPermission(
+            Permission.REGISTER_INTERN,
+            "RegisterInternDashboard.fxml",
+            "Acceso denegado al registro de estudiantes."
         );
     }
 
@@ -1126,28 +1140,46 @@ public class InternManagementController {
         );
     }
 
-    private void showNotification(
-            Alert.AlertType type,
-            String title,
-            String content
+    private void openViewWithPermission(
+            Permission permission,
+            String fxmlName,
+            String logMessage
     ) {
-        Alert alert =
-            new Alert(
-                type
+        try {
+            validatePermission(
+                permission
             );
 
-        alert.setTitle(
-            title
-        );
+            WindowManagerController.changeView(
+                fxmlName
+            );
 
-        alert.setHeaderText(
-            null
-        );
+            LOGGER.info(
+                "Acceso permitido a la vista {}.",
+                fxmlName
+            );
+        } catch (BusinessException businessException) {
+            LOGGER.warn(
+                logMessage,
+                businessException
+            );
 
-        alert.setContentText(
-            content
-        );
+            FormAlertSupport.showError(
+                "Acceso denegado",
+                businessException.getMessage()
+            );
+        }
+    }
 
-        alert.showAndWait();
+    private void validatePermission(
+            Permission permission
+    ) throws BusinessException {
+        AccessControlManager accessControlManager =
+            new AccessControlManager();
+
+        accessControlManager.validatePermission(
+            UserSessionManager.getCurrentUser(),
+            permission
+        );
     }
 }

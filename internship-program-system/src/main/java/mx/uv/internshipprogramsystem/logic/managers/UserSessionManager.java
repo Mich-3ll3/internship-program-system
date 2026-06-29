@@ -3,6 +3,7 @@ package mx.uv.internshipprogramsystem.logic.managers;
 import java.util.Optional;
 
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
+import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 
 public final class UserSessionManager {

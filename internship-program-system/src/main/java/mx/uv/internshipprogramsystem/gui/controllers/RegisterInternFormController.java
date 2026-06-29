@@ -257,9 +257,13 @@ public class RegisterInternFormController {
     @FXML
     private void clearForm() {
         txtInstitutionalEmail.clear();
+
         txtName.clear();
+
         txtFirstSurname.clear();
+
         txtSecondSurname.clear();
+
         txtEnrollment.clear();
     }
 

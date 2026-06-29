@@ -5,20 +5,29 @@ import javafx.beans.property.StringProperty;
 
 public class ActivityPlanDTO {
 
+    private int id;
     private final StringProperty activityName = new SimpleStringProperty("");
     private final StringProperty type = new SimpleStringProperty("Real");
+    private final StringProperty totalHours = new SimpleStringProperty("0");
     private final StringProperty week1Hours = new SimpleStringProperty("0");
     private final StringProperty week2Hours = new SimpleStringProperty("0");
     private final StringProperty week3Hours = new SimpleStringProperty("0");
     private final StringProperty week4Hours = new SimpleStringProperty("0");
 
-    // --- Getters para el TableView ---
+    public int getId() {
+        return id;
+    }
+
     public String getActivityName() {
         return activityName.get();
     }
 
     public String getType() {
         return type.get();
+    }
+
+    public String getTotalHours() {
+        return totalHours.get();
     }
 
     public String getWeek1Hours() {
@@ -37,9 +46,20 @@ public class ActivityPlanDTO {
         return week4Hours.get();
     }
 
-    // --- Setters ---
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setActivityName(String name) {
         this.activityName.set(name);
+    }
+
+    public void setType(String type) {
+        this.type.set(type);
+    }
+
+    public void setTotalHours(String h) {
+        this.totalHours.set(h);
     }
 
     public void setWeek1Hours(String h) {
@@ -58,13 +78,16 @@ public class ActivityPlanDTO {
         this.week4Hours.set(h);
     }
 
-    // --- Property Getters (NECESARIOS para el CellValueFactory) ---
     public StringProperty activityNameProperty() {
         return activityName;
     }
 
     public StringProperty typeProperty() {
         return type;
+    }
+
+    public StringProperty totalHoursProperty() {
+        return totalHours;
     }
 
     public StringProperty week1HoursProperty() {

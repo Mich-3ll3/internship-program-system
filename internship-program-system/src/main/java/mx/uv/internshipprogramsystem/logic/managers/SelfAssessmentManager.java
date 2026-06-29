@@ -10,6 +10,15 @@ import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
 
 public class SelfAssessmentManager {
 
+    private static final String ERROR_GET_ASSESSMENTS = "Ocurrió un error al obtener las autoevaluaciones.";
+    private static final String ERROR_REGISTER_ASSESSMENT = "No se pudo registrar la autoevaluación.";
+    private static final String ERROR_NULL_STUDENT = "Debes seleccionar un estudiante.";
+    private static final String ERROR_NULL_PROJECT = "Debes seleccionar un proyecto.";
+    private static final String ERROR_NULL_ORG = "Debes seleccionar una organización.";
+    private static final String ERROR_NULL_RESPONSIBLE = "Debes seleccionar un responsable.";
+    private static final String ERROR_BLANK_DEPT = "El departamento no puede estar vacío.";
+    private static final String ERROR_BLANK_PLACE = "El lugar no puede estar vacío.";
+
     private final SelfAssessmentDAO selfAssessmentDAO;
 
     public SelfAssessmentManager() {
@@ -20,7 +29,15 @@ public class SelfAssessmentManager {
         try {
             return selfAssessmentDAO.getAllSelfAssessments();
         } catch (Exception exception) {
-            throw new BusinessException("Ocurrió un error al obtener las autoevaluaciones.", exception);
+            throw new BusinessException(ERROR_GET_ASSESSMENTS, exception);
+        }
+    }
+
+    public List<SelfAssessmentDTO> getSelfAssessmentsByStudentId(int studentId) throws BusinessException {
+        try {
+            return selfAssessmentDAO.getSelfAssessmentsByStudentId(studentId);
+        } catch (Exception exception) {
+            throw new BusinessException(ERROR_GET_ASSESSMENTS, exception);
         }
     }
 
@@ -77,7 +94,7 @@ public class SelfAssessmentManager {
         try {
             selfAssessmentDAO.insert(dto);
         } catch (Exception exception) {
-            throw new BusinessException("No se pudo registrar la autoevaluación.", exception);
+            throw new BusinessException(ERROR_REGISTER_ASSESSMENT, exception);
         }
     }
 

@@ -1,6 +1,6 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
-import java.util.List;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
@@ -18,6 +18,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import mx.uv.internshipprogramsystem.logic.dao.UserDAO;
+import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
+import mx.uv.internshipprogramsystem.logic.dto.UserRole;
+import mx.uv.internshipprogramsystem.logic.exceptions.BusinessException;
+import mx.uv.internshipprogramsystem.logic.managers.AccessControlManager;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 import mx.uv.internshipprogramsystem.logic.validations.InputCleaner;
 import mx.uv.internshipprogramsystem.logic.validations.UserValidator;
@@ -25,7 +29,28 @@ import mx.uv.internshipprogramsystem.logic.validations.ProfessorValidator;
 
 public class UpdateProfessorDashboardController {
 
-    private static final Logger LOGGER = Logger.getLogger(RegisterProfessorFormController.class.getName());
+    private static final Logger LOGGER =
+        LoggerFactory.getLogger(
+            UpdateProfessorDashboardController.class
+        );
+
+    @FXML
+    private TextField txtInstitutionalEmail;
+
+    @FXML
+    private TextField txtName;
+
+    @FXML
+    private TextField txtFirstSurname;
+
+    @FXML
+    private TextField txtSecondSurname;
+
+    @FXML
+    private TextField txtStaffNumber;
+
+    @FXML
+    private CheckBox chkCoordinator;
 
     @FXML private TextField txtInstitutionalEmail;
     @FXML private TextField txtName;
@@ -36,8 +61,10 @@ public class UpdateProfessorDashboardController {
     @FXML private javafx.scene.control.Label lblCoordinatorWarning;
     
     private ProfessorDTO currentProfessor;
-    private final ProfessorDAO professorDAO = new ProfessorDAO();
-    
+
+    private final ProfessorDAO professorDAO =
+        new ProfessorDAO();
+
     @FXML
     public void initialize() {
         setupFormatFilters();
@@ -67,33 +94,41 @@ public class UpdateProfessorDashboardController {
     }
 
     @FXML
-    private void goProfessorModule(ActionEvent event) {
-        WindowManagerController.changeView("ProfessorModuleDashboard.fxml");
+    private void goProfessorModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_PROFESSOR,
+            "ProfessorModuleDashboard.fxml",
+            "Acceso denegado al módulo de profesores."
+        );
     }
 
     @FXML
-    private void goInternModule(ActionEvent event) {
-        WindowManagerController.changeView("InternModuleDashboard.fxml");
+    private void goInternModule(
+            ActionEvent event
+    ) {
+        openViewWithPermission(
+            Permission.CONSULT_INTERN,
+            "InternModuleDashboard.fxml",
+            "Acceso denegado al módulo de estudiantes."
+        );
     }
 
     @FXML
-    private void logOut(ActionEvent event) {
+    private void logOut(
+            ActionEvent event
+    ) {
         UserSessionManager.clearSession();
-        LOGGER.info("Cierre de sesión realizado correctamente.");
+
+        LOGGER.info(
+            "Cierre de sesión realizado correctamente."
+        );
+
         WindowManagerController.changeView(
             "LoginDashboard.fxml"
         );
     }
-    
-    public void setProfessorData(ProfessorDTO professor) {
-        this.currentProfessor = professor;
-        
-        txtName.setText(professor.getName());
-        txtFirstSurname.setText(professor.getFirstSurname());
-        txtSecondSurname.setText(professor.getSecondSurname());
-        txtInstitutionalEmail.setText(professor.getInstitutionalEmail());
-        txtStaffNumber.setText(String.valueOf(professor.getStaffNumber()));
-        chkCoordinator.setSelected(professor.getIsCoordinator());
 
         txtInstitutionalEmail.setEditable(false);
         txtStaffNumber.setEditable(false);
@@ -142,7 +177,7 @@ public class UpdateProfessorDashboardController {
         lblCoordinatorWarning.setVisible(true);
         lblCoordinatorWarning.setManaged(true);
     }
-    
+
     @FXML
     private void handleUpdateAction() {
         updateProfessor();
@@ -231,10 +266,17 @@ public class UpdateProfessorDashboardController {
     @FXML
     private void clearForm() {
         txtInstitutionalEmail.clear();
+
         txtName.clear();
+
         txtFirstSurname.clear();
+
         txtSecondSurname.clear();
+
         txtStaffNumber.clear();
-        chkCoordinator.setSelected(false);
+
+        chkCoordinator.setSelected(
+            false
+        );
     }
 }

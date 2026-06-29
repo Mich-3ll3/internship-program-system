@@ -66,6 +66,13 @@ public class ProjectDAO implements IProjectDAO {
         + "SET activo = FALSE "
         + "WHERE id = ?";
 
+    // --- NUEVA CONSULTA PARA LA INTERFAZ GRÁFICA ---
+    private static final String SELECT_AVAILABLE_PROJECTS_UI_QUERY =
+        "SELECT p.*, o.nombre AS nombre_organizacion "
+        + "FROM PROYECTO p "
+        + "INNER JOIN ORGANIZACION_VINCULADA o ON p.organizacion_id = o.id "
+        + "WHERE p.activo = TRUE";
+
     @Override
     public boolean create(ProjectDTO project)
             throws BusinessException, DataAccessException {
@@ -239,6 +246,51 @@ public class ProjectDAO implements IProjectDAO {
             throw new BusinessException(
                 "Error listando proyectos con estado activo="
                     + isActive,
+                sqlException
+            );
+        }
+
+        return List.copyOf(projects);
+    }
+
+    // --- NUEVO MÉTODO PARA LA INTERFAZ GRÁFICA ---
+    public List<ProjectDTO> getAvailableProjectsForUI() throws BusinessException {
+        List<ProjectDTO> projects = new ArrayList<>();
+
+        try (Connection connection = DataBaseManager.getConnection();
+             PreparedStatement selectStatement = 
+                 connection.prepareStatement(SELECT_AVAILABLE_PROJECTS_UI_QUERY);
+             ResultSet resultSet = selectStatement.executeQuery()) {
+
+            while (resultSet.next()) {
+                // 1. Construye el proyecto usando tu método existente
+                ProjectDTO project = buildProject(resultSet);
+                
+                // 2. Agrega los datos específicos requeridos por la tabla gráfica
+                project.setOrganizationName(resultSet.getString("nombre_organizacion"));
+                
+                // TODO: Datos estáticos de prueba (Mock) hasta que existan en la BD
+                project.setArea("Desarrollo de Software");
+                project.setAvailableSpots(3);
+
+                projects.add(project);
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error(
+                "Fallo de conexión con la base de datos al buscar proyectos para UI",
+                connectionException
+            );
+            throw new BusinessException(
+                "No se pudo conectar con la base de datos.",
+                connectionException
+            );
+        } catch (SQLException sqlException) {
+            LOGGER.error(
+                "Error listando proyectos disponibles para la interfaz",
+                sqlException
+            );
+            throw new BusinessException(
+                "Error listando proyectos disponibles.",
                 sqlException
             );
         }
