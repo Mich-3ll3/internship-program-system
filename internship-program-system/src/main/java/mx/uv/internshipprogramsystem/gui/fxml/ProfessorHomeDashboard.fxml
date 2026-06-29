@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorHomeDashboardController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorHomeDashboardController">
     
     <left>
         <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#4a90e2;" BorderPane.alignment="CENTER">
@@ -34,7 +34,7 @@
                 </StackPane>
                 
                 <Button fx:id="btnHome" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" text="⌂" textFill="WHITE" />
-                <Button fx:id="btnAlumnosNav" mnemonicParsing="false" onAction="#goStudentsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🎓" textFill="WHITE" />
+                <Button fx:id="btnAlumnosNav" mnemonicParsing="false" onAction="#goInternsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🎓" textFill="WHITE" />
                 <Button fx:id="btnDocumentosNav" mnemonicParsing="false" onAction="#goDocumentsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📑" textFill="WHITE" />
                 <Button fx:id="btnReportesNav" mnemonicParsing="false" onAction="#goReportsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📋" textFill="WHITE" />
                 
@@ -201,7 +201,7 @@
                                         </Label>
                                         <Label text="Consulta la lista de tus estudiantes asignados, evalúa su desempeño y revisa su historial." textFill="#6b7280" wrapText="true" />
                                         <Region VBox.vgrow="ALWAYS" />
-                                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goStudentsModule" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Abrir módulo" />
+                                        <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#goInternsModule" style="-fx-background-color: #EBF3FF; -fx-background-radius: 8; -fx-text-fill: #1d4ed8;" text="Abrir módulo" />
                                     </children>
                                 </VBox>
 

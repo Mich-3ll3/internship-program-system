@@ -3,6 +3,7 @@ package mx.uv.internshipprogramsystem.logic.managers;
 import java.util.Optional;
 
 import mx.uv.internshipprogramsystem.logic.dto.InternDTO;
+import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.dto.UserDTO;
 
 public final class UserSessionManager {
@@ -42,6 +43,16 @@ public final class UserSessionManager {
         }
 
         return currentIntern;
+    }
+    
+    public static Optional<ProfessorDTO> getCurrentProfessor() {
+        Optional<ProfessorDTO> currentProfessor = Optional.empty();
+
+        if (currentUser instanceof ProfessorDTO) {
+            currentProfessor = Optional.of((ProfessorDTO) currentUser);
+        }
+
+        return currentProfessor;
     }
 
     public static void clearSession() {

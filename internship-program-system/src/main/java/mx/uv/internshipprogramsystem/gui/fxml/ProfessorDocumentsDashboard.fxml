@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorDocumentsDashboardController">
+    
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#4a90e2;" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #e8a020; -fx-background-radius: 10;">
+                    <VBox.margin>
+                        <Insets top="20.0" />
+                    </VBox.margin>
+                    <children>
+                        <Label text="PF" textFill="WHITE">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Label>
+                    </children>
+                </StackPane>
+                
+                <Button fx:id="btnHome" mnemonicParsing="false" onAction="#goHome" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="⌂" textFill="WHITE" />
+                <Button fx:id="btnInternsNav" mnemonicParsing="false" onAction="#goInternsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🎓" textFill="WHITE" />
+                <Button fx:id="btnDocumentosNav" mnemonicParsing="false" onAction="#goDocumentsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 10;" text="📑" textFill="WHITE" />
+                <Button fx:id="btnReportesNav" mnemonicParsing="false" onAction="#goReportsModule" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="📋" textFill="WHITE" />
+                
+                <Region VBox.vgrow="ALWAYS" />
+                
+                <Button fx:id="btnSalir" mnemonicParsing="false" onAction="#logOut" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent;" text="🚪" textFill="WHITE">
+                    <VBox.margin>
+                        <Insets bottom="20.0" />
+                    </VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="20.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="24.0" left="24.0" right="24.0" top="20.0" />
+            </padding>
+            <children>
+                
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <VBox>
+                            <children>
+                                <Label text="Revisión de Documentos" textFill="#1a2744">
+                                    <font>
+                                        <Font name="System Bold" size="22.0" />
+                                    </font>
+                                </Label>
+                                <Label text="Gestiona y evalúa los formatos obligatorios entregados por tus practicantes" textFill="#6b7280" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnBack" mnemonicParsing="false" onAction="#goHome" style="-fx-background-color: white; -fx-background-radius: 8; -fx-border-color: rgba(0,0,0,0.08); -fx-border-radius: 8; -fx-text-fill: #4b5563;" text="← Volver al Inicio" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: rgba(0,0,0,0.04); -fx-border-radius: 10;">
+                    <children>
+                        <TextField fx:id="txtSearchDocument" prefWidth="280.0" promptText="Buscar por nombre de alumno..." style="-fx-background-color: #f5f6fa; -fx-background-radius: 8; -fx-border-color: rgba(0,0,0,0.06); -fx-border-radius: 8;" />
+                        <ComboBox fx:id="cmbStatusFilter" prefWidth="180.0" promptText="Filtrar por estado" style="-fx-background-color: #f5f6fa; -fx-background-radius: 8; -fx-border-color: rgba(0,0,0,0.06); -fx-border-radius: 8;" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="btnReviewDocument" mnemonicParsing="false" onAction="#reviewSelectedDocument" style="-fx-background-color: #e8a020; -fx-background-radius: 8; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;" text="Evaluar Documento" />
+                    </children>
+                </HBox>
+
+                <TableView fx:id="tblDocuments" prefHeight="480.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: rgba(0,0,0,0.05); -fx-border-radius: 10;" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInternName" prefWidth="250.0" text="Alumno" />
+                        <TableColumn fx:id="colDocumentType" prefWidth="220.0" text="Tipo de Documento" />
+                        <TableColumn fx:id="colUploadDate" prefWidth="150.0" text="Fecha de Entrega" />
+                        <TableColumn fx:id="colStatus" prefWidth="150.0" text="Estado" />
+                    </columns>
+                </TableView>
+                
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

@@ -1,6 +1,10 @@
 package mx.uv.internshipprogramsystem.gui.controllers;
 
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import javafx.event.ActionEvent;
@@ -14,21 +18,12 @@ import javafx.scene.control.ProgressBar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import mx.uv.internshipprogramsystem.logic.dto.ProfessorDTO;
 import mx.uv.internshipprogramsystem.logic.managers.UserSessionManager;
 
 public class ProfessorHomeDashboardController implements Initializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProfessorHomeDashboardController.class);
-
-    // Mensajes dirigidos al usuario final
-    private static final String MSG_IN_DEVELOPMENT = "Esta funcionalidad estará disponible en la próxima versión.";
-
-    // Constantes de rastreo técnico internas en español
-    private static final String LOG_HOME_NAVIGATION = "Intento de navegación a Inicio finalizado.";
-    private static final String LOG_LOGOUT_FINISHED = "Intento de cierre de sesión finalizado.";
-    private static final String LOG_STUDENTS_NAVIGATION = "Intento de navegación al módulo de Alumnos finalizado.";
-    private static final String LOG_REPORTS_NAVIGATION = "Intento de navegación al módulo de Reportes finalizado.";
-    private static final String LOG_DOCUMENTS_NAVIGATION = "Intento de navegación al módulo de Documentos finalizado.";
 
     // ==========================================
     // COMPONENTES DE LA INTERFAZ (FXML)
@@ -56,6 +51,60 @@ public class ProfessorHomeDashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         LOGGER.info("Inicializando el panel principal del profesor.");
+        configureCurrentDate();
+        loadPersonalData();
+    }
+
+    private void configureCurrentDate() {
+        try {
+            LocalDate currentDate = LocalDate.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", new Locale("es", "MX"));
+            
+            String formattedDate = currentDate.format(formatter);
+            formattedDate = formattedDate.substring(0, 1).toUpperCase() + formattedDate.substring(1);
+            lblFecha.setText(formattedDate);
+        } catch (RuntimeException runtimeException) {
+            LOGGER.error("Error al configurar la fecha del sistema: {}", runtimeException.getMessage());
+            lblFecha.setText("Fecha no disponible");
+        }
+    }
+
+    private void loadPersonalData() {
+        try {
+            LOGGER.info("Cargando datos personales del profesor desde la sesión.");
+            
+            Optional<ProfessorDTO> currentProfessorOpt = UserSessionManager.getCurrentProfessor();
+            
+            if (currentProfessorOpt.isPresent()) {
+                ProfessorDTO professor = currentProfessorOpt.get();
+                
+                lblProfessorName.setText(professor.getFullName());
+                
+                String initials = "";
+                if (professor.getName() != null && !professor.getName().trim().isEmpty()) {
+                    initials += professor.getName().trim().charAt(0);
+                }
+                if (professor.getFirstSurname() != null && !professor.getFirstSurname().trim().isEmpty()) {
+                    initials += professor.getFirstSurname().trim().charAt(0);
+                }
+                lblProfessorInitials.setText(initials.toUpperCase());
+                
+                String roleDisplay = "Profesor";
+                if (Boolean.TRUE.equals(professor.getIsCoordinator())) {
+                    roleDisplay = "Coordinador";
+                }
+                
+                lblProfessorDetails.setText(roleDisplay + " • Número de personal: " + professor.getStaffNumber());
+            } else {
+                LOGGER.warn("No se encontró una sesión de profesor activa.");
+                lblProfessorName.setText("Profesor Invitado");
+                lblProfessorInitials.setText("PI");
+                lblProfessorDetails.setText("Sesión temporal o caducada");
+            }
+        } catch (RuntimeException runtimeException) {
+            LOGGER.error("Error al cargar los datos personales: {}", runtimeException.getMessage());
+            lblProfessorName.setText("Error de Carga");
+        }
     }
 
     // ==========================================
@@ -64,68 +113,32 @@ public class ProfessorHomeDashboardController implements Initializable {
 
     @FXML
     private void goHome(ActionEvent event) {
-        try {
-            LOGGER.info("Recargando la vista del panel principal del profesor.");
-            WindowManagerController.changeView("ProfessorHomeDashboard.fxml");
-        } catch (RuntimeException runtimeException) {
-            LOGGER.error("Error al navegar al módulo de Inicio: {}", runtimeException.getMessage());
-        } finally {
-            LOGGER.debug(LOG_HOME_NAVIGATION);
-        }
+        LOGGER.info("Recargando la vista del panel principal del profesor.");
+        WindowManagerController.changeView("ProfessorHomeDashboard.fxml");
     }
 
     @FXML
     private void logOut(ActionEvent event) {
-        try {
-            LOGGER.info("Cerrando la sesión del profesor.");
-            UserSessionManager.clearSession();
-            WindowManagerController.changeView("LoginDashboard.fxml");
-        } catch (RuntimeException runtimeException) {
-            LOGGER.error("Error al cerrar la sesión: {}", runtimeException.getMessage());
-        } finally {
-            LOGGER.debug(LOG_LOGOUT_FINISHED);
-        }
+        LOGGER.info("Cerrando la sesión del profesor.");
+        UserSessionManager.clearSession();
+        WindowManagerController.changeView("LoginDashboard.fxml");
     }
 
     @FXML
-    private void goStudentsModule(ActionEvent event) {
-        try {
-            LOGGER.info("Navegando al módulo de Alumnos.");
-            showInfo(MSG_IN_DEVELOPMENT);
-        } finally {
-            LOGGER.debug(LOG_STUDENTS_NAVIGATION);
-        }
-    }
-
-    @FXML
-    private void goReportsModule(ActionEvent event) {
-        try {
-            LOGGER.info("Navegando al módulo de Reportes.");
-            showInfo(MSG_IN_DEVELOPMENT);
-        } finally {
-            LOGGER.debug(LOG_REPORTS_NAVIGATION);
-        }
+    private void goInternsModule(ActionEvent event) {
+        LOGGER.info("Navegando al módulo de Alumnos (Interns).");
+        WindowManagerController.changeView("ProfessorInternsDashboard.fxml");
     }
 
     @FXML
     private void goDocumentsModule(ActionEvent event) {
-        try {
-            LOGGER.info("Navegando al módulo de Documentos.");
-            showInfo(MSG_IN_DEVELOPMENT);
-        } finally {
-            LOGGER.debug(LOG_DOCUMENTS_NAVIGATION);
-        }
+        LOGGER.info("Navegando al módulo de Documentos.");
+        WindowManagerController.changeView("ProfessorDocumentsDashboard.fxml");
     }
-
-    // ==========================================
-    // ALERTAS
-    // ==========================================
-
-    private void showInfo(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Información");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    
+    @FXML
+    private void goReportsModule(ActionEvent event) {
+        LOGGER.info("Navegando al módulo de Reportes.");
+        WindowManagerController.changeView("ProfessorReportsDashboard.fxml");
     }
 }
