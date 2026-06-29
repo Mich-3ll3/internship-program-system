@@ -71,15 +71,15 @@ public class CoordinatorProfessorHomeDashboardController {
 
     @FXML
     private void goDocumentsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de documentos."
+        WindowManagerController.changeView(
+            "ProfessorDocumentDashboard.fxml"
         );
     }
 
     @FXML
     private void goReportsModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de reportes."
+        WindowManagerController.changeView(
+            "ProfessorReportDashboard.fxml"
         );
     }
 
@@ -92,9 +92,8 @@ public class CoordinatorProfessorHomeDashboardController {
 
     @FXML
     private void goProjectRequestModule(ActionEvent event) {
-        LOGGER.info(
-            "Acceso al módulo de solicitudes."
-        );
+        LOGGER.info("Acceso al módulo de solicitudes.");
+        WindowManagerController.changeView("ProjectRequestDashboard.fxml");
     }
 
     @FXML

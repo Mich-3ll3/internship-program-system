@@ -249,6 +249,41 @@ public class ReportDAO implements IReportDAO {
         }
     }
 
+    @Override
+    public List<ReportDTO> getReportsByProfessor(int professorId) throws BusinessException {
+        InputValidator.validatePositive(professorId, "El id del profesor debe ser positivo.");
+
+        List<ReportDTO> reports = new ArrayList<>();
+        
+        String selectQuery = 
+            "SELECT r.*, ra.horas_reportadas, ra.resultados_obtenidos_momento, ra.observaciones_particulares " +
+            "FROM REPORTE r " +
+            "LEFT JOIN REPORTE_AVANCES ra ON r.id = ra.reporte_id " +
+            "WHERE r.profesor_id = ?";
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectQuery)) {
+
+            preparedStatement.setInt(1, professorId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    ReportDTO report = buildReport(resultSet);
+                    report.setReportedHours(resultSet.getInt("horas_reportadas"));
+                    report.setCurrentResults(resultSet.getString("resultados_obtenidos_momento"));
+                    report.setParticularObservations(resultSet.getString("observaciones_particulares"));
+                    reports.add(report);
+                }
+            }
+
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error obteniendo los reportes para profesor {}", professorId, sqlException);
+            throw new BusinessException("Error obteniendo reportes para profesor", sqlException);
+        }
+
+        return reports;
+    }
+
     private ReportDTO buildReport(ResultSet resultSet) throws SQLException {
         ReportDTO report = new ReportDTO(
             resultSet.getInt("id"),

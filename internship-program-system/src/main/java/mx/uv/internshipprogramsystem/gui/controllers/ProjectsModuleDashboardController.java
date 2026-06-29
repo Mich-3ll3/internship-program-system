@@ -34,6 +34,8 @@ import mx.uv.internshipprogramsystem.logic.dto.ProjectResponsibleDTO;
 import mx.uv.internshipprogramsystem.logic.dto.ProjectActivityDTO;
 import java.util.HashMap;
 import java.util.Map;
+import mx.uv.internshipprogramsystem.logic.managers.SessionManager;
+import mx.uv.internshipprogramsystem.logic.security.Permission;
 
 public class ProjectsModuleDashboardController implements Initializable {
     private static final Logger LOGGER =
@@ -55,6 +57,21 @@ public class ProjectsModuleDashboardController implements Initializable {
 
     @FXML
     private VBox vbxProjectsContainer;
+    
+    @FXML
+    private VBox vbxStudentAssignments;
+    
+    @FXML
+    private javafx.scene.control.TableView<String> tblAssignments;
+    
+    @FXML
+    private javafx.scene.control.TableColumn<String, String> colProjectName;
+    
+    @FXML
+    private javafx.scene.control.TableColumn<String, String> colDate;
+    
+    @FXML
+    private javafx.scene.control.TableColumn<String, String> colAssignmentStatus;
 
     private ProjectManager projectManager;
     private final LinkedOrganizationDAO linkedOrganizationDAO = new LinkedOrganizationDAO();
@@ -66,7 +83,31 @@ public class ProjectsModuleDashboardController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         projectManager = new ProjectManager();
+        
+        List<Permission> userPermissions = SessionManager.getInstance().getPermissions();
+        if (!userPermissions.contains(Permission.REGISTER_PROJECT)) {
+            btnAddProject.setVisible(false);
+            btnAddProject.setManaged(false);
+        }
+        
+        if (userPermissions.contains(Permission.REQUEST_PROJECT)) {
+            vbxStudentAssignments.setVisible(true);
+            vbxStudentAssignments.setManaged(true);
+            setupAssignmentsTable();
+        } else {
+            vbxStudentAssignments.setVisible(false);
+            vbxStudentAssignments.setManaged(false);
+        }
+        
         loadProjects();
+    }
+    
+    private void setupAssignmentsTable() {
+        // Mock data logic for assignments
+        colProjectName.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty("Sistema de Inventario QR"));
+        colDate.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty("2026-06-25"));
+        colAssignmentStatus.setCellValueFactory(data -> new javafx.beans.property.SimpleStringProperty("Aceptada"));
+        tblAssignments.getItems().add("dummy");
     }
 
     public static Optional<ProjectDTO> getSelectedProject() {
@@ -190,6 +231,7 @@ public class ProjectsModuleDashboardController implements Initializable {
         Label lblStatus = (Label) vbxProjectCard.lookup("#lblStatus");
         Button btnEditProject = (Button) vbxProjectCard.lookup("#btnEditProject");
         Button btnViewProject = (Button) vbxProjectCard.lookup("#btnViewProject");
+        Button btnRequestProject = (Button) vbxProjectCard.lookup("#btnRequestProject");
         Label lblInitials = (Label) vbxProjectCard.lookup("#lblInitials");
         StackPane pneImagePlaceholder = (StackPane) vbxProjectCard.lookup("#pneImagePlaceholder");
 
@@ -252,7 +294,35 @@ public class ProjectsModuleDashboardController implements Initializable {
         }
 
         setProjectStatusLabel(lblStatus, project);
-        configureEditButton(btnEditProject, project);
+        
+        List<Permission> userPermissions = SessionManager.getInstance().getPermissions();
+        if (userPermissions.contains(Permission.UPDATE_PROJECT)) {
+            configureEditButton(btnEditProject, project);
+        } else {
+            if (btnEditProject != null) {
+                btnEditProject.setVisible(false);
+                btnEditProject.setManaged(false);
+            }
+        }
+        
+        if (userPermissions.contains(Permission.REQUEST_PROJECT)) {
+            if (btnRequestProject != null) {
+                btnRequestProject.setVisible(true);
+                btnRequestProject.setManaged(true);
+                btnRequestProject.setOnAction(e -> {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Solicitud");
+                    alert.setHeaderText(null);
+                    alert.setContentText("Has solicitado el proyecto: " + project.getName());
+                    alert.showAndWait();
+                });
+            }
+        } else {
+            if (btnRequestProject != null) {
+                btnRequestProject.setVisible(false);
+                btnRequestProject.setManaged(false);
+            }
+        }
 
         if (btnViewProject != null) {
             btnViewProject.setUserData(project);

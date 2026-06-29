@@ -148,5 +148,8 @@ public class InternHomeDashboardController implements Initializable {
         LOGGER.info("Envío de reporte realizado.");
     }
 
-
+    @FXML
+    private void goNotificationsModule(ActionEvent event) {
+        WindowManagerController.changeView("NotificationsDashboard.fxml");
+    }
 }

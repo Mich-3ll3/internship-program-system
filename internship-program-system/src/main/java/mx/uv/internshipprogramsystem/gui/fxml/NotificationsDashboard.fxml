@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.NotificationsDashboardController">
+
+    <left>
+        <VBox alignment="TOP_CENTER" prefWidth="70.0" spacing="20.0" style="-fx-background-color:#1a2744;" BorderPane.alignment="CENTER">
+            <children>
+                <StackPane prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #4a90e2; -fx-background-radius: 10;">
+                    <VBox.margin><Insets top="20.0" /></VBox.margin>
+                    <children>
+                        <Label text="UV" textFill="WHITE">
+                            <font><Font name="System Bold" size="12.0" /></font>
+                        </Label>
+                    </children>
+                </StackPane>
+                <Button fx:id="btnHome" text="⌂" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
+                        onAction="#goHome"/>
+                
+                <Button fx:id="btnNotifications" text="🔔" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: rgba(255,255,255,0.2); -fx-background-radius: 10; -fx-cursor: hand;" />
+
+                <Region VBox.vgrow="ALWAYS" />
+                <Button fx:id="btnExit" text="🚪" textFill="WHITE"
+                        prefHeight="40.0" prefWidth="40.0"
+                        style="-fx-background-color: transparent; -fx-cursor: hand;"
+                        onAction="#logOut">
+                    <VBox.margin><Insets bottom="20.0" /></VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
+            <content>
+                <VBox spacing="20.0">
+                    <padding><Insets bottom="24.0" left="30.0" right="30.0" top="30.0" /></padding>
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Notificaciones" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="24.0" /></font>
+                                        </Label>
+                                        <Label text="Centro de mensajes y avisos" textFill="#6b7280">
+                                            <font><Font size="13.0" /></font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <VBox spacing="10.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; 
+                                     -fx-border-color: #e5e7eb; -fx-border-radius: 12; 
+                                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);">
+                            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
+                            <children>
+                                
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <StackPane prefHeight="36.0" prefWidth="36.0"
+                                                   style="-fx-background-color: #EEEDFE; -fx-background-radius: 10;">
+                                            <children>
+                                                <Label text="🔔" textFill="#7c3aed">
+                                                    <font><Font name="System Bold" size="16.0" /></font>
+                                                </Label>
+                                            </children>
+                                        </StackPane>
+                                        <Label text="Mensajes Recientes" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="16.0" /></font>
+                                        </Label>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Button text="Marcar todas como leídas" onAction="#handleMarkAllRead"
+                                                style="-fx-background-color: transparent; -fx-text-fill: #4a90e2; -fx-cursor: hand; -fx-underline: true;" />
+                                    </children>
+                                </HBox>
+
+                                <ListView fx:id="listNotifications" prefHeight="400.0" 
+                                          style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8;" />
+
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

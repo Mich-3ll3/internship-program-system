@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorDocumentReviewDashboardController">
+
+    <children>
+        <VBox spacing="20.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="30.0" AnchorPane.rightAnchor="30.0" AnchorPane.topAnchor="30.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
+                    <children>
+                        <Button text="← Volver" onAction="#goBack" style="-fx-background-color: #e5e7eb; -fx-text-fill: #374151; -fx-font-weight: bold; -fx-cursor: hand;" />
+                        <VBox>
+                            <children>
+                                <Label text="Revisión de Documento" textFill="#1a2744">
+                                    <font>
+                                        <Font name="System Bold" size="24.0" />
+                                    </font>
+                                </Label>
+                                <Label fx:id="lblDocumentName" text="Documento: " textFill="#6b7280">
+                                    <font>
+                                        <Font size="13.0" />
+                                    </font>
+                                </Label>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                    <children>
+                        <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20;" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Label text="Vista Previa del Documento" style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #1a2744;" />
+                                <Label text="(La previsualización del archivo se mostraría aquí)" style="-fx-font-style: italic; -fx-text-fill: #9ca3af;" />
+                                <Label fx:id="lblDocumentPath" text="Ruta: " wrapText="true" style="-fx-text-fill: #4b5563;" />
+                            </children>
+                        </VBox>
+                        
+                        <VBox spacing="15.0" prefWidth="350.0" style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 20; -fx-border-color: #e5e7eb; -fx-border-radius: 8;">
+                            <children>
+                                <Label text="Calificar Documento" style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #1a2744;" />
+                                
+                                <Label text="Estado:" style="-fx-font-weight: bold; -fx-text-fill: #4b5563;" />
+                                <ComboBox fx:id="cmbStatus" prefWidth="310.0" promptText="Seleccione estado..." style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6;" />
+                                
+                                <Label text="Observaciones:" style="-fx-font-weight: bold; -fx-text-fill: #4b5563;" />
+                                <TextArea fx:id="txtObservations" prefHeight="200.0" wrapText="true" promptText="Escriba las observaciones o retroalimentación aquí..." style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6;" />
+                                
+                                <Button text="Guardar Calificación" onAction="#handleSaveReview" maxWidth="Infinity" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

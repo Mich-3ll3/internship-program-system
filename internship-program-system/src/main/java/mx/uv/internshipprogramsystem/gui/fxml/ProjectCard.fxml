@@ -90,6 +90,16 @@
                                                        -fx-background-radius: 8;
                                                        -fx-padding: 6 12 6 12;
                                                        -fx-cursor: hand;" />
+                                                       
+                                        <Button fx:id="btnRequestProject"
+                                                text="Solicitar"
+                                                style="-fx-background-color: #ecfdf5;
+                                                       -fx-text-fill: #059669;
+                                                       -fx-font-size: 12px;
+                                                       -fx-font-weight: bold;
+                                                       -fx-background-radius: 8;
+                                                       -fx-padding: 6 12 6 12;
+                                                       -fx-cursor: hand;" />
                                     </children>
                                 </HBox>
                             </children>

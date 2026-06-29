@@ -85,7 +85,8 @@
                                 </VBox>
                                 <Region HBox.hgrow="ALWAYS" />
                                 <StackPane prefHeight="40.0" prefWidth="40.0"
-                                           style="-fx-background-color: #1a2744; -fx-background-radius: 50;">
+                                           onMouseClicked="#handleAvatarClick"
+                                           style="-fx-background-color: #1a2744; -fx-background-radius: 50; -fx-cursor: hand;">
                                     <children>
                                         <Label text="SF" textFill="WHITE">
                                             <font><Font name="System Bold" size="13.0" /></font>

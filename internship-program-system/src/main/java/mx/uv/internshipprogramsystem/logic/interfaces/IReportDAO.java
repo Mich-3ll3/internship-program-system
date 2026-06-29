@@ -22,6 +22,8 @@ public interface IReportDAO {
 
     Optional<ReportDTO> getReportByStudent(int studentId) throws BusinessException;
 
+    List<ReportDTO> getReportsByProfessor(int professorId) throws BusinessException;
+
     List<String> getAllProjects() throws BusinessException;
 
     List<PlannedActivityDTO> getProjectActivities(int projectId);

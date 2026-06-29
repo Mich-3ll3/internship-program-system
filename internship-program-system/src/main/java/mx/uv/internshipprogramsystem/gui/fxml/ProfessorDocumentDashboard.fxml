@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #f5f6fa;"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="mx.uv.internshipprogramsystem.gui.controllers.ProfessorDocumentDashboardController">
+
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-background: #f5f6fa;">
+            <content>
+                <VBox spacing="20.0">
+                    <padding><Insets bottom="24.0" left="30.0" right="30.0" top="30.0" /></padding>
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <VBox>
+                                    <children>
+                                        <Label text="Panel del Profesor" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="24.0" /></font>
+                                        </Label>
+                                        <Label text="Revisión de Documentos de Estudiantes" textFill="#6b7280">
+                                            <font><Font size="13.0" /></font>
+                                        </Label>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <VBox spacing="20.0"
+                              style="-fx-background-color: white; -fx-background-radius: 12; 
+                                     -fx-border-color: #e5e7eb; -fx-border-radius: 12; 
+                                     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 0, 4);">
+                            <padding><Insets bottom="24.0" left="24.0" right="24.0" top="24.0" /></padding>
+                            <children>
+                                
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <StackPane prefHeight="36.0" prefWidth="36.0"
+                                                   style="-fx-background-color: #EEEDFE; -fx-background-radius: 10;">
+                                            <children>
+                                                <Label text="D" textFill="#7c3aed">
+                                                    <font><Font name="System Bold" size="16.0" /></font>
+                                                </Label>
+                                            </children>
+                                        </StackPane>
+                                        <Label text="Documentos Subidos" textFill="#1a2744">
+                                            <font><Font name="System Bold" size="16.0" /></font>
+                                        </Label>
+                                    </children>
+                                </HBox>
+
+                                <HBox spacing="10.0" alignment="CENTER_LEFT" style="-fx-padding: 10 0 5 0;">
+                                    <children>
+                                        <Label text="🔍 Filtrar por matrícula:" textFill="#4b5563">
+                                            <font><Font name="System Bold" size="13.0" /></font>
+                                        </Label>
+                                        <TextField fx:id="txtSearchMatricula" promptText="Matrícula..." 
+                                                   prefWidth="200.0"
+                                                   style="-fx-background-color: #f9fafb; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 10;" />
+                                        <Button text="Filtrar" onAction="#handleSearch"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 6 12; -fx-cursor: hand;" />
+                                        <Button text="Limpiar" onAction="#handleClearSearch"
+                                                style="-fx-background-color: transparent; -fx-text-fill: #6b7280; -fx-cursor: hand; -fx-underline: true;" />
+                                    </children>
+                                </HBox>
+
+                                <TableView fx:id="tblDocuments" prefHeight="280.0" 
+                                           style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8;">
+                                    <columns>
+                                        <TableColumn fx:id="colStudent" text="Estudiante" prefWidth="180"/>
+                                        <TableColumn fx:id="colType" text="Tipo de Documento" prefWidth="150"/>
+                                        <TableColumn fx:id="colDate" text="Fecha Subida" prefWidth="130"/>
+                                        <TableColumn fx:id="colStatus" text="Estado" prefWidth="120"/>
+                                    </columns>
+                                </TableView>
+                                
+                                <HBox spacing="12.0">
+                                    <children>
+                                        <Button fx:id="btnReview" onAction="#handleReviewDocument" text="Revisar Documento"
+                                                style="-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+                                        <Button fx:id="btnDownload" onAction="#handleDownloadDocument" text="Descargar"
+                                                style="-fx-background-color: white; -fx-text-fill: #4b5563; -fx-border-color: #d1d5db; -fx-border-radius: 6; -fx-padding: 8 16; -fx-cursor: hand;" />
+                                    </children>
+                                </HBox>
+
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

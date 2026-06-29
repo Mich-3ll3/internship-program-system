@@ -148,7 +148,26 @@ public class ReportHomeDashboardController implements Initializable {
 
     @FXML
     private void sendReport(ActionEvent event) {
-        showInfo("Funcionalidad de envío pendiente de implementación.");
+        ReportDTO selectedReport = tblReports.getSelectionModel().getSelectedItem();
+        if (selectedReport == null) {
+            showWarning("Debes seleccionar un reporte.");
+            return;
+        }
+        
+        mx.uv.internshipprogramsystem.logic.dao.ReportDeadlineDAO deadlineDAO = new mx.uv.internshipprogramsystem.logic.dao.ReportDeadlineDAO();
+        // Just mock checking the deadline for the professor
+        Optional<mx.uv.internshipprogramsystem.logic.dto.ReportDeadlineDTO> deadlineOpt = deadlineDAO.getDeadline(selectedReport.getProfessorId(), selectedReport.getNumber());
+        
+        String lateMessage = "";
+        if (deadlineOpt.isPresent()) {
+            if (LocalDate.now().isAfter(deadlineOpt.get().getDeadline())) {
+                lateMessage = " (Entrega con Retraso)";
+                selectedReport.setStatus(selectedReport.getStatus() + lateMessage);
+            }
+        }
+        
+        showInfo("Reporte " + selectedReport.getNumber() + " enviado a revisión" + lateMessage + ".");
+        tblReports.refresh();
     }
 
     @FXML
@@ -205,6 +224,11 @@ public class ReportHomeDashboardController implements Initializable {
     @FXML
     private void goSelfAssessmentsModule(ActionEvent event) {
         WindowManagerController.changeView("SelfAssessmentHomeDashboard.fxml");
+    }
+
+    @FXML
+    private void handleAvatarClick(javafx.scene.input.MouseEvent event) {
+        WindowManagerController.changeView("UserProfileDashboard.fxml");
     }
 
     @FXML

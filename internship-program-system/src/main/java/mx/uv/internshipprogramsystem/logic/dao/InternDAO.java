@@ -82,6 +82,16 @@ public class InternDAO implements IInternDAO {
     private static final String SELECT_COUNT_INTERNS_QUERY =
         "SELECT COUNT(*) AS total FROM ESTUDIANTE";
 
+    private static final String SELECT_INTERNS_BY_PROFESSOR_QUERY =
+        "SELECT e.matricula, ee_est.NRC AS NRC, ee_est.estado AS estado_experiencia, "
+        + "u.id, u.correo_institucional, u.nombre, u.apellido_paterno, u.apellido_materno, u.activo, "
+        + "'' AS historial_experiencias "
+        + "FROM ESTUDIANTE e "
+        + "JOIN USUARIO u ON e.usuario_id = u.id "
+        + "JOIN EXPERIENCIA_ESTUDIANTES ee_est ON e.usuario_id = ee_est.estudiante_id AND ee_est.estado = 'ACTIVA' "
+        + "JOIN EXPERIENCIA_EDUCATIVA ee ON ee_est.NRC = ee.NRC "
+        + "WHERE ee.profesor_id = ?";
+
     @Override
 
     public boolean create(InternDTO intern, Connection connection) throws BusinessException, DataAccessException {
@@ -248,6 +258,31 @@ public class InternDAO implements IInternDAO {
                 "Error obteniendo la lista de estudiantes.",
                 sqlException
             );
+        }
+
+        return List.copyOf(interns);
+    }
+
+    public List<InternDTO> findByProfessor(int professorId) throws BusinessException, DataAccessException {
+        List<InternDTO> interns = new ArrayList<>();
+
+        try (Connection connection = DatabaseManager.getConnection();
+             PreparedStatement selectStatement =
+                 connection.prepareStatement(SELECT_INTERNS_BY_PROFESSOR_QUERY)) {
+                 
+            selectStatement.setInt(1, professorId);
+            
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    interns.add(buildIntern(resultSet));
+                }
+            }
+        } catch (SQLTransientConnectionException connectionException) {
+            LOGGER.error("Fallo de conexión con la base de datos", connectionException);
+            throw new BusinessException("No se pudo conectar con la base de datos.", connectionException);
+        } catch (SQLException sqlException) {
+            LOGGER.error("Error SQL al obtener la lista de estudiantes por profesor", sqlException);
+            throw new BusinessException("Error obteniendo la lista de estudiantes por profesor.", sqlException);
         }
 
         return List.copyOf(interns);

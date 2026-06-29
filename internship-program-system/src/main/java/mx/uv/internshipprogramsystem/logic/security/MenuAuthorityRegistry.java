@@ -102,6 +102,12 @@ public final class MenuAuthorityRegistry {
                 if ("Inicio".equals(copy.getTitle()) && role != null && user != null) {
                     copy.setFxmlPath("/mx/uv/internshipprogramsystem/gui/fxml/" + role.getFxmlPath(user));
                 }
+                if ("Reportes".equals(copy.getTitle()) && role == UserRole.PROFESSOR) {
+                    copy.setFxmlPath("/mx/uv/internshipprogramsystem/gui/fxml/ProfessorReportDashboard.fxml");
+                }
+                if ("Documentos".equals(copy.getTitle()) && role == UserRole.PROFESSOR) {
+                    copy.setFxmlPath("/mx/uv/internshipprogramsystem/gui/fxml/ProfessorDocumentDashboard.fxml");
+                }
                 available.add(copy);
             }
         }

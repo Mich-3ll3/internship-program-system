@@ -13,5 +13,6 @@ public interface IInternDAO {
     Optional<InternDTO> findByEnrollmentNumber(String enrollmentNumber) throws BusinessException, DataAccessException;
     List<InternDTO> findAll() throws BusinessException, DataAccessException;
     boolean update(InternDTO intern) throws BusinessException, DataAccessException;
+    List<InternDTO> findByProfessor(int professorId) throws BusinessException, DataAccessException;
     int countAll() throws BusinessException, DataAccessException;
 }

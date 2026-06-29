@@ -42,6 +42,21 @@
                                -fx-font-weight: bold;
                                -fx-background-radius: 12;" />
             </HBox>
+            
+            <VBox fx:id="vbxStudentAssignments" spacing="10">
+                <Label text="Mis Asignaciones / Solicitudes"
+                       style="-fx-font-size: 16px;
+                              -fx-font-weight: bold;
+                              -fx-text-fill: #1e293b;" />
+                <javafx.scene.control.TableView fx:id="tblAssignments" prefHeight="150" 
+                           style="-fx-background-color: white; -fx-border-color: #e5e7eb; -fx-border-radius: 8;">
+                    <columns>
+                        <javafx.scene.control.TableColumn fx:id="colProjectName" text="Proyecto" prefWidth="250"/>
+                        <javafx.scene.control.TableColumn fx:id="colDate" text="Fecha de Solicitud" prefWidth="150"/>
+                        <javafx.scene.control.TableColumn fx:id="colAssignmentStatus" text="Estado" prefWidth="150"/>
+                    </columns>
+                </javafx.scene.control.TableView>
+            </VBox>
 
             <ScrollPane fitToWidth="true"
                         hbarPolicy="NEVER">

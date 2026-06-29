@@ -61,6 +61,7 @@
                                         <ProgressBar fx:id="progressProyecto" prefWidth="160.0" progress="0.62" />
                                     </children>
                                 </VBox>
+                                <Button fx:id="btnNotifications" onAction="#goNotificationsModule" text="🔔" style="-fx-font-size: 24; -fx-background-color: transparent; -fx-cursor: hand;" />
                             </children>
                         </HBox>
 
